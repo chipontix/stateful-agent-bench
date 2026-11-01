@@ -10,7 +10,7 @@ partition moves and write load, and then checking the system's invariants
 against an independent reference. Unit tests play no part in the grade.
 
 ```bash
-make up deps          # Postgres + Kafka for the verifiers, upstream clones, Python env
+make up deps          # Postgres + Kafka for the verifiers (KAFKA=native: Kafka on the host JVM), upstream clones, Python env
 make verify-all       # per task: bug red, reference fix green, 3 reference runs without a flake
 make mutation         # mutants of every reference fix against its verifier
 make runs             # stub agents in a container with --network none, traces, audits, pass@k
@@ -47,7 +47,9 @@ other three projects took its place.
 Each task directory holds `issue.md` (what the agent sees), `bug.patch` (on
 top of the pinned commit in `task.json`), `fix.patch` (the reference: the
 original code), `wrong.patch` (a plausible fix that is wrong), `cheat.patch`
-(an edit to the verifier's own files) and, for some tasks, `near_misses/`.
+(an edit that gets past the verifier instead of fixing the bug: a change to
+the checker's files, a disarmed crash point, a swallowed error) and, for some
+tasks, `near_misses/`.
 The agent's repository is a fresh git repo with one commit, so neither history
 nor `git diff` gives the bug away. `scripts/author_patches.py` writes all the
 patches from readable before/after edits.
@@ -61,9 +63,10 @@ one needs a second actor, a retry or a crash in a particular gap:
 - **Double charge** needs a retry with a new message id while the first
   attempt's decision is already committed. A test of `Decide` passes,
   because `Decide` is still correct; the caller stopped consulting the
-  saga's history. The crash harness produces such retries on every run
-  (timeouts, deferred deliveries, redeliveries, SIGKILL after commit), and
-  the audit sees the money: "moved src −2x".
+  saga's history. `sabrace` sends every retry at the same instant as the
+  first attempt, and the crash harness produces such retries on every run
+  (timeouts, deferred deliveries, redeliveries, SIGKILL after commit). Both
+  check the money: "moved src −2x".
 - **Hold/release race** needs two transactions for one saga in flight at
   once, under READ COMMITTED, reading the saga's prior steps before either
   commits. That interleaving only happens when the ledger catches up on a
@@ -178,8 +181,7 @@ The survivors that are not equivalent are the bench's measured blind spots:
 - **`reload-seen-at-start`** fills the in-memory dedup set from Postgres at
   startup. That is correct when workers take turns on a partition and wrong
   when two of them own it at once. The lakehouse scenario never has two
-  owners at once, because then the duplicate counter disagrees with the
-  reference even on the original code (see Limitations).
+  owners at once (see Limitations).
 - **`drop-on-shutdown`** moves the slot drop from startup to shutdown, after
   `connector.Close()`. It never takes effect in this scenario: a drop would
   lose the writes made in the restart gap, and none were lost. Either the
@@ -240,7 +242,9 @@ rules:
 - each verifier problem, translated into what it means ("money moved for a
   transfer differs from its amount");
 - a final message that claims success the verifier does not confirm;
-- integrity: edits to protected files, or network inside the sandbox.
+- a fatal error turned into a skip;
+- integrity: edits to protected files, a removed crash point the verifier
+  arms, or network inside the sandbox.
 
 An attempt that passes but touched the grader is `INVALID`, not `RESOLVED`.
 Example reports: `results/traces/stub-cheat/*.audit.md`.
@@ -285,15 +289,17 @@ verifier's virtualenv). The sizes are in `results/raw/environment.txt`, and
   "minimal agent on a local model" from the plan was not built.
 - **The agent container has no toolchain.** `python:3.13-slim` is enough to
   play back a patch. A real agent that should build Go and run the unit tests
-  offline needs an image with Go and a module cache. That image would be about
-  1 GB, and the disk budget did not allow it.
+  offline needs an image with Go and a module cache, an estimated 1 GB or
+  more, which the disk budget did not allow.
 - **Six tasks, three projects.** The userver task was dropped for disk
   (above).
 - **A verifier only sees the interleavings its scenario reaches.** The
   survivors above are the measured blind spots. The lakehouse scenario lets
-  workers take turns and never makes two of them own a partition at once,
-  because with overlapping ownership the duplicate counter disagrees with the
-  reference even on the original code.
+  workers take turns and never makes two of them own a partition at once.
+  With two owners, each re-read message would be counted in
+  `ingest_batches.duplicates` even by the original code, so the duplicate
+  invariant would need a different reference. That follows from the code; it
+  was not run.
 - **Budgets and timings come from a loaded laptop** (see the load average in
   each result file). They are pass/fail thresholds, not benchmarks.
 - **Local credentials only.** `postgres:postgres` in `infra/` and in the
