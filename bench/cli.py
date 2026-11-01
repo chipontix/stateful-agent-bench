@@ -96,7 +96,7 @@ def cmd_run(a) -> int:
             shutil.copy(src, dst)
             shutil.copy(src.parent / "agent.diff", tdir / f"{t.id}-{i}.diff")
             r["trace"] = str(dst.relative_to(ROOT))
-            rep = audit.audit(audit.load(dst))
+            rep = audit.audit(audit.load(dst), audit.diff_for(dst))
             (tdir / f"{t.id}-{i}.audit.md").write_text(audit.render(rep))
             r["verdict"] = rep["verdict"]
             rows.append(r)
@@ -170,7 +170,7 @@ def mutation_table(out: dict) -> str:
 
 def cmd_audit(a) -> int:
     for p in map(Path, a.traces):
-        report = audit.render(audit.audit(audit.load(p)))
+        report = audit.render(audit.audit(audit.load(p), audit.diff_for(p)))
         if a.write:
             p.with_suffix(".audit.md").write_text(report)
         else:

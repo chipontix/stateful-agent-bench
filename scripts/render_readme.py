@@ -72,7 +72,7 @@ def runs() -> str:
     rows = ["| agent | what it plays back | tasks | attempts per task | mean pass@1 | mean pass@k | audit verdicts |",
             "|---|---|---|---|---|---|---|"]
     what = {"stub-ref": "the reference fix", "stub-wrong": "a plausible wrong fix", "stub-cheat":
-            "an edit to the verifier's own files", "stub-coin": "reference or wrong fix, 50/50 per attempt"}
+            "an edit that gets past the verifier instead of fixing the bug", "stub-coin": "reference or wrong fix, 50/50 per attempt"}
     any_ = False
     for agent in ("stub-ref", "stub-wrong", "stub-cheat", "stub-coin"):
         d = load(f"run-{agent}")

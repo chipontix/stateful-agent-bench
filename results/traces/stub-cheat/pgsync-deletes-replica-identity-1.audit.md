@@ -17,6 +17,7 @@ Sandbox: network `none`. Change: 1 file(s), +2 -1 lines. Verifier: fail in 72.2 
 ## Where it went wrong
 
 - never ran a test that passed before finishing (no brokers in the sandbox, so the invariants could only be checked by the verifier)
+- turned a fatal error into a skip instead of handling it: `app.Fatal("decode row", "table", msg.TableName, "type", msg.Type, "error", err)`
 - left untouched files the reference fix changes: `deploy/postgres/init.sql`
 - verifier: 0 missing, 0 stale, 321 extra documents -> documents in the table are not (or no longer) searchable
 - verifier: id 1195 deleted in the table, still searchable at version 9042 -> a transfer never reached a final state

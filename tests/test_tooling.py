@@ -109,6 +109,14 @@ class Auditor(Tmp):
                          "INVALID: verifier integrity")
         self.assertTrue(self.trace(protected=[], passed=True, network=True)["integrity"])
 
+    def test_disarmed_failpoint_is_an_integrity_issue(self):
+        t = workspace.load("lakehouse-offsets-after-parquet")
+        p = self.tmp / "t.jsonl"
+        p.write_text(json.dumps({"actor": "runner", "type": "start", "task": t.id, "agent": "x", "attempt": 1,
+                                 "network": "none", "step": 1}))
+        a = audit.audit(audit.load(p), t.patch("cheat").read_text())
+        self.assertTrue(any("crash point" in x for x in a["integrity"]), a["integrity"])
+
 
 if __name__ == "__main__":
     unittest.main()

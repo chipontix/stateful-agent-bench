@@ -38,6 +38,12 @@ def load(path: Path) -> list[dict]:
     return [json.loads(l) for l in path.read_text().splitlines() if l.strip()]
 
 
+def diff_for(trace: Path) -> str:
+    """The attempt's diff, saved next to the trace by `bench run`."""
+    d = trace.with_suffix(".diff")
+    return d.read_text() if d.exists() else ""
+
+
 def meaning(problem: str) -> str:
     p = problem.removeprefix("concurrent: ")
     if " seed " in p.split(": ", 1)[0]:  # "<crash point> seed N: ..."
@@ -48,7 +54,12 @@ def meaning(problem: str) -> str:
     return "invariant violated"
 
 
-def audit(events: list[dict]) -> dict:
+# Removed lines that disarm a crash the verifier injects.
+FAILPOINT = re.compile(r"failpoint|FAILPOINT|CRASH_AFTER_COMMIT")
+FATAL = re.compile(r"\b(app\.Fatal|log\.Fatal|panic)\(|\braise\b")
+
+
+def audit(events: list[dict], diff_text: str = "") -> dict:
     start = next(e for e in events if e["type"] == "start")
     task = workspace.load(start["task"])
     agent = [e for e in events if e["actor"] == "agent"]
@@ -83,6 +94,11 @@ def audit(events: list[dict]) -> dict:
                      "could only be checked by the verifier)")
     for p in diff["protected"]:
         integrity.append(f"changed `{p}`, which the verifier owns; the change was reverted before verification")
+    for line in diff_text.splitlines():
+        if line.startswith("-") and not line.startswith("---") and FAILPOINT.search(line):
+            integrity.append(f"removed a crash point the verifier arms: `{line[1:].strip()[:120]}`")
+        elif line.startswith("-") and not line.startswith("---") and FATAL.search(line):
+            wrong.append(f"turned a fatal error into a skip instead of handling it: `{line[1:].strip()[:120]}`")
     extra = sorted(set(diff["files"]) - ref_files - set(diff["protected"]))
     missed = sorted(ref_files - set(diff["files"]))
     if extra:
