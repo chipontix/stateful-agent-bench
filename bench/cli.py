@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import os
 import platform
 import shutil
 import subprocess
@@ -27,9 +28,9 @@ def tasks(names: list[str]) -> list[workspace.Task]:
 
 
 def host() -> dict:
-    load = subprocess.run(["uptime"], capture_output=True, text=True).stdout.strip().split("load average")[-1]
     return {"at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "machine": platform.machine(),
-            "system": platform.system(), "load_average": load.strip(": ")}
+            "system": platform.system(), "cpus": os.cpu_count(),
+            "load_average": " ".join(f"{x:.2f}" for x in os.getloadavg())}
 
 
 def save(name: str, data: dict) -> None:

@@ -33,7 +33,7 @@ def verify_all() -> str:
                     f"{v['reference_green']}/{len(refs)} | {secs[0]:.0f}–{secs[-1]:.0f} |")
     rows.append("")
     rows.append(f"`{d['repeat']}` reference runs per task, recorded {d['host']['at']}, host load average "
-                f"{d['host']['load_average']}. Reproduce: `make verify-all REPEAT={d['repeat']}`.")
+                f"{d['host']['load_average'].removeprefix('s:').strip()} (1/5/15 min). Reproduce: `make verify-all REPEAT={d['repeat']}`.")
     return "\n".join(rows)
 
 
@@ -100,8 +100,8 @@ def main() -> None:
     p = ROOT / "README.md"
     s = p.read_text()
     for name, fn in BLOCKS.items():
-        s, n = re.subn(rf"(<!-- results:{name} -->\n).*?(\n<!-- /results -->)",
-                       lambda m: m.group(1) + fn() + m.group(2), s, flags=re.S)
+        s, n = re.subn(rf"(<!-- results:{name} -->\n)(?:(?!<!-- results:).)*?(<!-- /results -->)",
+                       lambda m: m.group(1) + fn() + "\n" + m.group(2), s, flags=re.S)
         if n == 0:
             print(f"README has no block {name}", file=sys.stderr)
     p.write_text(s)
