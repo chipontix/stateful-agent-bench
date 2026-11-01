@@ -4,7 +4,7 @@
 # settings as the compose service. Usage: infra/kafka-native.sh start|stop
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
-k=$root/.cache/kafka data=$root/.cache/kafka-data port=${SAB_KAFKA_PORT:-29192}
+k=$root/.cache/kafka data=$root/.cache/kafka-data port=${SAB_KAFKA_PORT:-23092}
 case ${1:-start} in
 start)
   if [ ! -x "$k/bin/kafka-server-start.sh" ]; then

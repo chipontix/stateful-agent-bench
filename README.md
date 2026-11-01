@@ -10,7 +10,7 @@ partition moves and write load, and then checking the system's invariants
 against an independent reference. Unit tests play no part in the grade.
 
 ```bash
-make up deps          # Postgres + Kafka for the verifiers (KAFKA=native: Kafka on the host JVM), upstream clones, Python env
+make up KAFKA=native deps  # Postgres in Docker, Kafka on the host JVM (the stand's requirement), upstream clones, Python env
 make verify-all       # per task: bug red, reference fix green, 3 reference runs without a flake
 make mutation         # mutants of every reference fix against its verifier
 make runs             # stub agents in a container with --network none, traces, audits, pass@k
@@ -259,10 +259,22 @@ Example reports: `results/traces/stub-cheat/*.audit.md`.
   winner's file is complete and the loser exits non-zero. The verifier's first
   draft hit this on the reference code. The lakehouse scenario now restarts
   the crashed worker alone first, because this race is not what the tasks
-  test. A fix upstream: a per-process tmp name, or recovery under the
-  advisory lock `apply_schema` already takes.
+  test. Fixed upstream in
+  [e382864](https://github.com/chipontix/events-lakehouse/commit/e382864)
+  (a unique tmp name via `mkstemp`, with a regression test). The tasks here
+  stay pinned to the commit before it.
 
 ## Infrastructure
+
+**Requirement of the stand: Kafka runs on the host JVM** (`make up
+KAFKA=native`, Java 17+ on the host). `infra/compose.yaml` can run it in
+Docker too, and CI does that, but on a shared Docker VM it is not reliable
+enough for verification (below). Ports are 23000+: Postgres 23432, Kafka
+23092 (controller 23093), the ledger crash harness 23100+. The stand takes
+`SAB_PG_PORT` and `SAB_KAFKA_PORT`; the verifiers take `SAB_PG_URL`,
+`SAB_KAFKA` and `SAB_PORT_BASE`. On a machine where several projects share
+one Docker VM, bring the stand up only while you hold the shared queue lock,
+and bring it down afterwards.
 
 `infra/compose.yaml` runs Postgres 17.6 (logical decoding on) and Kafka 3.9.1
 (KRaft, single node), with the same image tags the upstream projects use, so

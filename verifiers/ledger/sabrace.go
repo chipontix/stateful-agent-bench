@@ -51,7 +51,7 @@ type sagaRun struct {
 }
 
 func main() {
-	admin := flag.String("admin", "postgres://postgres:postgres@localhost:25432/postgres?sslmode=disable", "")
+	admin := flag.String("admin", "postgres://postgres:postgres@localhost:23432/postgres?sslmode=disable", "")
 	out := flag.String("out", "", "result JSON")
 	n := flag.Int("sagas", 600, "")
 	inflight := flag.Int("inflight", 24, "sagas being handled at once")

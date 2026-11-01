@@ -8,7 +8,7 @@
 set -uo pipefail
 repo=$1 out=$2 points=$3
 here=$(cd "$(dirname "$0")" && pwd)
-pg=${SAB_PG_URL:-postgres://postgres:postgres@localhost:25432/postgres?sslmode=disable}
+pg=${SAB_PG_URL:-postgres://postgres:postgres@localhost:23432/postgres?sslmode=disable}
 cd "$repo"
 mkdir -p cmd/sabrace && cp "$here/sabrace.go" cmd/sabrace/main.go
 # The harness hard-codes ports 21000+; take them from the environment so the
@@ -21,7 +21,7 @@ fi
 if [ "${SAB_CHAOS_ONLY:-}" = 1 ]; then echo '{"problems": [], "metrics": {"skipped": true}}' > race.json
 else ./bin/sabrace -admin "$pg" -seed "${SAB_SEED:-1}" -out race.json > race.log 2>&1; fi
 n=$(tr ',' '\n' <<<"$points" | wc -l | tr -d ' ')
-CHAOS_PORT_BASE=${SAB_PORT_BASE:-31000} KAFKA_BROKERS=${SAB_KAFKA:-localhost:29192} PG_ADMIN_URL=$pg \
+CHAOS_PORT_BASE=${SAB_PORT_BASE:-23100} KAFKA_BROKERS=${SAB_KAFKA:-localhost:23092} PG_ADMIN_URL=$pg \
   ./bin/ledgersaga chaos -points "$points" -seeds "${SAB_LEDGER_SEEDS:-1}" -parallel "$n" \
     -out chaos.md -json chaos.json -logs raw > chaos.log 2>&1
 python3 "$here/summary.py" race.json chaos.json "$out"

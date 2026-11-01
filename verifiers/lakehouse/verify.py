@@ -41,13 +41,13 @@ from lakehouse.generator import Spec  # noqa: E402
 
 N = int(os.environ.get("SAB_LAKEHOUSE_N", 60_000))
 SEED = int(os.environ.get("SAB_SEED", 1))
-BOOTSTRAP = os.environ.get("SAB_KAFKA", "localhost:29192")
-ADMIN_DSN = os.environ.get("SAB_PG", "postgresql://postgres:postgres@localhost:25432/postgres")
+BOOTSTRAP = os.environ.get("SAB_KAFKA", "localhost:23092")
+ADMIN_DSN = os.environ.get("SAB_PG_URL", "postgresql://postgres:postgres@localhost:23432/postgres")
 BUDGET_MSG_S = float(os.environ.get("SAB_BUDGET_MSG_S", 1500))
 
 name = "lh_" + uuid.uuid4().hex[:10]
 work = OUT.parent / (OUT.stem + ".work")
-env = dict(os.environ, KAFKA_BOOTSTRAP=BOOTSTRAP, PG_DSN=ADMIN_DSN.rsplit("/", 1)[0] + "/" + name, TOPIC=name,
+env = dict(os.environ, KAFKA_BOOTSTRAP=BOOTSTRAP, PG_DSN=ADMIN_DSN.split("?")[0].rsplit("/", 1)[0] + "/" + name, TOPIC=name,
            LAKE_DIR=str(work / "lake"), PYTHONPATH=str(REPO / "src"))
 env.pop("LAKEHOUSE_CRASH_AFTER_COMMIT", None)
 problems: list[str] = []

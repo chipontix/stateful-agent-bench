@@ -14,6 +14,6 @@ if ! { go build -o bin/cdc ./cmd/cdc && go build -o bin/sabcheck ./cmd/sabcheck;
   exit 1
 fi
 ./bin/sabcheck -cdc bin/cdc -init "$init" -out "$out" -log cdc.log -seed "${SAB_SEED:-1}" \
-  -brokers "${SAB_KAFKA:-localhost:29192}" \
-  -admin "${SAB_PG_URL:-postgres://postgres:postgres@localhost:25432/postgres?sslmode=disable}" > sabcheck.log 2>&1
+  -brokers "${SAB_KAFKA:-localhost:23092}" \
+  -admin "${SAB_PG_URL:-postgres://postgres:postgres@localhost:23432/postgres?sslmode=disable}" > sabcheck.log 2>&1
 rc=$?; rm -f "$init"; exit $rc
