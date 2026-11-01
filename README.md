@@ -223,11 +223,57 @@ trace records the result.
 |---|---|---|---|---|---|---|
 | `stub-ref` | the reference fix | 6 | 1 | 1.00 | pass@1 1.00 | 6× RESOLVED |
 | `stub-wrong` | a plausible wrong fix | 6 | 1 | 0.00 | pass@1 0.00 | 6× NOT RESOLVED |
-| `stub-cheat` | an edit that gets past the verifier instead of fixing the bug | 6 | 1 | 0.00 | pass@1 0.00 | 1× NOT RESOLVED, 5× NOT RESOLVED, with an attempt to game the verifier |
+| `stub-cheat` | an edit that gets past the verifier instead of fixing the bug | 6 | 1 | 0.00 | pass@1 0.00 | 1× NOT RESOLVED, 5× NOT RESOLVED, and changed what the verifier relies on |
 | `stub-coin` | reference or wrong fix, 50/50 per attempt | 6 | 4 | 0.58 | pass@2 0.72 | 10× NOT RESOLVED, 14× RESOLVED |
+| `llm-qwen-coder-1.5b` | its own edits: Qwen2.5-Coder-1.5B-Instruct Q4_K_M on llama.cpp, 20 tool calls max | 6 | 5 | 0.00 | pass@5 0.00 | 28× NOT RESOLVED, 2× NOT RESOLVED, and changed what the verifier relies on |
 
 Reproduce: `make runs`; traces, diffs and audit reports: `results/traces/<agent>/`.
 <!-- /results -->
+
+### Local model agent
+
+`agents/llm.py` is a minimal tool-using agent. It sees the bug report and the
+file list, then gets 20 turns. In each turn the model answers with one JSON
+call to one of six tools: `list_files`, `read_file`, `search`, `replace`,
+`write_file` or `finish`. The tool's output goes back as the next message.
+The agent's only crutch is a loop guard: a call repeated verbatim is dropped
+from the history, and the next call runs at a higher temperature. The model
+is Qwen2.5-Coder-1.5B-Instruct (Q4_K_M GGUF, 1.1 GB, in the standard Hugging
+Face cache), served by llama.cpp's `llama-server` on the host. The container
+still has `--network none`. Each request is written to a mounted directory,
+and `bench/bridge.py` answers it on the host. Five attempts per task, each
+with its own seed; verification runs separately, under the Docker queue
+lock (`--phase agent`, then `--phase verify`). An attempt that changed
+nothing is the buggy snapshot, which verify-all already shows red, so it is
+recorded as `no-change` without running the verifier again.
+
+<!-- results:llm -->
+| what the attempts did | attempts |
+|---|---|
+| passed the verifier | 0 of 30 |
+| changed nothing | 22 of 30 |
+| read the file the reference fix changes | 4 of 30 |
+| changed that file | 1 of 30 |
+| changed only other files (README, new placeholder files, comments) | 7 of 30 |
+| changed a protected file or removed the failpoint | 2 of 30 |
+| called finish | 6 of 30 |
+| ran out of its 20 steps | 24 of 30 |
+| repeated a call verbatim at least once | 26 of 30 |
+
+514 model calls, 52684 completion tokens in all, recorded 2026-11-01T10:18:01Z. Reproduce: `make runs-llm` then `python3 scripts/llm_analysis.py`; per attempt: `results/llm-analysis.json`, traces and audits: `results/traces/llm-qwen-coder-1.5b/`.
+<!-- /results -->
+
+pass@1 and pass@5 are 0 on all six tasks (table above). The traces show why.
+Most attempts never open the file with the bug: the model searches for words
+from the report, opens the harness or the README, and repeats itself until
+its steps run out. The few edits are to the wrong files: a reworded comment,
+a new placeholder file, the README. The two attempts the auditor flags
+changed what the verifier relies on. One rewrote `ingest.py` wholesale and
+lost the failpoint; the other edited `reference.py`, which the verifier then
+put back. Neither got through. A 1.5B model is far below what these tasks
+need, and that is the expected result: the number shows that the runner, the
+bridge, the verifiers and the auditor work end to end on a real agent, not
+how good an agent can be.
 
 ### Trace auditor
 
@@ -299,9 +345,8 @@ verifier's virtualenv). The sizes are in `results/raw/environment.txt`, and
 
 ## Limitations and what is not done
 
-- **The agents are stubs.** No model was run against these tasks, and the
-  pass@k numbers come from stubs whose outcome is known in advance. The
-  "minimal agent on a local model" from the plan was not built.
+- **The only real agent is a 1.5B local model**, and it solves nothing (above).
+  No larger model was run: the plan capped the model at 1.5 GB of disk.
 - **The agent container has no toolchain.** `python:3.13-slim` is enough to
   play back a patch. A real agent that should build Go and run the unit tests
   offline needs an image with Go and a module cache, an estimated 1 GB or

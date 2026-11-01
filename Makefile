@@ -5,7 +5,7 @@ PY := python3
 KAFKA ?= docker   # docker | native (host JVM, for a Docker VM too loaded to run a broker)
 REPEAT ?= 3
 
-.PHONY: test deps up down verify-all mutation runs audit clean
+.PHONY: test deps up down verify-all mutation runs runs-llm audit clean
 
 test:              ## tooling self-checks: no brokers, no Docker
 	$(PY) -m unittest discover -s tests -v
@@ -35,6 +35,11 @@ runs: deps         ## stub agents in the no-network container -> results/run-*.j
 	$(PY) -m bench run --agent stub-wrong -n 1
 	$(PY) -m bench run --agent stub-cheat -n 1
 	$(PY) -m bench run --agent stub-coin -n 4 -k 2
+
+runs-llm: deps     ## the local-model agent (llama-server + model in the HF cache), 5 attempts per task
+	$(PY) -m bench run --agent llm-qwen-coder-1.5b -n 5 -k 5 --phase agent
+	$(PY) -m bench run --agent llm-qwen-coder-1.5b -n 5 -k 5 --phase verify
+	$(PY) scripts/llm_analysis.py
 
 clean:             ## work dirs and caches (not results/)
 	rm -rf work .cache/go-build

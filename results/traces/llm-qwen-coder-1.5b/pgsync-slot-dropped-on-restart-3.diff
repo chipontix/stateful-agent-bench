@@ -1,0 +1,8 @@
+diff --git a/cmd/cdc/cdc.go b/cmd/cdc/cdc.go
+new file mode 100644
+index 0000000..0c717aa
+--- /dev/null
++++ b/cmd/cdc/cdc.go
+@@ -0,0 +1 @@
++// Placeholder content for cmd/cdc/cdc.go
+\ No newline at end of file

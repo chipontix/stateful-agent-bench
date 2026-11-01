@@ -1,0 +1,26 @@
+diff --git a/README.md b/README.md
+index 504d428..622fcb3 100644
+--- a/README.md
++++ b/README.md
+@@ -28,7 +28,7 @@ ports 16092 for Kafka and 16432 for Postgres, overridable with `KAFKA_PORT`,
+ 
+ | claim | evidence |
+ |---|---|
+-| Every output equals the independently computed expectation | `test_two_phases_with_late_events_match_the_reference`: half the stream, `dbt run`, the other half, `dbt run`. Postgres `events`, the Parquet lake and `fct_events` match the reference row for row (count + order-independent digest of all columns); `agg_daily_events` and `daily_revenue` match key for key; quarantine counts per reason and the duplicate count match. Runs at 50k in `make test` and at 1M in `make test-1m` / every bench run |
++| Every output equals the independently computed expectation | `test_two_phases_with_late_events_match_the_reference`: half the stream, `dbt run`, the other halff, `dbt run`. Postgres `events`, the Parquet lake and `fct_events` match the reference row for row (count + order-independent digest of all columns); `agg_daily_events` and `daily_revenue` match key for key; quarantine counts per reason and the duplicate count match. Runs at 50k in `make test` and at 1M in `make test-1m` / every bench run |
+ | …at 1M messages with duplicates and late events | 1,000,000 messages → 944,774 events, 50,250 duplicates dropped, 4,976 quarantined; equal to the reference in all 6 bench runs ([`results/bench.jsonl`](results/bench.jsonl)) and in `make test-1m` ([`results/raw/test-1m-*.log`](results/raw)) |
+ | The reference is independent | `reference.py` reads only the generator's labels (event / duplicate / bad + reason, the canonical event). No Avro, Kafka, contract code or SQL |
+ | Late events land in already aggregated days and the aggregates are still right | the second phase carries late events for dates the first `dbt run` already built (`test_late_events_reach_dates_the_first_half_already_covered` guards that the test really exercises this) |
+diff --git a/src/lakehouse/reference.py b/src/lakehouse/reference.py
+index 1b4bcde..71b6907 100644
+--- a/src/lakehouse/reference.py
++++ b/src/lakehouse/reference.py
+@@ -37,7 +37,7 @@ class Result:
+ 
+     def add_row(self, *row) -> None:
+         self.events += 1
+-        self.digest = (self.digest + row_hash(*row)) & MASK
++        self.digest = (self.digest + row_hash(*row)) & (self.digest >> 1)
+ 
+ 
+ def expected(spec: Spec) -> Result:

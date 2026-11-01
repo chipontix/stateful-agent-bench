@@ -106,7 +106,7 @@ class Auditor(Tmp):
         self.assertTrue(any("lake holds a different number" in w for w in a["wrong"]))
         self.assertTrue(any("without reading" in w for w in a["wrong"]))
         self.assertEqual(self.trace(protected=["src/lakehouse/verify.py"], passed=True)["verdict"],
-                         "INVALID: verifier integrity")
+                         "INVALID: changed what the verifier relies on")
         self.assertTrue(self.trace(protected=[], passed=True, network=True)["integrity"])
 
     def test_disarmed_failpoint_is_an_integrity_issue(self):

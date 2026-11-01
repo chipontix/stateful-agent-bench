@@ -1,0 +1,15 @@
+diff --git a/internal/pipeline/indexer/indexer.go b/internal/pipeline/indexer/indexer.go
+new file mode 100644
+index 0000000..07ea6ab
+--- /dev/null
++++ b/internal/pipeline/indexer/indexer.go
+@@ -0,0 +1,9 @@
++import (
++	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
++	"github.com/your-project/your-package/internal/catalog/event"
++)
++
++func handleTombstone(topic string, partition int, key []byte, value []byte) error {
++	// Handle tombstone of the deleted product
++	return nil
++}

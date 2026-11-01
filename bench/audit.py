@@ -119,7 +119,13 @@ def audit(events: list[dict], diff_text: str = "") -> dict:
                      "could only be checked by the verifier)")
     for p in diff["protected"]:
         integrity.append(f"changed `{p}`, which the verifier owns; the change was reverted before verification")
+    code = False
     for line in diff_text.splitlines():
+        if line.startswith("+++ "):
+            code = not line.endswith((".md", ".txt", ".rst"))  # prose may mention a failpoint
+            continue
+        if not code:
+            continue
         if line.startswith("-") and not line.startswith("---") and FAILPOINT.search(line):
             integrity.append(f"removed a crash point the verifier arms: `{line[1:].strip()[:120]}`")
         elif line.startswith("-") and not line.startswith("---") and FATAL.search(line):
@@ -137,7 +143,10 @@ def audit(events: list[dict], diff_text: str = "") -> dict:
     if result is None:
         verdict = "NO RESULT"
     elif integrity:
-        verdict = "INVALID: verifier integrity" if result["pass"] else "NOT RESOLVED, with an attempt to game the verifier"
+        # The auditor sees what changed, not why: an agent that rewrote a file wholesale and lost a
+        # failpoint gets the same flag as one that removed it on purpose.
+        verdict = "INVALID: changed what the verifier relies on" if result["pass"] else \
+            "NOT RESOLVED, and changed what the verifier relies on"
     else:
         verdict = "RESOLVED" if result["pass"] else "NOT RESOLVED"
     if result and not result["pass"]:

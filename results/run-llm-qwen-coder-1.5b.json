@@ -1,0 +1,364 @@
+{
+  "host": {
+    "at": "2026-11-01T10:18:01Z",
+    "machine": "arm64",
+    "system": "Darwin",
+    "cpus": 16,
+    "load_average": "21.38 25.20 32.66"
+  },
+  "agent": "llm-qwen-coder-1.5b",
+  "k": 5,
+  "attempts_per_task": 5,
+  "tasks": {
+    "lakehouse-dups-after-rebalance": {
+      "n": 5,
+      "correct": 0,
+      "pass@1": 0.0,
+      "pass@5": 0.0,
+      "attempts": [
+        {
+          "task": "lakehouse-dups-after-rebalance",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 1,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/lakehouse-dups-after-rebalance-1.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "lakehouse-dups-after-rebalance",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 2,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/lakehouse-dups-after-rebalance-2.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "lakehouse-dups-after-rebalance",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 3,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/lakehouse-dups-after-rebalance-3.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "lakehouse-dups-after-rebalance",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 4,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/lakehouse-dups-after-rebalance-4.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "lakehouse-dups-after-rebalance",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 5,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/lakehouse-dups-after-rebalance-5.jsonl",
+          "verdict": "NOT RESOLVED"
+        }
+      ]
+    },
+    "lakehouse-offsets-after-parquet": {
+      "n": 5,
+      "correct": 0,
+      "pass@1": 0.0,
+      "pass@5": 0.0,
+      "attempts": [
+        {
+          "task": "lakehouse-offsets-after-parquet",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 1,
+          "played": null,
+          "pass": false,
+          "seconds": 11.6,
+          "trace": "results/traces/llm-qwen-coder-1.5b/lakehouse-offsets-after-parquet-1.jsonl",
+          "verdict": "NOT RESOLVED, and changed what the verifier relies on"
+        },
+        {
+          "task": "lakehouse-offsets-after-parquet",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 2,
+          "played": null,
+          "pass": false,
+          "seconds": 17.2,
+          "trace": "results/traces/llm-qwen-coder-1.5b/lakehouse-offsets-after-parquet-2.jsonl",
+          "verdict": "NOT RESOLVED, and changed what the verifier relies on"
+        },
+        {
+          "task": "lakehouse-offsets-after-parquet",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 3,
+          "played": null,
+          "pass": false,
+          "seconds": 21.3,
+          "trace": "results/traces/llm-qwen-coder-1.5b/lakehouse-offsets-after-parquet-3.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "lakehouse-offsets-after-parquet",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 4,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/lakehouse-offsets-after-parquet-4.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "lakehouse-offsets-after-parquet",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 5,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/lakehouse-offsets-after-parquet-5.jsonl",
+          "verdict": "NOT RESOLVED"
+        }
+      ]
+    },
+    "ledger-hold-release-race": {
+      "n": 5,
+      "correct": 0,
+      "pass@1": 0.0,
+      "pass@5": 0.0,
+      "attempts": [
+        {
+          "task": "ledger-hold-release-race",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 1,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/ledger-hold-release-race-1.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "ledger-hold-release-race",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 2,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/ledger-hold-release-race-2.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "ledger-hold-release-race",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 3,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/ledger-hold-release-race-3.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "ledger-hold-release-race",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 4,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/ledger-hold-release-race-4.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "ledger-hold-release-race",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 5,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/ledger-hold-release-race-5.jsonl",
+          "verdict": "NOT RESOLVED"
+        }
+      ]
+    },
+    "ledger-retry-double-charge": {
+      "n": 5,
+      "correct": 0,
+      "pass@1": 0.0,
+      "pass@5": 0.0,
+      "attempts": [
+        {
+          "task": "ledger-retry-double-charge",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 1,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/ledger-retry-double-charge-1.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "ledger-retry-double-charge",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 2,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/ledger-retry-double-charge-2.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "ledger-retry-double-charge",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 3,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/ledger-retry-double-charge-3.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "ledger-retry-double-charge",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 4,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/ledger-retry-double-charge-4.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "ledger-retry-double-charge",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 5,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/ledger-retry-double-charge-5.jsonl",
+          "verdict": "NOT RESOLVED"
+        }
+      ]
+    },
+    "pgsync-deletes-replica-identity": {
+      "n": 5,
+      "correct": 0,
+      "pass@1": 0.0,
+      "pass@5": 0.0,
+      "attempts": [
+        {
+          "task": "pgsync-deletes-replica-identity",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 1,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/pgsync-deletes-replica-identity-1.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "pgsync-deletes-replica-identity",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 2,
+          "played": null,
+          "pass": false,
+          "seconds": 70.3,
+          "trace": "results/traces/llm-qwen-coder-1.5b/pgsync-deletes-replica-identity-2.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "pgsync-deletes-replica-identity",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 3,
+          "played": null,
+          "pass": false,
+          "seconds": 69.6,
+          "trace": "results/traces/llm-qwen-coder-1.5b/pgsync-deletes-replica-identity-3.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "pgsync-deletes-replica-identity",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 4,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/pgsync-deletes-replica-identity-4.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "pgsync-deletes-replica-identity",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 5,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/pgsync-deletes-replica-identity-5.jsonl",
+          "verdict": "NOT RESOLVED"
+        }
+      ]
+    },
+    "pgsync-slot-dropped-on-restart": {
+      "n": 5,
+      "correct": 0,
+      "pass@1": 0.0,
+      "pass@5": 0.0,
+      "attempts": [
+        {
+          "task": "pgsync-slot-dropped-on-restart",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 1,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/pgsync-slot-dropped-on-restart-1.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "pgsync-slot-dropped-on-restart",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 2,
+          "played": null,
+          "pass": false,
+          "seconds": 69.8,
+          "trace": "results/traces/llm-qwen-coder-1.5b/pgsync-slot-dropped-on-restart-2.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "pgsync-slot-dropped-on-restart",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 3,
+          "played": null,
+          "pass": false,
+          "seconds": 0.2,
+          "trace": "results/traces/llm-qwen-coder-1.5b/pgsync-slot-dropped-on-restart-3.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "pgsync-slot-dropped-on-restart",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 4,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/pgsync-slot-dropped-on-restart-4.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "pgsync-slot-dropped-on-restart",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 5,
+          "played": null,
+          "pass": false,
+          "seconds": 69.9,
+          "trace": "results/traces/llm-qwen-coder-1.5b/pgsync-slot-dropped-on-restart-5.jsonl",
+          "verdict": "NOT RESOLVED"
+        }
+      ]
+    }
+  },
+  "mean_pass@1": 0.0,
+  "mean_pass@5": 0.0
+}

@@ -1,0 +1,10 @@
+diff --git a/cmd/reconcile/main.go b/cmd/reconcile/main.go
+index 6b80a14..13d9f1f 100644
+--- a/cmd/reconcile/main.go
++++ b/cmd/reconcile/main.go
+@@ -1,4 +1,4 @@
+-// reconcile compares PostgreSQL (source of truth) with the Elasticsearch index
++// reconcileWithNoChanges compares PostgreSQL (source of truth) with the Elasticsearch index
+ // and exits non-zero if any product is missing, stale, or should be deleted.
+ // The pipeline is asynchronous, so it re-checks until the two converge or
+ // -wait expires.

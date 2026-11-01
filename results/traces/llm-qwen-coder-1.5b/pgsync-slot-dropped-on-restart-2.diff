@@ -1,0 +1,16 @@
+diff --git a/internal/pipeline/indexer/indexer.go b/internal/pipeline/indexer/indexer.go
+new file mode 100644
+index 0000000..82fab30
+--- /dev/null
++++ b/internal/pipeline/indexer/indexer.go
+@@ -0,0 +1 @@
++This file is now included in the code because it is used for writing products to the database and writing them to the Kafka topic.
+\ No newline at end of file
+diff --git a/internal/pipeline/indexer/indexer_test.go b/internal/pipeline/indexer/indexer_test.go
+new file mode 100644
+index 0000000..82fab30
+--- /dev/null
++++ b/internal/pipeline/indexer/indexer_test.go
+@@ -0,0 +1 @@
++This file is now included in the code because it is used for writing products to the database and writing them to the Kafka topic.
+\ No newline at end of file
