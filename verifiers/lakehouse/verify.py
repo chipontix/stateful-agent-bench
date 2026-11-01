@@ -140,7 +140,8 @@ def main() -> None:
         if rate < BUDGET_MSG_S:
             problems.append(f"performance budget: slowest phase A worker {rate:.0f} msg/s, budget {BUDGET_MSG_S:.0f}")
     finally:
-        AdminClient({"bootstrap.servers": BOOTSTRAP}).delete_topics([name])
+        for f in AdminClient({"bootstrap.servers": BOOTSTRAP}).delete_topics([name]).values():
+            f.result(timeout=30)
         with psycopg.connect(ADMIN_DSN, autocommit=True) as c:
             c.execute(f"DROP DATABASE IF EXISTS {name} WITH (FORCE)")
         subprocess.run(["rm", "-rf", str(work)])

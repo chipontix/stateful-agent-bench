@@ -30,6 +30,8 @@ transaction.state.log.min.isr=1
 auto.create.topics.enable=false
 group.initial.rebalance.delay.ms=0
 log.retention.ms=3600000
+log.segment.bytes=16777216
+log.index.size.max.bytes=1048576
 P
   "$k/bin/kafka-storage.sh" format -t "$("$k/bin/kafka-storage.sh" random-uuid)" -c "$data/server.properties" >/dev/null
   KAFKA_HEAP_OPTS="-Xms1g -Xmx1g" LOG_DIR=$data/app-logs nohup "$k/bin/kafka-server-start.sh" "$data/server.properties" >"$data/stdout.log" 2>&1 &

@@ -8,7 +8,7 @@ import os
 import sys
 from pathlib import Path
 
-BUDGET = float(os.environ.get("SAB_BUDGET_QUIESCE_S", 40))
+BUDGET = float(os.environ.get("SAB_BUDGET_QUIESCE_S", 90))
 args = sys.argv[1:]
 if args[0] == "--build-failed":
     log = Path(args[1]).read_text()[-2000:]

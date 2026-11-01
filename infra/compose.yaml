@@ -35,6 +35,8 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_LOG_RETENTION_MS: 3600000
+      KAFKA_LOG_SEGMENT_BYTES: 16777216      # small segments and indexes: verifiers create and drop many topics
+      KAFKA_LOG_INDEX_SIZE_MAX_BYTES: 1048576
     tmpfs: [/tmp/kraft-combined-logs]
     healthcheck:
       test: /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:29092 --list
