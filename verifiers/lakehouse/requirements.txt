@@ -1,0 +1,6 @@
+confluent-kafka==2.16.1
+duckdb==2.0.0
+fastavro==1.13.1
+psycopg==3.3.6
+psycopg-binary==3.3.6
+pyarrow==26.0.0
