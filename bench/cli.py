@@ -169,8 +169,12 @@ def mutation_table(out: dict) -> str:
 
 
 def cmd_audit(a) -> int:
-    for p in a.traces:
-        print(audit.render(audit.audit(audit.load(Path(p)))))
+    for p in map(Path, a.traces):
+        report = audit.render(audit.audit(audit.load(p)))
+        if a.write:
+            p.with_suffix(".audit.md").write_text(report)
+        else:
+            print(report)
     return 0
 
 
@@ -197,6 +201,7 @@ def main(argv=None) -> int:
     p.set_defaults(fn=cmd_mutation)
     p = sub.add_parser("audit", help="Task Auditor report for traces")
     p.add_argument("traces", nargs="+")
+    p.add_argument("--write", action="store_true", help="write TRACE.audit.md next to each trace")
     p.set_defaults(fn=cmd_audit)
     a = ap.parse_args(argv)
     return a.fn(a)

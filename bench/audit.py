@@ -4,16 +4,22 @@ around the verifier. Rule-based, so the same trace always gets the same
 report."""
 
 import json
+import re
 from pathlib import Path
 
 from . import workspace
 from .mutate import hunks
 
-# What a failing invariant means, by the words its message starts with.
+# What a failing invariant means: the first pattern found in its message.
 MEANING = [
+    (r"[1-9]\d* sagas with disallowed", "sagas left ledger operations their final state does not allow"),
+    (r"[1-9]\d* applied twice|recorded 2 times", "a ledger step was applied twice"),
+    (r"[1-9]\d* with wrong money", "money moved for a transfer differs from its amount"),
+    ("still failing after", "a command could never be applied: the saga is stuck"),
+    ("not quiescent", "the system never settled: transfers still open long after the workload"),
+    ("at rest but", "money is still held or in clearing after every saga finished"),
     ("moved src", "money moved for a transfer differs from its amount (double or missing effect)"),
     ("ledger effects", "a saga left ledger operations its final state does not allow"),
-    ("at rest but", "money is still held or in clearing after every saga finished"),
     ("customer money", "total customer money differs from what was opened: money created or destroyed"),
     ("balance row", "an account's balance disagrees with its journal or is negative"),
     ("still", "a transfer never reached a final state"),
@@ -33,9 +39,11 @@ def load(path: Path) -> list[dict]:
 
 
 def meaning(problem: str) -> str:
-    p = problem.split(": ", 1)[-1] if " seed " in problem.split(": ", 1)[0] else problem
+    p = problem.removeprefix("concurrent: ")
+    if " seed " in p.split(": ", 1)[0]:  # "<crash point> seed N: ..."
+        p = p.split(": ", 1)[-1]
     for key, text in MEANING:
-        if key in p:
+        if re.search(key, p):
             return text
     return "invariant violated"
 
