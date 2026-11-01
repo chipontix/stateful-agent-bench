@@ -14,6 +14,8 @@ ROOT = workspace.ROOT
 def run(task: workspace.Task, repo: Path, out_dir: Path, seed: int = 1) -> dict:
     """Verifies repo (left untouched) in out_dir/vrepo: protected paths are put
     back first. Result: pass, problems, metrics, seconds, tampered."""
+    out_dir = out_dir.resolve()
+    repo = repo.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
     vrepo = out_dir / "vrepo"
     tampered = workspace.verification_copy(task, repo, vrepo)
