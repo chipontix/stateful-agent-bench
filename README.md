@@ -263,18 +263,20 @@ Example reports: `results/traces/stub-cheat/*.audit.md`.
 `infra/compose.yaml` runs Postgres 17.6 (logical decoding on) and Kafka 3.9.1
 (KRaft, single node), with the same image tags the upstream projects use, so
 nothing extra is pulled where they are already present. The Docker VM on the
-machine these results come from (colima, 4 vCPU) was shared with several
-other projects' brokers and builds; its load average reached 170, and a
-broker in it timed out on its own controller heartbeats. `make up
-KAFKA=native` (`infra/kafka-native.sh`) instead runs the same Kafka on the
-host JVM, from the official tarball checked against its SHA-512. All the
-results here were recorded that way. The agent container is the only thing
-that has to be in Docker.
+machine these results come from (colima, 4 vCPU) was at times shared with
+several other projects' brokers and builds. Its load average then reached
+174, and a broker inside it timed out on heartbeats to its own controller
+(`results/raw/environment.txt`). `make up KAFKA=native`
+(`infra/kafka-native.sh`) instead runs the same Kafka on the host JVM, from
+the official tarball checked against its SHA-512. All the results here were
+recorded that way. The agent container is the only thing that has to be in
+Docker.
 
-Disk: the bench adds one 386 MB Postgres image (the Kafka image was already
-present) and ~0.6 GB of caches under `.cache/` (Go build cache, Kafka
-tarball, the lakehouse verifier's virtualenv). `make clean` removes the
-caches.
+Disk: the bench pulls one image of its own (`postgres:17.6-alpine`; the Kafka
+image is the upstream projects' and the agent image is `python:3.13-slim`) and
+keeps its caches under `.cache/` (Go build cache, Kafka, the lakehouse
+verifier's virtualenv). The sizes are in `results/raw/environment.txt`, and
+`make clean` removes the caches.
 
 ## Limitations and what is not done
 

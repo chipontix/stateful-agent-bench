@@ -1,0 +1,16 @@
+# recorded 2026-11-01T09:42:34Z by: docker images; du -sh .cache/*; colima ssh -- cat /proc/loadavg; nproc in the VM
+python:3.13-slim 204MB
+postgres:17.6-alpine 386MB
+apache/kafka:3.9.1 626MB
+4.0K	.cache/docker
+886M	.cache/go-build
+122M	.cache/kafka
+105M	.cache/kafka-data
+212M	.cache/venv-lakehouse
+colima VM loadavg: 0.00 0.11 1.73 1/198 852623
+colima VM cpus: 4
+host loadavg: { 68.49 60.02 50.24 }
+host cpus: 16
+# earlier in the same session, 2026-11-01 ~07:13Z, while the native-Kafka switch was decided:
+colima VM loadavg (colima ssh -- cat /proc/loadavg): 174.28 181.53 121.78 94/1293
+broker log at the time: "[BrokerLifecycleManager id=1] Broker 1 sent a heartbeat request but received error REQUEST_TIMED_OUT"

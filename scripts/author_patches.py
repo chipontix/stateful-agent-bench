@@ -233,8 +233,8 @@ TASKS = {
 			ProducerBatchSize:           app.EnvInt("PRODUCER_BATCH_SIZE", 1),
 			ProducerBatchTickerDuration: app.EnvDuration("PRODUCER_BATCH_TICK", time.Millisecond),''')],
         "near_misses": {
-            # Drops the slot on shutdown instead of at start. Survives: the slot is
-            # still active when the drop runs, so it is skipped (README "Survivors").
+            # Drops the slot on shutdown instead of at start. Survives: the drop never
+            # takes effect in the verifier's scenario (README, mutation testing).
             "drop-on-shutdown": [("internal/pipeline/cdc.go", '''	if err := dropIdleSlot(ctx, cfg.CDC); err != nil {
 		return err
 	}
