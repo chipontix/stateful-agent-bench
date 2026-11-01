@@ -1,0 +1,755 @@
+{
+  "n": 20,
+  "states": {
+    "ledger-hold-release-race/fix": {
+      "passed": 20,
+      "runs": [
+        {
+          "seed": 1,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 1973
+        },
+        {
+          "seed": 2,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2379
+        },
+        {
+          "seed": 3,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2064
+        },
+        {
+          "seed": 4,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2105
+        },
+        {
+          "seed": 5,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2435
+        },
+        {
+          "seed": 6,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2178
+        },
+        {
+          "seed": 7,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2387
+        },
+        {
+          "seed": 8,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2340
+        },
+        {
+          "seed": 9,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2454
+        },
+        {
+          "seed": 10,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2095
+        },
+        {
+          "seed": 11,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2120
+        },
+        {
+          "seed": 12,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2539
+        },
+        {
+          "seed": 13,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2737
+        },
+        {
+          "seed": 14,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2256
+        },
+        {
+          "seed": 15,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2824
+        },
+        {
+          "seed": 16,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2055
+        },
+        {
+          "seed": 17,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2485
+        },
+        {
+          "seed": 18,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2725
+        },
+        {
+          "seed": 19,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2456
+        },
+        {
+          "seed": 20,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2548
+        }
+      ]
+    },
+    "ledger-hold-release-race/bug": {
+      "passed": 0,
+      "runs": [
+        {
+          "seed": 1,
+          "pass": false,
+          "first_problem": "297 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1854
+        },
+        {
+          "seed": 2,
+          "pass": false,
+          "first_problem": "294 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 2034
+        },
+        {
+          "seed": 3,
+          "pass": false,
+          "first_problem": "289 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1828
+        },
+        {
+          "seed": 4,
+          "pass": false,
+          "first_problem": "290 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1679
+        },
+        {
+          "seed": 5,
+          "pass": false,
+          "first_problem": "292 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1603
+        },
+        {
+          "seed": 6,
+          "pass": false,
+          "first_problem": "291 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1916
+        },
+        {
+          "seed": 7,
+          "pass": false,
+          "first_problem": "296 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1949
+        },
+        {
+          "seed": 8,
+          "pass": false,
+          "first_problem": "292 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 2036
+        },
+        {
+          "seed": 9,
+          "pass": false,
+          "first_problem": "298 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1447
+        },
+        {
+          "seed": 10,
+          "pass": false,
+          "first_problem": "292 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1852
+        },
+        {
+          "seed": 11,
+          "pass": false,
+          "first_problem": "295 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1795
+        },
+        {
+          "seed": 12,
+          "pass": false,
+          "first_problem": "294 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1754
+        },
+        {
+          "seed": 13,
+          "pass": false,
+          "first_problem": "295 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1550
+        },
+        {
+          "seed": 14,
+          "pass": false,
+          "first_problem": "293 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1895
+        },
+        {
+          "seed": 15,
+          "pass": false,
+          "first_problem": "296 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1756
+        },
+        {
+          "seed": 16,
+          "pass": false,
+          "first_problem": "293 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 2026
+        },
+        {
+          "seed": 17,
+          "pass": false,
+          "first_problem": "297 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1654
+        },
+        {
+          "seed": 18,
+          "pass": false,
+          "first_problem": "293 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1609
+        },
+        {
+          "seed": 19,
+          "pass": false,
+          "first_problem": "290 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1888
+        },
+        {
+          "seed": 20,
+          "pass": false,
+          "first_problem": "296 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1929
+        }
+      ]
+    },
+    "ledger-hold-release-race/wrong": {
+      "passed": 0,
+      "runs": [
+        {
+          "seed": 1,
+          "pass": false,
+          "first_problem": "291 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1838
+        },
+        {
+          "seed": 2,
+          "pass": false,
+          "first_problem": "296 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 2078
+        },
+        {
+          "seed": 3,
+          "pass": false,
+          "first_problem": "293 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1701
+        },
+        {
+          "seed": 4,
+          "pass": false,
+          "first_problem": "295 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1637
+        },
+        {
+          "seed": 5,
+          "pass": false,
+          "first_problem": "297 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1696
+        },
+        {
+          "seed": 6,
+          "pass": false,
+          "first_problem": "298 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1847
+        },
+        {
+          "seed": 7,
+          "pass": false,
+          "first_problem": "299 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1351
+        },
+        {
+          "seed": 8,
+          "pass": false,
+          "first_problem": "293 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1708
+        },
+        {
+          "seed": 9,
+          "pass": false,
+          "first_problem": "297 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1405
+        },
+        {
+          "seed": 10,
+          "pass": false,
+          "first_problem": "298 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1575
+        },
+        {
+          "seed": 11,
+          "pass": false,
+          "first_problem": "293 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1734
+        },
+        {
+          "seed": 12,
+          "pass": false,
+          "first_problem": "289 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1583
+        },
+        {
+          "seed": 13,
+          "pass": false,
+          "first_problem": "294 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1216
+        },
+        {
+          "seed": 14,
+          "pass": false,
+          "first_problem": "290 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1683
+        },
+        {
+          "seed": 15,
+          "pass": false,
+          "first_problem": "288 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 696
+        },
+        {
+          "seed": 16,
+          "pass": false,
+          "first_problem": "290 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 612
+        },
+        {
+          "seed": 17,
+          "pass": false,
+          "first_problem": "293 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 641
+        },
+        {
+          "seed": 18,
+          "pass": false,
+          "first_problem": "297 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1629
+        },
+        {
+          "seed": 19,
+          "pass": false,
+          "first_problem": "292 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1687
+        },
+        {
+          "seed": 20,
+          "pass": false,
+          "first_problem": "296 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+          "commands_per_s": 1785
+        }
+      ]
+    },
+    "ledger-retry-double-charge/fix": {
+      "passed": 20,
+      "runs": [
+        {
+          "seed": 1,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2315
+        },
+        {
+          "seed": 2,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2575
+        },
+        {
+          "seed": 3,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2322
+        },
+        {
+          "seed": 4,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 1678
+        },
+        {
+          "seed": 5,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2461
+        },
+        {
+          "seed": 6,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2511
+        },
+        {
+          "seed": 7,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2399
+        },
+        {
+          "seed": 8,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 1958
+        },
+        {
+          "seed": 9,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 1902
+        },
+        {
+          "seed": 10,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2060
+        },
+        {
+          "seed": 11,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2606
+        },
+        {
+          "seed": 12,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2317
+        },
+        {
+          "seed": 13,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2331
+        },
+        {
+          "seed": 14,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 1998
+        },
+        {
+          "seed": 15,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2517
+        },
+        {
+          "seed": 16,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2439
+        },
+        {
+          "seed": 17,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2679
+        },
+        {
+          "seed": 18,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2172
+        },
+        {
+          "seed": 19,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2228
+        },
+        {
+          "seed": 20,
+          "pass": true,
+          "first_problem": "",
+          "commands_per_s": 2687
+        }
+      ]
+    },
+    "ledger-retry-double-charge/bug": {
+      "passed": 0,
+      "runs": [
+        {
+          "seed": 1,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 1504
+        },
+        {
+          "seed": 2,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 1353
+        },
+        {
+          "seed": 3,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 1441
+        },
+        {
+          "seed": 4,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 1483
+        },
+        {
+          "seed": 5,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 1511
+        },
+        {
+          "seed": 6,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 1370
+        },
+        {
+          "seed": 7,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 1764
+        },
+        {
+          "seed": 8,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 2011
+        },
+        {
+          "seed": 9,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 1806
+        },
+        {
+          "seed": 10,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 1745
+        },
+        {
+          "seed": 11,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 1739
+        },
+        {
+          "seed": 12,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 1720
+        },
+        {
+          "seed": 13,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 1694
+        },
+        {
+          "seed": 14,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 2112
+        },
+        {
+          "seed": 15,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 1769
+        },
+        {
+          "seed": 16,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 1585
+        },
+        {
+          "seed": 17,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 1312
+        },
+        {
+          "seed": 18,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 1568
+        },
+        {
+          "seed": 19,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 1103
+        },
+        {
+          "seed": 20,
+          "pass": false,
+          "first_problem": "0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600)",
+          "commands_per_s": 1958
+        }
+      ]
+    },
+    "ledger-retry-double-charge/wrong": {
+      "passed": 0,
+      "runs": [
+        {
+          "seed": 1,
+          "pass": false,
+          "first_problem": "saga 01a19686-67b2-7ea9-9580-44564744436e capture attempt 1 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 144
+        },
+        {
+          "seed": 2,
+          "pass": false,
+          "first_problem": "saga 01a19686-a48e-7135-a2ca-60ad4013ef58 capture attempt 1 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 138
+        },
+        {
+          "seed": 3,
+          "pass": false,
+          "first_problem": "saga 01a19686-e268-700b-8768-2a0245057852 capture attempt 2 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 144
+        },
+        {
+          "seed": 4,
+          "pass": false,
+          "first_problem": "saga 01a19687-1ecc-727f-a5fd-0489b8e1357b capture attempt 1 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 136
+        },
+        {
+          "seed": 5,
+          "pass": false,
+          "first_problem": "saga 01a19687-5e6b-7535-bbb9-41c29d307480 capture attempt 1 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 137
+        },
+        {
+          "seed": 6,
+          "pass": false,
+          "first_problem": "saga 01a19687-9d81-7f03-8ff3-da118c773468 capture attempt 1 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 132
+        },
+        {
+          "seed": 7,
+          "pass": false,
+          "first_problem": "saga 01a19687-de82-7ecf-b3ea-2b314dfa2e96 capture attempt 1 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 145
+        },
+        {
+          "seed": 8,
+          "pass": false,
+          "first_problem": "saga 01a19688-1a9f-7b08-acac-c5beb564af15 capture attempt 1 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 136
+        },
+        {
+          "seed": 9,
+          "pass": false,
+          "first_problem": "saga 01a19688-5ae7-77f1-88ee-18e7b0c2005f capture attempt 2 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 143
+        },
+        {
+          "seed": 10,
+          "pass": false,
+          "first_problem": "saga 01a19688-97da-7d05-adfc-22b58eb1ab84 capture attempt 1 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 144
+        },
+        {
+          "seed": 11,
+          "pass": false,
+          "first_problem": "saga 01a19688-d417-7635-b262-d7a7f5b7ffed capture attempt 2 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 148
+        },
+        {
+          "seed": 12,
+          "pass": false,
+          "first_problem": "saga 01a19689-0e34-7880-8fd4-bf933099bf43 capture attempt 1 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 149
+        },
+        {
+          "seed": 13,
+          "pass": false,
+          "first_problem": "saga 01a19689-49ec-7175-910d-2efb8d672308 capture attempt 2 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 107
+        },
+        {
+          "seed": 14,
+          "pass": false,
+          "first_problem": "saga 01a19689-9ab0-76a4-94cc-0452d2384143 capture attempt 1 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 134
+        },
+        {
+          "seed": 15,
+          "pass": false,
+          "first_problem": "saga 01a19689-dbba-7925-a1d7-5846813f18df capture attempt 2 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 134
+        },
+        {
+          "seed": 16,
+          "pass": false,
+          "first_problem": "saga 01a1968a-1bd5-718b-91b0-759051b51360 capture attempt 1 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 143
+        },
+        {
+          "seed": 17,
+          "pass": false,
+          "first_problem": "saga 01a1968a-58e0-712d-a247-6894745d38d3 capture attempt 1 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 138
+        },
+        {
+          "seed": 18,
+          "pass": false,
+          "first_problem": "saga 01a1968a-9746-74ab-8be7-a73fe36bfae0 capture attempt 1 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 145
+        },
+        {
+          "seed": 19,
+          "pass": false,
+          "first_problem": "saga 01a1968a-d2bb-7c3f-868a-57d5cc9165bc capture attempt 1 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 139
+        },
+        {
+          "seed": 20,
+          "pass": false,
+          "first_problem": "saga 01a1968b-1110-704e-afbb-27d6d48358db capture attempt 2 still failing after 20 tries: ERROR: new row for relation \"accounts\" violates check constraint \"acco",
+          "commands_per_s": 148
+        }
+      ]
+    }
+  }
+}

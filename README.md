@@ -76,7 +76,10 @@ one needs a second actor, a retry or a crash in a particular gap:
   got through once in two tries
   (`results/raw/race-detection-crash-harness-only.txt`). That is why the ledger verifier starts with
   `sabrace`, which sends hold and release of one saga at the same instant
-  300 times per verification.
+  300 times per verification. Run alone 20 times with different seeds on
+  each ledger task, it passed the reference 20/20 and failed the bug and the
+  wrong fix 20/20 (`results/raw/sabrace-reliability.json`,
+  `python3 scripts/sabrace_reliability.py 20`).
 - **Slot dropped on restart** needs the connector to die while writes
   continue. The code that drops the slot even has a careful `AND NOT
   active`. The verifier kills it twice and restarts it once under 400
