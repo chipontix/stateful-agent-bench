@@ -37,6 +37,7 @@ MEANING = [
     ("failpoint", "the crash the verifier injects did not happen"),
     ("performance budget", "correct, but slower than the task's performance budget"),
     ("build failed", "the change does not compile"),
+    ("no change:", "the agent left the bug in place"),
 ]
 
 
@@ -93,8 +94,26 @@ def audit(events: list[dict], diff_text: str = "") -> dict:
                 wrong.append(f"{s} edited `{e['path']}` without reading it first")
         elif t == "run_command":
             did.append(f"{s} ran `{e['cmd']}` -> exit {e['exit']}")
+        elif t == "search":
+            did.append(f"{s} searched `{e['pattern']}` -> {e['hits']} hits")
+        elif t == "think":
+            did.append(f"{s} thought: \"{e['text'][:200]}\" -> {e['tool']}")
+        elif t == "tool_error":
+            did.append(f"{s} tool error: {e['error'][:160]}")
         elif t == "finish":
             did.append(f"{s} finished: \"{e['message']}\"")
+            if e.get("forced"):
+                wrong.append(f"{s} ran out of steps without calling finish")
+    calls = [e for e in agent if e["type"] == "model_call"]
+    if calls:
+        did.insert(0, f"{len(calls)} model calls, {sum(e['prompt_tokens'] or 0 for e in calls)} prompt and "
+                      f"{sum(e['completion_tokens'] or 0 for e in calls)} completion tokens, "
+                      f"{sum(e['seconds'] for e in calls):.0f} s of generation")
+    errors = [e for e in agent if e["type"] == "tool_error"]
+    if errors:
+        wrong.append(f"{len(errors)} replies or tool calls failed (unparseable reply, missing text, bad arguments)")
+    if not any(e["type"] == "edit_file" for e in agent):
+        wrong.append("made no change to the repository")
     if not any(e["type"] == "run_command" and e["exit"] == 0 and "test" in e["cmd"] for e in agent):
         wrong.append("never ran a test that passed before finishing (no brokers in the sandbox, so the invariants "
                      "could only be checked by the verifier)")

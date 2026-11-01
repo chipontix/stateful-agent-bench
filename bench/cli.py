@@ -1,6 +1,7 @@
 """python3 -m bench <command>; see README "Commands"."""
 
 import argparse
+import contextlib
 import json
 import os
 import platform
@@ -10,7 +11,7 @@ import sys
 import time
 from pathlib import Path
 
-from . import audit, mutate, run, verify, workspace
+from . import audit, bridge, mutate, run, verify, workspace
 
 ROOT = workspace.ROOT
 WORK = ROOT / "work"
@@ -82,30 +83,43 @@ def cmd_verify_all(a) -> int:
 
 
 def cmd_run(a) -> int:
+    """--phase agent needs no brokers (only Docker for the container and, for
+    the llm agent, the local model); --phase verify needs the stand."""
     k = a.k
+    runs_dir = WORK / "runs" / a.agent
+    attempts = [(t, i) for t in tasks(a.tasks) for i in range(1, a.n + 1)]
+    if a.phase in ("all", "agent"):
+        model = run.AGENTS[a.agent] is None
+        with (bridge.Server(runs_dir / "llama-server.log") if model else contextlib.nullcontext()):
+            for t, i in attempts:
+                run.attempt(t, a.agent, i, runs_dir / f"{t.id}-{i}", seed=i)
+                diff = (runs_dir / f"{t.id}-{i}" / "agent.diff").read_text()
+                print(f"{t.id:36} #{i} agent done, diff {len(diff.splitlines())} lines", flush=True)
+    if a.phase == "agent":
+        return 0
     out = {"host": host(), "agent": a.agent, "k": k, "attempts_per_task": a.n, "tasks": {}}
     tdir = RESULTS / "traces" / a.agent
     shutil.rmtree(tdir, ignore_errors=True)
     tdir.mkdir(parents=True)
-    for t in tasks(a.tasks):
-        rows = []
-        for i in range(1, a.n + 1):
-            r = run.attempt(t, a.agent, i, WORK / "runs" / a.agent / f"{t.id}-{i}", seed=i)
-            src = ROOT / r["trace"]
-            dst = tdir / f"{t.id}-{i}.jsonl"
-            shutil.copy(src, dst)
-            shutil.copy(src.parent / "agent.diff", tdir / f"{t.id}-{i}.diff")
-            r["trace"] = str(dst.relative_to(ROOT))
-            rep = audit.audit(audit.load(dst), audit.diff_for(dst))
-            (tdir / f"{t.id}-{i}.audit.md").write_text(audit.render(rep))
-            r["verdict"] = rep["verdict"]
-            rows.append(r)
-            print(f"{t.id:36} #{i} played {r['played']:5} -> {'pass' if r['pass'] else 'fail'}  {rep['verdict']}", flush=True)
-            shutil.rmtree(WORK / "runs" / a.agent / f"{t.id}-{i}", ignore_errors=True)
+    by_task: dict = {}
+    for t, i in attempts:
+        r = run.verify_attempt(t, a.agent, i, runs_dir / f"{t.id}-{i}", seed=i)
+        src = ROOT / r["trace"]
+        dst = tdir / f"{t.id}-{i}.jsonl"
+        shutil.copy(src, dst)
+        shutil.copy(src.parent / "agent.diff", tdir / f"{t.id}-{i}.diff")
+        r["trace"] = str(dst.relative_to(ROOT))
+        rep = audit.audit(audit.load(dst), audit.diff_for(dst))
+        (tdir / f"{t.id}-{i}.audit.md").write_text(audit.render(rep))
+        r["verdict"] = rep["verdict"]
+        by_task.setdefault(t.id, []).append(r)
+        print(f"{t.id:36} #{i} played {r['played'] or '-':5} -> {'pass' if r['pass'] else 'fail'}  {rep['verdict']}",
+              flush=True)
+        shutil.rmtree(runs_dir / f"{t.id}-{i}", ignore_errors=True)
+    for tid, rows in by_task.items():
         c = sum(r["pass"] for r in rows)
-        out["tasks"][t.id] = {"n": a.n, "correct": c, "pass@1": round(run.pass_at_k(a.n, c, 1), 3),
-                              f"pass@{k}": round(run.pass_at_k(a.n, c, min(k, a.n)), 3), "attempts": rows}
-        save(f"run-{a.agent}", out)
+        out["tasks"][tid] = {"n": a.n, "correct": c, "pass@1": round(run.pass_at_k(a.n, c, 1), 3),
+                             f"pass@{k}": round(run.pass_at_k(a.n, c, min(k, a.n)), 3), "attempts": rows}
     n = len(out["tasks"])
     out["mean_pass@1"] = round(sum(v["pass@1"] for v in out["tasks"].values()) / n, 3)
     out[f"mean_pass@{k}"] = round(sum(v[f"pass@{k}"] for v in out["tasks"].values()) / n, 3)
@@ -200,6 +214,8 @@ def main(argv=None) -> int:
     p.add_argument("--agent", choices=sorted(run.AGENTS), required=True)
     p.add_argument("-n", type=int, default=1, help="attempts per task")
     p.add_argument("-k", type=int, default=1)
+    p.add_argument("--phase", choices=["all", "agent", "verify"], default="all",
+                   help="agent: attempts only; verify: verify the attempts a previous agent phase left")
     p.add_argument("tasks", nargs="*")
     p.set_defaults(fn=cmd_run)
     p = sub.add_parser("mutation", help="mutants of each reference fix against its verifier")
