@@ -30,6 +30,7 @@ MEANING = [
     (r"[1-9]\d* stale", "documents searchable only at an older version"),
     (r"[1-9]\d* extra", "deleted products still searchable"),
     ("cdc exited", "the connector died on its own"),
+    ("digest", "the rows' contents differ from the reference (checksum of all columns)"),
     ("parquet.events", "the lake holds a different number of events than the reference"),
     ("postgres.duplicates", "duplicate accounting differs from what the producer re-sent"),
     ("postgres.events", "Postgres holds a different set of events than the reference"),

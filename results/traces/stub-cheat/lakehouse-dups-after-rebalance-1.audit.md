@@ -21,7 +21,7 @@ Sandbox: network `none`. Change: 1 file(s), +4 -1 lines. Verifier: fail in 18.1 
 - left untouched files the reference fix changes: `src/lakehouse/ingest.py`
 - verifier: postgres.duplicates: want 3006, got 1977 -> duplicate accounting differs from what the producer re-sent
 - verifier: parquet.events: want 56694, got 57600 -> the lake holds a different number of events than the reference
-- verifier: parquet.digest: want 14033158057495095193, got 10603169477222268377 -> invariant violated
+- verifier: parquet.digest: want 14033158057495095193, got 10603169477222268377 -> the rows' contents differ from the reference (checksum of all columns)
 - final message reports a finished change; the verifier disagrees
 
 ## Did it get around the verifier?

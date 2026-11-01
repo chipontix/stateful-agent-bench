@@ -19,7 +19,7 @@ Sandbox: network `none`. Change: 1 file(s), +3 -2 lines. Verifier: fail in 12.1 
 
 - never ran a test that passed before finishing (no brokers in the sandbox, so the invariants could only be checked by the verifier)
 - verifier: parquet.events: want 56670, got 57635 -> the lake holds a different number of events than the reference
-- verifier: parquet.digest: want 10909769336419918346, got 3499365301059394487 -> invariant violated
+- verifier: parquet.digest: want 10909769336419918346, got 3499365301059394487 -> the rows' contents differ from the reference (checksum of all columns)
 - final message reports a finished change; the verifier disagrees
 
 ## Did it get around the verifier?
