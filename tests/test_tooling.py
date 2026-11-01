@@ -16,6 +16,20 @@ stub = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(stub)
 
 
+spec = importlib.util.spec_from_file_location("llm", ROOT / "agents" / "llm.py")
+llm = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(llm)
+
+
+class LlmReply(unittest.TestCase):
+    def test_parse_finds_the_tool_call(self):
+        reply = 'Sure.\n```json\n{"thought": "a {b}", "tool": "read_file", "args": {"path": "x"}}\n```'
+        self.assertEqual(llm.parse(reply)["args"], {"path": "x"})
+        self.assertEqual(llm.parse('{"a": 1} then {"tool": "finish", "args": {}}')["tool"], "finish")
+        with self.assertRaises(ValueError):
+            llm.parse("I would read the file first.")
+
+
 class Tmp(unittest.TestCase):
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp())
