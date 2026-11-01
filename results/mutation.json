@@ -1,0 +1,493 @@
+{
+  "tasks": {
+    "lakehouse-dups-after-rebalance": {
+      "mutants": 7,
+      "stillborn": 0,
+      "killed": 6,
+      "survived": 1,
+      "score": 0.857,
+      "rows": [
+        {
+          "id": "m01",
+          "op": "revert-hunk",
+          "where": "src/lakehouse/ingest.py:55 hunk reverted to the buggy version",
+          "outcome": "killed",
+          "problems": [
+            "A worker 0,1,2: exit 1: tchall\n    res = self._check_result_for_fetch()\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/dev/stateful-agent-bench/.cache/venv-lakehouse/lib/python3.12/site-packages/psycopg/_cursor_base.py\", line 628, in _check_result_for_fetch\n    raise e.ProgrammingError(\npsycopg.ProgrammingError: the last operation didn't produce records (command status: INSERT 0 7561)",
+            "A worker 3,4,5: exit 1: tchall\n    res = self._check_result_for_fetch()\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/dev/stateful-agent-bench/.cache/venv-lakehouse/lib/python3.12/site-packages/psycopg/_cursor_base.py\", line 628, in _check_result_for_fetch\n    raise e.ProgrammingError(\npsycopg.ProgrammingError: the last operation didn't produce records (command status: INSERT 0 7531)",
+            "B: after-commit failpoint did not fire (exit 1, want 3)"
+          ],
+          "seconds": 20.2
+        },
+        {
+          "id": "m02",
+          "op": "revert-hunk",
+          "where": "src/lakehouse/ingest.py:105 hunk reverted to the buggy version",
+          "outcome": "survived",
+          "problems": [],
+          "seconds": 23.4
+        },
+        {
+          "id": "m03",
+          "op": "revert-hunk",
+          "where": "src/lakehouse/ingest.py:123 hunk reverted to the buggy version",
+          "outcome": "killed",
+          "problems": [
+            "A worker 0,1,2: exit 1: house/ingest.py\", line 217, in run\n    ing.flush(buf)\n  File \"/home/dev/stateful-agent-bench/work/mutation/lakehouse-dups-after-rebalance/m03/vrepo/src/lakehouse/ingest.py\", line 126, in flush\n    elif e[\"event_id\"] in rows or e[\"event_id\"] in self.seen:\n                                                   ^^^^^^^^^\nAttributeError: 'Ingest' object has no attribute 'seen'",
+            "A worker 3,4,5: exit 1: house/ingest.py\", line 217, in run\n    ing.flush(buf)\n  File \"/home/dev/stateful-agent-bench/work/mutation/lakehouse-dups-after-rebalance/m03/vrepo/src/lakehouse/ingest.py\", line 126, in flush\n    elif e[\"event_id\"] in rows or e[\"event_id\"] in self.seen:\n                                                   ^^^^^^^^^\nAttributeError: 'Ingest' object has no attribute 'seen'",
+            "B: after-commit failpoint did not fire (exit 1, want 3)"
+          ],
+          "seconds": 19.3
+        },
+        {
+          "id": "m04",
+          "op": "revert-hunk",
+          "where": "src/lakehouse/ingest.py:145 hunk reverted to the buggy version",
+          "outcome": "killed",
+          "problems": [
+            "postgres.duplicates: want 3006, got 1697",
+            "parquet.events: want 56694, got 57880",
+            "parquet.digest: want 14033158057495095193, got 14715434550802383019"
+          ],
+          "seconds": 24.7
+        },
+        {
+          "id": "m05",
+          "op": "revert-hunk",
+          "where": "src/lakehouse/ingest.py:160 hunk reverted to the buggy version",
+          "outcome": "killed",
+          "problems": [
+            "A worker 0,1,2: exit 1: ul-agent-bench/work/mutation/lakehouse-dups-after-rebalance/m05/vrepo/src/lakehouse/ingest.py\", line 218, in run\n    ing.flush(buf)\n  File \"/home/dev/stateful-agent-bench/work/mutation/lakehouse-dups-after-rebalance/m05/vrepo/src/lakehouse/ingest.py\", line 163, in flush\n    self.seen.update(inserted)\n    ^^^^^^^^^\nAttributeError: 'Ingest' object has no attribute 'seen'",
+            "A worker 3,4,5: exit 1: ul-agent-bench/work/mutation/lakehouse-dups-after-rebalance/m05/vrepo/src/lakehouse/ingest.py\", line 218, in run\n    ing.flush(buf)\n  File \"/home/dev/stateful-agent-bench/work/mutation/lakehouse-dups-after-rebalance/m05/vrepo/src/lakehouse/ingest.py\", line 163, in flush\n    self.seen.update(inserted)\n    ^^^^^^^^^\nAttributeError: 'Ingest' object has no attribute 'seen'",
+            "B: after-commit failpoint did not fire (exit 1, want 3)"
+          ],
+          "seconds": 25.0
+        },
+        {
+          "id": "m06",
+          "op": "delete-line",
+          "where": "src/lakehouse/ingest.py:126 deleted `elif e[\"event_id\"] in rows:`",
+          "outcome": "killed",
+          "problems": [
+            "postgres.duplicates: want 3006, got 1611"
+          ],
+          "seconds": 24.6
+        },
+        {
+          "id": "m07",
+          "op": "delete-line",
+          "where": "src/lakehouse/ingest.py:148 deleted `inserted = {r[0] for r in cur.fetchall()}`",
+          "outcome": "killed",
+          "problems": [
+            "verifier error: IOException: IO Error: No files found that match the pattern \"/home/dev/stateful-agent-bench/work/mutation/lakehouse-dups-after-rebalance/m07/result.work/lake/events/*/*.parquet\" at names, types, parameters, return_type, deferred, captured, writes = con._bind("
+          ],
+          "seconds": 34.4
+        },
+        {
+          "id": "reload-seen-at-start",
+          "op": "near-miss",
+          "where": "tasks/lakehouse-dups-after-rebalance/near_misses/reload-seen-at-start.patch",
+          "outcome": "survived",
+          "problems": [],
+          "seconds": 29.9
+        }
+      ],
+      "near_misses": 1,
+      "near_misses_killed": 0
+    },
+    "lakehouse-offsets-after-parquet": {
+      "mutants": 6,
+      "stillborn": 2,
+      "killed": 3,
+      "survived": 1,
+      "score": 0.75,
+      "rows": [
+        {
+          "id": "m01",
+          "op": "revert-hunk",
+          "where": "src/lakehouse/ingest.py:155 hunk reverted to the buggy version",
+          "outcome": "killed",
+          "problems": [
+            "postgres.duplicates: want 3006, got 186077"
+          ],
+          "seconds": 26.8
+        },
+        {
+          "id": "m02",
+          "op": "revert-hunk",
+          "where": "src/lakehouse/ingest.py:167 hunk reverted to the buggy version",
+          "outcome": "survived",
+          "problems": [],
+          "seconds": 19.6
+        },
+        {
+          "id": "m03",
+          "op": "delete-line",
+          "where": "src/lakehouse/ingest.py:158 deleted `cur.executemany(`",
+          "outcome": "stillborn",
+          "problems": [
+            "File \"/home/dev/stateful-agent-bench/work/mutation/lakehouse-offsets-after-parquet/m03/repo/src/lakehouse/ingest.py\", line 161\n    )\n    ^\nSyntaxError: unmatched ')'"
+          ],
+          "seconds": 0
+        },
+        {
+          "id": "m04",
+          "op": "delete-line",
+          "where": "src/lakehouse/ingest.py:159 deleted `\"INSERT INTO ingest_offsets (topic, partition, next_offset) VALUES (%s, %s, %s)\"`",
+          "outcome": "killed",
+          "problems": [
+            "A worker 0,1,2: exit 1: k/mutation/lakehouse-offsets-after-parquet/m04/vrepo/src/lakehouse/ingest.py\", line 158, in flush\n    cur.executemany(\n  File \"/home/dev/stateful-agent-bench/.cache/venv-lakehouse/lib/python3.12/site-packages/psycopg/cursor.py\", line 148, in executemany\n    raise ex.with_traceback(None)\npsycopg.ProgrammingError: the query has 0 placeholders but 3 parameters were passed",
+            "A worker 3,4,5: exit 1: k/mutation/lakehouse-offsets-after-parquet/m04/vrepo/src/lakehouse/ingest.py\", line 158, in flush\n    cur.executemany(\n  File \"/home/dev/stateful-agent-bench/.cache/venv-lakehouse/lib/python3.12/site-packages/psycopg/cursor.py\", line 148, in executemany\n    raise ex.with_traceback(None)\npsycopg.ProgrammingError: the query has 0 placeholders but 3 parameters were passed",
+            "B: after-commit failpoint did not fire (exit 1, want 3)"
+          ],
+          "seconds": 11.9
+        },
+        {
+          "id": "m05",
+          "op": "delete-line",
+          "where": "src/lakehouse/ingest.py:160 deleted `\" ON CONFLICT (topic, partition) DO UPDATE SET next_offset = excluded.next_offset\",`",
+          "outcome": "stillborn",
+          "problems": [
+            "kehouse-offsets-after-parquet/m05/repo/src/lakehouse/ingest.py\", line 159\n    \"INSERT INTO ingest_offsets (topic, partition, next_offset) VALUES (%s, %s, %s)\"\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nSyntaxError: invalid syntax. Perhaps you forgot a comma?"
+          ],
+          "seconds": 0
+        },
+        {
+          "id": "m06",
+          "op": "delete-line",
+          "where": "src/lakehouse/ingest.py:161 deleted `[(self.topic, p, o) for p, o in next_offsets.items()],`",
+          "outcome": "killed",
+          "problems": [
+            "A worker 0,1,2: exit 1: t-bench/work/mutation/lakehouse-offsets-after-parquet/m06/vrepo/src/lakehouse/ingest.py\", line 216, in run\n    ing.flush(buf)\n  File \"/home/dev/stateful-agent-bench/work/mutation/lakehouse-offsets-after-parquet/m06/vrepo/src/lakehouse/ingest.py\", line 158, in flush\n    cur.executemany(\nTypeError: Cursor.executemany() missing 1 required positional argument: 'params_seq'",
+            "A worker 3,4,5: exit 1: t-bench/work/mutation/lakehouse-offsets-after-parquet/m06/vrepo/src/lakehouse/ingest.py\", line 216, in run\n    ing.flush(buf)\n  File \"/home/dev/stateful-agent-bench/work/mutation/lakehouse-offsets-after-parquet/m06/vrepo/src/lakehouse/ingest.py\", line 158, in flush\n    cur.executemany(\nTypeError: Cursor.executemany() missing 1 required positional argument: 'params_seq'",
+            "B: after-commit failpoint did not fire (exit 1, want 3)"
+          ],
+          "seconds": 14.9
+        }
+      ],
+      "near_misses": 0,
+      "near_misses_killed": 0
+    },
+    "ledger-hold-release-race": {
+      "mutants": 4,
+      "stillborn": 1,
+      "killed": 2,
+      "survived": 1,
+      "score": 0.667,
+      "rows": [
+        {
+          "id": "m01",
+          "op": "revert-hunk",
+          "where": "internal/ledger/store.go:36 hunk reverted to the buggy version",
+          "outcome": "killed",
+          "problems": [
+            "concurrent: 282 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600)",
+            "concurrent: at rest but 71641 held",
+            "concurrent: saga 01a19662-54a1-74c2-bd23-877c2cd5360b (race): ledger effects map[hold:ok release:ok/tombstone] not allowed for CANCELLED"
+          ],
+          "seconds": 52.1
+        },
+        {
+          "id": "m02",
+          "op": "flip",
+          "where": "internal/ledger/store.go:39 `if _, err := tx.Exec(ctx, `SELECT pg_advisory_xact_lock(hashtextextended($1, 0))`, c.SagaID.String()); err != nil {` -> `if _, err := tx.Exec(ctx, `SELECT pg_advisory_xact_lock(hashtextextended($1, 0))`, c.SagaID.String()); err == nil {`",
+          "outcome": "killed",
+          "problems": [
+            "concurrent: 600 sagas with disallowed effects, 0 applied twice, 300 with wrong money (of 600)",
+            "concurrent: saga 01a19663-1d39-7eff-9a1b-fe3b83abd965 (race): ledger effects map[] not allowed for CANCELLED",
+            "concurrent: saga 01a19663-1d39-7f0f-931a-c2e91e0f38fe (retry): ledger effects map[] not allowed for COMPLETED"
+          ],
+          "seconds": 70.2
+        },
+        {
+          "id": "m03",
+          "op": "delete-line",
+          "where": "internal/ledger/store.go:39 deleted `if _, err := tx.Exec(ctx, `SELECT pg_advisory_xact_lock(hashtextextended($1, 0))`, c.SagaID.String()); err != nil {`",
+          "outcome": "stillborn",
+          "problems": [
+            "-saga/internal/ledger\ninternal/ledger/store.go:41:2: syntax error: non-declaration statement outside function body\ninternal/ledger/store.go:47:2: syntax error: non-declaration statement outside function body\ninternal/ledger/store.go:50:3: syntax error: non-declaration statement outside function body"
+          ],
+          "seconds": 0
+        },
+        {
+          "id": "m04",
+          "op": "delete-line",
+          "where": "internal/ledger/store.go:40 deleted `return \"\", err`",
+          "outcome": "survived",
+          "problems": [],
+          "seconds": 40.5
+        }
+      ],
+      "near_misses": 0,
+      "near_misses_killed": 0
+    },
+    "ledger-retry-double-charge": {
+      "mutants": 12,
+      "stillborn": 3,
+      "killed": 7,
+      "survived": 2,
+      "score": 0.778,
+      "rows": [
+        {
+          "id": "m01",
+          "op": "revert-hunk",
+          "where": "internal/db/schema.sql:68 hunk reverted to the buggy version",
+          "outcome": "survived",
+          "problems": [],
+          "seconds": 48.5
+        },
+        {
+          "id": "m02",
+          "op": "revert-hunk",
+          "where": "internal/ledger/store.go:44 hunk reverted to the buggy version",
+          "outcome": "killed",
+          "problems": [
+            "concurrent: saga 01a19665-94a1-7dcf-8c14-a29914301939 hold attempt 2 still failing after 20 tries: ERROR: duplicate key value violates unique constraint \"operations_saga_id_step_key\" (SQLSTATE 23505)",
+            "concurrent: saga 01a19665-94a1-7dc9-b9d8-55f5485d41b1 hold attempt 2 still failing after 20 tries: ERROR: duplicate key value violates unique constraint \"operations_saga_id_step_key\" (SQLSTATE 23505)",
+            "concurrent: saga 01a19665-94a1-7dcb-96ef-62be4fae7ffb hold attempt 1 still failing after 20 tries: ERROR: duplicate key value violates unique constraint \"operations_saga_id_step_key\" (SQLSTATE 23505)"
+          ],
+          "seconds": 193.2
+        },
+        {
+          "id": "m03",
+          "op": "flip",
+          "where": "internal/ledger/store.go:51 `if err := rows.Scan(&step, &d.Outcome, &d.Reason); err != nil {` -> `if err := rows.Scan(&step, &d.Outcome, &d.Reason); err == nil {`",
+          "outcome": "killed",
+          "problems": [
+            "concurrent: 420 sagas with disallowed effects, 0 applied twice, 300 with wrong money (of 600)",
+            "concurrent: at rest but 104783 held",
+            "concurrent: saga 01a19668-89f2-7704-8330-82a0384f764d (retry): ledger effects map[hold:ok] not allowed for COMPLETED"
+          ],
+          "seconds": 73.3
+        },
+        {
+          "id": "m04",
+          "op": "delete-line",
+          "where": "internal/db/schema.sql:71 deleted `at         timestamptz NOT NULL DEFAULT now(),`",
+          "outcome": "survived",
+          "problems": [],
+          "seconds": 40.2
+        },
+        {
+          "id": "m05",
+          "op": "flip",
+          "where": "internal/ledger/store.go:55 `if step == c.Step {` -> `if step != c.Step {`",
+          "outcome": "killed",
+          "problems": [
+            "concurrent: saga 01a1966a-4873-7159-add4-5654a8eb244d hold attempt 1 still failing after 20 tries: ERROR: duplicate key value violates unique constraint \"operations_saga_id_step_key\" (SQLSTATE 23505)",
+            "concurrent: saga 01a1966a-4873-7172-917f-f68d27ad6c68 hold attempt 1 still failing after 20 tries: ERROR: duplicate key value violates unique constraint \"operations_saga_id_step_key\" (SQLSTATE 23505)",
+            "concurrent: saga 01a1966a-4873-7170-a177-b23b5e4cd7af hold attempt 1 still failing after 20 tries: ERROR: duplicate key value violates unique constraint \"operations_saga_id_step_key\" (SQLSTATE 23505)"
+          ],
+          "seconds": 164.2
+        },
+        {
+          "id": "m06",
+          "op": "delete-line",
+          "where": "internal/db/schema.sql:72 deleted `UNIQUE (saga_id, step)`",
+          "outcome": "killed",
+          "problems": [
+            "concurrent: verifier error: ERROR: syntax error at or near \")\" (SQLSTATE 42601)",
+            "none seed 1: migrate: exit status 1: time=2026-11-01T12:24:36.038+03:00 level=ERROR msg=migrate err=\"ERROR: syntax error at or near \\\")\\\" (SQLSTATE 42601)\"\n",
+            "orch.reply.after_commit seed 1: migrate: exit status 1: time=2026-11-01T12:24:36.037+03:00 level=ERROR msg=migrate err=\"ERROR: syntax error at or near \\\")\\\" (SQLSTATE 42601)\"\n"
+          ],
+          "seconds": 6.6
+        },
+        {
+          "id": "m07",
+          "op": "flip",
+          "where": "internal/ledger/store.go:65 `if d == nil {` -> `if d != nil {`",
+          "outcome": "killed",
+          "problems": [
+            "concurrent: sabrace produced no result (see race.log)",
+            "none seed 1: no warm-up transfer completed within 60s",
+            "none seed 1: ledger exited unexpectedly: exit status 2"
+          ],
+          "seconds": 67.0
+        },
+        {
+          "id": "m08",
+          "op": "delete-line",
+          "where": "internal/ledger/store.go:47 deleted `var replay *Decision`",
+          "outcome": "stillborn",
+          "problems": [
+            "# github.com/chipontix/ledger-saga/internal/ledger\ninternal/ledger/store.go:55:4: undefined: replay\ninternal/ledger/store.go:63:7: undefined: replay"
+          ],
+          "seconds": 0
+        },
+        {
+          "id": "m09",
+          "op": "flip",
+          "where": "internal/ledger/store.go:71 `case err == nil:` -> `case err != nil:`",
+          "outcome": "killed",
+          "problems": [
+            "concurrent: 600 sagas with disallowed effects, 0 applied twice, 300 with wrong money (of 600)",
+            "concurrent: saga 01a1966d-f525-7e6b-85d9-b81ee4982d0d (race): ledger effects map[] not allowed for CANCELLED",
+            "concurrent: saga 01a1966d-f525-7e6c-9bb4-481ead66d8eb (retry): ledger effects map[] not allowed for COMPLETED"
+          ],
+          "seconds": 70.8
+        },
+        {
+          "id": "m10",
+          "op": "delete-line",
+          "where": "internal/ledger/store.go:50 deleted `var d Decision`",
+          "outcome": "stillborn",
+          "problems": [
+            "# github.com/chipontix/ledger-saga/internal/ledger\ninternal/ledger/store.go:50:31: undefined: d\ninternal/ledger/store.go:53:17: undefined: d\ninternal/ledger/store.go:55:14: undefined: d"
+          ],
+          "seconds": 0
+        },
+        {
+          "id": "m11",
+          "op": "flip",
+          "where": "internal/ledger/store.go:72 `a.Exists = true` -> `a.Exists = false`",
+          "outcome": "killed",
+          "problems": [
+            "concurrent: 300 sagas with disallowed effects, 0 applied twice, 300 with wrong money (of 600)",
+            "concurrent: saga 01a1966f-0bcc-7cd5-8c4b-ed03d5f4a24f (retry): ledger effects map[capture:rejected credit:rejected hold:rejected] not allowed for COMPLETED",
+            "concurrent: saga 01a1966f-0bcc-7cd5-8c4b-ed03d5f4a24f (retry) moved src 0 dst 0, want -38/38"
+          ],
+          "seconds": 74.3
+        },
+        {
+          "id": "m12",
+          "op": "delete-line",
+          "where": "internal/ledger/store.go:51 deleted `if err := rows.Scan(&step, &d.Outcome, &d.Reason); err != nil {`",
+          "outcome": "stillborn",
+          "problems": [
+            "# github.com/chipontix/ledger-saga/internal/ledger\ninternal/ledger/store.go:58:2: syntax error: non-declaration statement outside function body"
+          ],
+          "seconds": 0
+        }
+      ],
+      "near_misses": 0,
+      "near_misses_killed": 0
+    },
+    "pgsync-deletes-replica-identity": {
+      "mutants": 4,
+      "stillborn": 0,
+      "killed": 2,
+      "survived": 2,
+      "score": 0.5,
+      "rows": [
+        {
+          "id": "m01",
+          "op": "revert-hunk",
+          "where": "deploy/postgres/init.sql:28 hunk reverted to the buggy version",
+          "outcome": "survived",
+          "problems": [],
+          "seconds": 27.5
+        },
+        {
+          "id": "m02",
+          "op": "revert-hunk",
+          "where": "internal/pipeline/cdc.go:37 hunk reverted to the buggy version",
+          "outcome": "killed",
+          "problems": [
+            "1117 missing, 116 stale, 40 extra documents",
+            "id 405 (version 10810) not searchable",
+            "id 1146 (version 12216) not searchable"
+          ],
+          "seconds": 69.7
+        },
+        {
+          "id": "m03",
+          "op": "delete-line",
+          "where": "deploy/postgres/init.sql:33 deleted `ALTER TABLE products REPLICA IDENTITY FULL;`",
+          "outcome": "survived",
+          "problems": [],
+          "seconds": 27.3
+        },
+        {
+          "id": "m04",
+          "op": "delete-line",
+          "where": "internal/pipeline/cdc.go:40 deleted `Tables: publication.Tables{{Name: \"products\", ReplicaIdentity: publication.ReplicaIdentityFull}},`",
+          "outcome": "killed",
+          "problems": [
+            "verifier error: replication slot pgs_567068000_20320 not active after 30s"
+          ],
+          "seconds": 35.3
+        },
+        {
+          "id": "skip-unversioned-deletes",
+          "op": "near-miss",
+          "where": "tasks/pgsync-deletes-replica-identity/near_misses/skip-unversioned-deletes.patch",
+          "outcome": "killed",
+          "problems": [
+            "0 missing, 0 stale, 325 extra documents",
+            "id 568 deleted in the table, still searchable at version 3722",
+            "id 778 deleted in the table, still searchable at version 9992"
+          ],
+          "seconds": 70.6
+        }
+      ],
+      "near_misses": 1,
+      "near_misses_killed": 1
+    },
+    "pgsync-slot-dropped-on-restart": {
+      "mutants": 4,
+      "stillborn": 4,
+      "killed": 0,
+      "survived": 0,
+      "score": null,
+      "rows": [
+        {
+          "id": "m01",
+          "op": "revert-hunk",
+          "where": "internal/pipeline/cdc.go:3 hunk reverted to the buggy version",
+          "outcome": "stillborn",
+          "problems": [
+            "# github.com/chipontix/pg-search-sync/internal/pipeline\ninternal/pipeline/cdc.go:6:2: \"fmt\" imported and not used\ninternal/pipeline/cdc.go:8:2: \"net/url\" imported and not used"
+          ],
+          "seconds": 0
+        },
+        {
+          "id": "m02",
+          "op": "revert-hunk",
+          "where": "internal/pipeline/cdc.go:11 hunk reverted to the buggy version",
+          "outcome": "stillborn",
+          "problems": [
+            "# github.com/chipontix/pg-search-sync/internal/pipeline\ninternal/pipeline/cdc.go:14:2: \"github.com/jackc/pgx/v5\" imported as pgx and not used"
+          ],
+          "seconds": 0
+        },
+        {
+          "id": "m03",
+          "op": "revert-hunk",
+          "where": "internal/pipeline/cdc.go:57 hunk reverted to the buggy version",
+          "outcome": "stillborn",
+          "problems": [
+            "# github.com/chipontix/pg-search-sync/internal/pipeline\ninternal/pipeline/cdc.go:64:12: undefined: dropIdleSlot"
+          ],
+          "seconds": 0
+        },
+        {
+          "id": "m04",
+          "op": "revert-hunk",
+          "where": "internal/pipeline/cdc.go:73 hunk reverted to the buggy version",
+          "outcome": "stillborn",
+          "problems": [
+            "# github.com/chipontix/pg-search-sync/internal/pipeline\ninternal/pipeline/cdc.go:77:9: undefined: fmt\ninternal/pipeline/cdc.go:77:50: undefined: url\ninternal/pipeline/cdc.go:79:15: undefined: pgx"
+          ],
+          "seconds": 0
+        },
+        {
+          "id": "drop-on-shutdown",
+          "op": "near-miss",
+          "where": "tasks/pgsync-slot-dropped-on-restart/near_misses/drop-on-shutdown.patch",
+          "outcome": "survived",
+          "problems": [],
+          "seconds": 25.4
+        }
+      ],
+      "near_misses": 1,
+      "near_misses_killed": 0
+    }
+  },
+  "host": {
+    "at": "2026-11-01T09:08:16Z",
+    "machine": "arm64",
+    "system": "Darwin",
+    "cpus": 16,
+    "load_average": "25.29 30.83 32.43"
+  }
+}

@@ -141,14 +141,54 @@ stays out of the score, because the compiler caught it and the verifier did
 not. The hand-written `near_misses/` run next to the generated mutants.
 
 <!-- results:mutation -->
-_not run yet_
+| task | mutants | stillborn | killed | survived | of which equivalent | caught | caught, equivalents excluded | near misses killed |
+|---|---|---|---|---|---|---|---|---|
+| `lakehouse-dups-after-rebalance` | 7 | 0 | 6 | 1 | 1 | 86% | 100% | 0/1 |
+| `lakehouse-offsets-after-parquet` | 6 | 2 | 3 | 1 | 1 | 75% | 100% | – |
+| `ledger-hold-release-race` | 4 | 1 | 2 | 1 | 0 | 67% | 67% | – |
+| `ledger-retry-double-charge` | 12 | 3 | 7 | 2 | 2 | 78% | 100% | – |
+| `pgsync-deletes-replica-identity` | 4 | 0 | 2 | 2 | 2 | 50% | 100% | 1/1 |
+| `pgsync-slot-dropped-on-restart` | 4 | 4 | 0 | 0 | 0 | n/a | n/a | 0/1 |
+| all | | | 20 of 27 live | | 6 | 74% | 95% | |
+
+Equivalent = argued by hand in `tasks/<id>/equivalent.json`; each argument is listed below.
+Recorded 2026-11-01T09:08:16Z. Reproduce: `make mutation`; per mutant: `results/mutation.json`.
 <!-- /results -->
 
 Surviving mutants:
 
 <!-- results:survivors -->
-_not run yet_
+- `lakehouse-dups-after-rebalance` m02 (revert-hunk): src/lakehouse/ingest.py:105 hunk reverted to the buggy version. **Equivalent:** re-adds `self.seen = set()` to __init__; nothing reads it in the reference.
+- `lakehouse-dups-after-rebalance` reload-seen-at-start (near-miss): tasks/lakehouse-dups-after-rebalance/near_misses/reload-seen-at-start.patch.
+- `lakehouse-offsets-after-parquet` m02 (revert-hunk): src/lakehouse/ingest.py:167 hunk reverted to the buggy version. **Equivalent:** re-adds a second upsert of the same offsets after the Parquet write; the batch transaction already stored them, and the upsert is idempotent.
+- `ledger-hold-release-race` m04 (delete-line): internal/ledger/store.go:40 deleted `return "", err`.
+- `ledger-retry-double-charge` m01 (revert-hunk): internal/db/schema.sql:68 hunk reverted to the buggy version. **Equivalent:** drops UNIQUE (saga_id, step) but keeps the replay check; under the per-saga advisory lock the replay alone already prevents a second decision, so only the safety net is gone.
+- `ledger-retry-double-charge` m04 (delete-line): internal/db/schema.sql:71 deleted `at         timestamptz NOT NULL DEFAULT now(),`. **Equivalent:** drops the `at` column of ledger.operations; nothing reads or writes it explicitly.
+- `pgsync-deletes-replica-identity` m01 (revert-hunk): deploy/postgres/init.sql:28 hunk reverted to the buggy version. **Equivalent:** edits deploy/postgres/init.sql, which the verifier never applies (it uses the pinned upstream schema) and which the connector overrides anyway.
+- `pgsync-deletes-replica-identity` m03 (delete-line): deploy/postgres/init.sql:33 deleted `ALTER TABLE products REPLICA IDENTITY FULL;`. **Equivalent:** same file as m01.
+- `pgsync-slot-dropped-on-restart` drop-on-shutdown (near-miss): tasks/pgsync-slot-dropped-on-restart/near_misses/drop-on-shutdown.patch.
 <!-- /results -->
+
+The survivors that are not equivalent are the bench's measured blind spots:
+
+- **`ledger-hold-release-race` m04** deletes the `return` after a failed
+  advisory-lock statement. Neither scenario makes that statement fail, so an
+  error path that silently carries on is invisible. Fault injection into
+  Postgres calls would close this gap; it is not built.
+- **`reload-seen-at-start`** fills the in-memory dedup set from Postgres at
+  startup. That is correct when workers take turns on a partition and wrong
+  when two of them own it at once. The lakehouse scenario never has two
+  owners at once, because then the duplicate counter disagrees with the
+  reference even on the original code (see Limitations).
+- **`drop-on-shutdown`** moves the slot drop from startup to shutdown, after
+  `connector.Close()`. It never takes effect in this scenario: a drop would
+  lose the writes made in the restart gap, and none were lost. Either the
+  process exits before the drop runs, or the slot is still active at that
+  moment. In production this would depend on timing.
+- **`pgsync-slot-dropped-on-restart` has no live generated mutants.** Its
+  fix only deletes code, so undoing one hunk either leaves an unused import
+  or function (which Go rejects) or reintroduces the whole bug. The wrong fix
+  and the near miss are what test this verifier.
 
 ## Runner and agents
 

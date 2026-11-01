@@ -145,21 +145,27 @@ def cmd_mutation(a) -> int:
                          "outcome": outcome, "problems": res["problems"][:3], "seconds": res["seconds"]})
             print(f"{t.id:36} {nm.stem} {outcome:9} near miss", flush=True)
             shutil.rmtree(md, ignore_errors=True)
-        live = [r for r in rows if r["outcome"] != "stillborn"]
+        gen = [r for r in rows if r["op"] != "near-miss"]
+        live = [r for r in gen if r["outcome"] != "stillborn"]
         killed = sum(r["outcome"] == "killed" for r in live)
-        out["tasks"][t.id] = {"mutants": len(rows), "stillborn": len(rows) - len(live), "killed": killed,
+        near = [r for r in rows if r["op"] == "near-miss"]
+        out["tasks"][t.id] = {"mutants": len(gen), "stillborn": len(gen) - len(live), "killed": killed,
                               "survived": len(live) - killed,
-                              "score": round(killed / len(live), 3) if live else None, "rows": rows}
+                              "score": round(killed / len(live), 3) if live else None,
+                              "near_misses": len(near), "near_misses_killed": sum(r["outcome"] == "killed" for r in near),
+                              "rows": rows}
         save("mutation", out)
     (RESULTS / "mutation.md").write_text(mutation_table(out))
     return 0
 
 
 def mutation_table(out: dict) -> str:
-    lines = ["| task | mutants | stillborn | killed | survived | caught |", "|---|---|---|---|---|---|"]
+    lines = ["| task | mutants | stillborn | killed | survived | caught | near misses killed |",
+             "|---|---|---|---|---|---|---|"]
     for tid, v in out["tasks"].items():
         score = "n/a" if v["score"] is None else f"{v['score']:.0%}"
-        lines.append(f"| {tid} | {v['mutants']} | {v['stillborn']} | {v['killed']} | {v['survived']} | {score} |")
+        near = f"{v['near_misses_killed']}/{v['near_misses']}" if v["near_misses"] else "–"
+        lines.append(f"| {tid} | {v['mutants']} | {v['stillborn']} | {v['killed']} | {v['survived']} | {score} | {near} |")
     lines += ["", "Survivors:", ""]
     for tid, v in out["tasks"].items():
         for r in v["rows"]:

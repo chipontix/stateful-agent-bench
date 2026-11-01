@@ -1,0 +1,4 @@
+{
+  "m01": "edits deploy/postgres/init.sql, which the verifier never applies (it uses the pinned upstream schema) and which the connector overrides anyway",
+  "m03": "same file as m01"
+}

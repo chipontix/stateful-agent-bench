@@ -41,19 +41,32 @@ def mutation() -> str:
     d = load("mutation")
     if not d:
         return "_not run yet_"
-    rows = ["| task | mutants | stillborn | killed | survived | caught | near misses killed |",
-            "|---|---|---|---|---|---|---|"]
+    rows = ["| task | mutants | stillborn | killed | survived | of which equivalent | caught | caught, equivalents excluded | near misses killed |",
+            "|---|---|---|---|---|---|---|---|---|"]
+    tot = [0, 0, 0]
     for tid, v in d["tasks"].items():
         gen = [r for r in v["rows"] if r["op"] != "near-miss"]
         near = [r for r in v["rows"] if r["op"] == "near-miss"]
         live = [r for r in gen if r["outcome"] != "stillborn"]
         k = sum(r["outcome"] == "killed" for r in live)
+        eq = equivalent(tid)
+        n_eq = sum(r["outcome"] == "survived" and r["id"] in eq for r in live)
         caught = f"{k / len(live):.0%}" if live else "n/a"
+        caught_x = f"{k / (len(live) - n_eq):.0%}" if len(live) > n_eq else "n/a"
         nk = f"{sum(r['outcome'] == 'killed' for r in near)}/{len(near)}" if near else "–"
-        rows.append(f"| `{tid}` | {len(gen)} | {len(gen) - len(live)} | {k} | {len(live) - k} | {caught} | {nk} |")
+        tot = [tot[0] + len(live), tot[1] + k, tot[2] + n_eq]
+        rows.append(f"| `{tid}` | {len(gen)} | {len(gen) - len(live)} | {k} | {len(live) - k} | {n_eq} | {caught} | {caught_x} | {nk} |")
+    rows.append(f"| all | | | {tot[1]} of {tot[0]} live | | {tot[2]} | {tot[1] / tot[0]:.0%} | "
+                f"{tot[1] / (tot[0] - tot[2]):.0%} | |")
     rows.append("")
+    rows.append("Equivalent = argued by hand in `tasks/<id>/equivalent.json`; each argument is listed below.")
     rows.append(f"Recorded {d['host']['at']}. Reproduce: `make mutation`; per mutant: `results/mutation.json`.")
     return "\n".join(rows)
+
+
+def equivalent(tid: str) -> dict:
+    p = ROOT / "tasks" / tid / "equivalent.json"
+    return json.loads(p.read_text()) if p.exists() else {}
 
 
 def survivors() -> str:
@@ -62,9 +75,11 @@ def survivors() -> str:
         return "_not run yet_"
     out = []
     for tid, v in d["tasks"].items():
+        eq = equivalent(tid)
         for r in v["rows"]:
             if r["outcome"] == "survived":
-                out.append(f"- `{tid}` {r['id']} ({r['op']}): {r['where']}")
+                why = f" **Equivalent:** {eq[r['id']]}." if r["id"] in eq else ""
+                out.append(f"- `{tid}` {r['id']} ({r['op']}): {r['where']}.{why}")
     return "\n".join(out) or "none"
 
 

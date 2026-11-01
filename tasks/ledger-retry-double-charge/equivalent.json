@@ -1,0 +1,4 @@
+{
+  "m01": "drops UNIQUE (saga_id, step) but keeps the replay check; under the per-saga advisory lock the replay alone already prevents a second decision, so only the safety net is gone",
+  "m04": "drops the `at` column of ledger.operations; nothing reads or writes it explicitly"
+}
