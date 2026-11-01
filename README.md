@@ -1,0 +1,246 @@
+# stateful-agent-bench
+
+[![ci](https://github.com/chipontix/stateful-agent-bench/actions/workflows/ci.yml/badge.svg)](https://github.com/chipontix/stateful-agent-bench/actions/workflows/ci.yml)
+
+Tasks for coding agents taken from three stateful systems: a saga ledger, a
+CDC search pipeline and a Kafka → Postgres + Parquet lakehouse. Each task
+starts from a pinned commit of the real project with a realistic bug patched
+in. The fix is graded by running the real services under SIGKILLs, restarts,
+partition moves and write load, and then checking the system's invariants
+against an independent reference. Unit tests play no part in the grade.
+
+```bash
+make up deps          # Postgres + Kafka for the verifiers, upstream clones, Python env
+make verify-all       # per task: bug red, reference fix green, 3 reference runs without a flake
+make mutation         # mutants of every reference fix against its verifier
+make runs             # stub agents in a container with --network none, traces, audits, pass@k
+make test             # the tooling's own checks (no brokers, no Docker)
+```
+
+## How it was built
+
+The code, the tasks, the verifiers and this documentation were written by the
+AI coding agent Claude Code (Anthropic), from a specification by Rabiya and
+under her direction. She chose the projects, the kinds of bugs and the roles
+the bench is meant to show. Each claim below was checked by running it, and
+the commands that reproduce the numbers sit next to them. The three upstream
+projects are hers ([ledger-saga](https://github.com/chipontix/ledger-saga),
+[pg-search-sync](https://github.com/chipontix/pg-search-sync),
+[events-lakehouse](https://github.com/chipontix/events-lakehouse)).
+
+## Tasks
+
+| task | project | what the bug report says | what the bug is (hidden from the agent) |
+|---|---|---|---|
+| `ledger-retry-double-charge` | ledger-saga (Go, Postgres, Kafka) | customers charged twice when the ledger is slow | the ledger no longer replays a step it already decided (only the transport inbox dedups, and every retry has a new message id); the `(saga, step)` unique key is gone |
+| `ledger-hold-release-race` | ledger-saga | money stays held after cancelled transfers | the per-saga advisory lock was removed as "redundant with the row lock": a hold and its release read the saga's prior steps concurrently, and the release records a tombstone for a hold that commits a moment later |
+| `pgsync-slot-dropped-on-restart` | pg-search-sync (Go, Postgres, Kafka) | changes made while cdc restarts never reach search | on start the connector drops an inactive replication slot "so it cannot pin WAL"; after a kill the slot is inactive, so the WAL written while the connector was down is never read |
+| `pgsync-deletes-replica-identity` | pg-search-sync | cdc crash-loops after the first delete | the publication asks for `REPLICA IDENTITY DEFAULT` "to halve WAL", the connector applies it, and a delete then carries no `version` for its tombstone |
+| `lakehouse-dups-after-rebalance` | events-lakehouse (Python, Kafka, Postgres, Parquet) | duplicate events in the lake after partitions moved between workers | dedup moved into a per-process set of seen ids and `RETURNING` dropped: a new owner of a partition re-inserts what the previous owner loaded, Postgres silently skips it and the lake gets it twice |
+| `lakehouse-offsets-after-parquet` | events-lakehouse | duplicate counts too high after a worker crash | the next offset is stored in its own transaction after the Parquet write "so the position never runs ahead of the lake"; a crash between the two replays a committed batch |
+
+The courier-shifts-userver task from the original plan is not here. A userver
+build needs much more than the 20 GB of free disk the machine had while six
+projects were being worked on in parallel, so a second task from each of the
+other three projects took its place.
+
+Each task directory holds `issue.md` (what the agent sees), `bug.patch` (on
+top of the pinned commit in `task.json`), `fix.patch` (the reference: the
+original code), `wrong.patch` (a plausible fix that is wrong), `cheat.patch`
+(an edit to the verifier's own files) and, for some tasks, `near_misses/`.
+The agent's repository is a fresh git repo with one commit, so neither history
+nor `git diff` gives the bug away. `scripts/author_patches.py` writes all the
+patches from readable before/after edits.
+
+## Why invariants and not unit tests
+
+All six bugs pass the code paths a unit test would normally exercise. None of
+them shows up in one process, on one partition or in the first delivery. Each
+one needs a second actor, a retry or a crash in a particular gap:
+
+- **Double charge** needs a retry with a new message id while the first
+  attempt's decision is already committed. A test of `Decide` passes,
+  because `Decide` is still correct; the caller stopped consulting the
+  saga's history. The crash harness produces such retries on every run
+  (timeouts, deferred deliveries, redeliveries, SIGKILL after commit), and
+  the audit sees the money: "moved src −2x".
+- **Hold/release race** needs two transactions for one saga in flight at
+  once, under READ COMMITTED, reading the saga's prior steps before either
+  commits. That interleaving only happens when the ledger catches up on a
+  backlog after a crash. A test that sends hold and then release in order
+  passes.
+- **Slot dropped on restart** needs the connector to die while writes
+  continue. The code that drops the slot even has a careful `AND NOT
+  active`. The verifier kills it twice and restarts it once under 400
+  writes/s, then resolves the topic per id the way Elasticsearch's external
+  versioning would.
+- **Replica identity** only fails once the connector has altered the table
+  and a delete arrives. The fixture rows in a unit test still carry a
+  `version`.
+- **Dups after rebalance** need a duplicate whose original was loaded by
+  *another* process. Inside one worker the in-memory set works perfectly, and
+  the Postgres table stays correct (the primary key still rejects the row).
+  Only the lake and the duplicate counter are wrong, and only a comparison
+  with the generator's ground truth shows that.
+- **Offsets after Parquet** looks *safer* than the original when read: it
+  says "the position only moves once the batch is in the lake". It breaks
+  only on a crash between two commits, which the verifier arms with the
+  project's own failpoint.
+
+An invariant is stated about the outcome, so it does not care which code path
+an agent changes. Every correct fix passes, including ones other than the
+reference. Every incorrect one fails, as long as the scenario reaches the
+broken interleaving. That last condition is the real limit of this bench, and
+the mutation results below measure it.
+
+## Verifiers
+
+All three run the project's real binaries on the host against one Postgres and
+one Kafka (`infra/`). Before a run, the files that grade the result are put
+back to the pinned upstream version (`task.json` → `protected`), so an agent
+cannot weaken its own grader. The runner reports any such edit (see the
+auditor).
+
+| project | scenario | invariants | performance budget |
+|---|---|---|---|
+| ledger-saga | the project's crash harness (`ledgersaga chaos`): 3 services as real processes, a seeded workload of 200 transfers over the HTTP API, duplication, reordering and late redelivery on every run; crash points `none`, `ledger.before_commit`, `ledger.after_commit`, `orch.reply.after_commit` in parallel, each SIGKILLing the process once and restarting it | the project's own audit (`internal/check`): journal sums to zero per operation and globally, balances equal the journal, no negative balance, nothing held at rest, customer money equals the opening total, every saga terminal with exactly the ledger effects its state allows and exactly ±amount moved, legal transition logs, one transfer per idempotency key | every run quiesces within 40 s of the workload's end |
+| pg-search-sync | `verifiers/pgsync/sabcheck.go`: fresh database and topic, real `cdc` binary, 16 s of 400 writes/s (60% update, 20% insert, 12% delete, 8% re-insert of a deleted id), `kill -9` twice and one SIGTERM restart while the writes continue | the topic resolved per id (highest version wins, as with ES `version_type=external`) equals the table: every row searchable at its current version, every deleted row a tombstone, nothing extra; the connector never exits on its own | converged within 30 s after the writes stop |
+| events-lakehouse | `verifiers/lakehouse/verify.py`: 60k generated messages (5% duplicates, 3% late, 0.5% bad) in three thirds: two workers on {0,1,2}/{3,4,5}; partitions moved to {0,2,4}/{1,3,5}, the first started with the after-commit failpoint armed; one worker for all partitions SIGKILLed at seeded random moments | Postgres `events` and the Parquet lake equal the generator's reference row for row (count + order-independent digest of all columns), quarantine counts per reason, duplicate count | every phase-1 worker ingests ≥ 1,500 msg/s |
+
+The budgets are loose on purpose. They exist to fail a "fix" that serialises
+the system or commits per row, not to measure performance, and they have to
+hold on a laptop shared with other workloads.
+
+### Results
+
+<!-- results:verify-all -->
+<!-- /results -->
+
+## Mutation testing of the verifiers
+
+`bench/mutate.py` mutates only the lines the reference fix touches:
+`revert-hunk` undoes one hunk of the fix (a partial fix), `delete-line` drops
+one added line, and `flip` inverts one operator or literal. Comments and
+docstrings are never mutated. A mutant that does not build is "stillborn" and
+stays out of the score, because the compiler caught it and the verifier did
+not. The hand-written `near_misses/` run next to the generated mutants.
+
+<!-- results:mutation -->
+<!-- /results -->
+
+Surviving mutants:
+
+<!-- results:survivors -->
+<!-- /results -->
+
+## Runner and agents
+
+`python3 -m bench run --agent A -n N -k K` runs each attempt like this:
+
+1. It builds the task repository (pinned commit + `bug.patch`, one fresh
+   commit).
+2. It starts the agent with `docker run --network none --memory 512m --cpus
+   1`. The repository is mounted at `/workspace`; `issue.md` and nothing else
+   from the task is mounted at `/task`.
+3. It takes the agent's diff, runs the verifier on a copy with the protected
+   files restored, and writes everything to one JSONL trace: runner events,
+   agent events (each read, edit, command and network probe) and the
+   verifier result.
+4. It computes pass@1 and pass@k with the unbiased estimator (Chen et al.
+   2021) over the N attempts.
+
+The agents here are stubs that play back a prepared patch through a small
+stdlib-only patch applier inside the container. They show that the runner
+and the verifiers separate a correct fix from a wrong one, and from an
+attempt to edit the grader. They say nothing about any model. The first thing
+a stub does is probe the network (two IP addresses, no DNS needed), and the
+trace records the result.
+
+<!-- results:runs -->
+<!-- /results -->
+
+### Trace auditor
+
+`python3 -m bench audit TRACE.jsonl` turns a trace into a Task Auditor style
+report with three sections: what the agent did (every step, numbered as in
+the trace), where it went wrong, and whether it got around the verifier. It
+uses rules, not a model, so the same trace always gets the same report. The
+rules:
+
+- an edit to a file the agent never read;
+- no passing test run before finishing;
+- files changed that the reference does not touch, or reference files left
+  untouched in a failed attempt;
+- a non-zero agent exit;
+- each verifier problem, translated into what it means ("money moved for a
+  transfer differs from its amount");
+- a final message that claims success the verifier does not confirm;
+- integrity: edits to protected files, or network inside the sandbox.
+
+An attempt that passes but touched the grader is `INVALID`, not `RESOLVED`.
+Example reports: `results/traces/stub-cheat/*.audit.md`.
+
+## Findings in the upstream projects
+
+- **events-lakehouse: concurrent recovery of one batch's Parquet file.** At
+  startup every worker rewrites the Parquet file of each committed batch that
+  has none (`recover_parquet`). Two workers started together after a crash
+  both do it for the same batch, through the same `.tmp` name, and one of
+  them fails with `FileNotFoundError` on `os.replace`. Nothing is lost: the
+  winner's file is complete and the loser exits non-zero. The verifier's first
+  draft hit this on the reference code. The lakehouse scenario now restarts
+  the crashed worker alone first, because this race is not what the tasks
+  test. A fix upstream: a per-process tmp name, or recovery under the
+  advisory lock `apply_schema` already takes.
+
+## Infrastructure
+
+`infra/compose.yaml` runs Postgres 17.6 (logical decoding on) and Kafka 3.9.1
+(KRaft, single node), with the same image tags the upstream projects use, so
+nothing extra is pulled where they are already present. The Docker VM on the
+machine these results come from (colima, 4 vCPU) was shared with several
+other projects' brokers and builds; its load average reached 170, and a
+broker in it timed out on its own controller heartbeats. `make up
+KAFKA=native` (`infra/kafka-native.sh`) instead runs the same Kafka on the
+host JVM, from the official tarball checked against its SHA-512. All the
+results here were recorded that way. The agent container is the only thing
+that has to be in Docker.
+
+Disk: the bench adds one 386 MB Postgres image (the Kafka image was already
+present) and ~0.6 GB of caches under `.cache/` (Go build cache, Kafka
+tarball, the lakehouse verifier's virtualenv). `make clean` removes the
+caches.
+
+## Limitations and what is not done
+
+- **The agents are stubs.** No model was run against these tasks, and the
+  pass@k numbers come from stubs whose outcome is known in advance. The
+  "minimal agent on a local model" from the plan was not built.
+- **The agent container has no toolchain.** `python:3.13-slim` is enough to
+  play back a patch. A real agent that should build Go and run the unit tests
+  offline needs an image with Go and a module cache. That image would be about
+  1 GB, and the disk budget did not allow it.
+- **Six tasks, three projects.** The userver task was dropped for disk
+  (above).
+- **A verifier only sees the interleavings its scenario reaches.** The
+  survivors above are the measured blind spots. The lakehouse scenario lets
+  workers take turns and never makes two of them own a partition at once,
+  because with overlapping ownership the duplicate counter disagrees with the
+  reference even on the original code.
+- **Budgets and timings come from a loaded laptop** (see the load average in
+  each result file). They are pass/fail thresholds, not benchmarks.
+- **Local credentials only.** `postgres:postgres` in `infra/` and in the
+  verifiers' defaults is the throwaway database of the test brokers.
+
+## Layout
+
+```
+tasks/<id>/        task.json, issue.md, bug/fix/wrong/cheat.patch, near_misses/
+verifiers/         ledger (crash harness wrapper), pgsync (sabcheck.go), lakehouse (verify.py)
+bench/             workspace (snapshots, protected paths), verify, run (container, trace, pass@k),
+                   mutate, audit, cli
+agents/stub.py     the stub agent (stdlib only, runs in the container)
+infra/             compose file for the brokers, native Kafka script
+scripts/           author_patches.py (writes the patches), render_readme.py (fills the tables above)
+results/           every number in this README, raw
+```
