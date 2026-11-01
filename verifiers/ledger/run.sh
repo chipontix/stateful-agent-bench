@@ -17,7 +17,9 @@ sed -i.orig 's/base := 21000 + h.slot\*10/base := envInt("CHAOS_PORT_BASE", 2100
 if ! { go build -o bin/ledgersaga ./cmd/ledgersaga && go build -o bin/sabrace ./cmd/sabrace; } > build.log 2>&1; then
   python3 "$here/summary.py" --build-failed build.log "$out"; exit 1
 fi
-./bin/sabrace -admin "$pg" -seed "${SAB_SEED:-1}" -out race.json > race.log 2>&1
+# SAB_CHAOS_ONLY=1 skips the stress (scripts/race_detection.py measures the harness alone).
+if [ "${SAB_CHAOS_ONLY:-}" = 1 ]; then echo '{"problems": [], "metrics": {"skipped": true}}' > race.json
+else ./bin/sabrace -admin "$pg" -seed "${SAB_SEED:-1}" -out race.json > race.log 2>&1; fi
 n=$(tr ',' '\n' <<<"$points" | wc -l | tr -d ' ')
 CHAOS_PORT_BASE=${SAB_PORT_BASE:-31000} KAFKA_BROKERS=${SAB_KAFKA:-localhost:29192} PG_ADMIN_URL=$pg \
   ./bin/ledgersaga chaos -points "$points" -seeds "${SAB_LEDGER_SEEDS:-1}" -parallel "$n" \
