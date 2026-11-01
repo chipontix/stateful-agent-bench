@@ -20,11 +20,11 @@ Sandbox: network `none`. Change: 1 file(s), +7 -6 lines. Verifier: fail in 71.6 
 - changed files the reference fix does not touch: `internal/catalog/event.go`
 - left untouched files the reference fix changes: `deploy/postgres/init.sql`, `internal/pipeline/cdc.go`
 - verifier: 315 missing, 0 stale, 0 extra documents -> documents in the table are not (or no longer) searchable
-- verifier: id 722 (version 10288) not searchable -> invariant violated
-- verifier: id 430 (version 11550) not searchable -> invariant violated
-- verifier: id 749 (version 12028) not searchable -> invariant violated
-- verifier: id 168 (version 11836) not searchable -> invariant violated
-- verifier: id 223 (version 10570) not searchable -> invariant violated
+- verifier: id 722 (version 10288) not searchable -> documents in the table are not (or no longer) searchable
+- verifier: id 430 (version 11550) not searchable -> documents in the table are not (or no longer) searchable
+- verifier: id 749 (version 12028) not searchable -> documents in the table are not (or no longer) searchable
+- verifier: id 168 (version 11836) not searchable -> documents in the table are not (or no longer) searchable
+- verifier: id 223 (version 10570) not searchable -> documents in the table are not (or no longer) searchable
 - final message reports a finished change; the verifier disagrees
 
 ## Did it get around the verifier?

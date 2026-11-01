@@ -19,11 +19,11 @@ Sandbox: network `none`. Change: 1 file(s), +5 -0 lines. Verifier: fail in 72.2 
 - never ran a test that passed before finishing (no brokers in the sandbox, so the invariants could only be checked by the verifier)
 - left untouched files the reference fix changes: `internal/pipeline/cdc.go`
 - verifier: 27 missing, 58 stale, 47 extra documents -> documents in the table are not (or no longer) searchable
-- verifier: id 698: index has version 5644, table 7390 -> invariant violated
-- verifier: id 1055 (version 7878) not searchable -> invariant violated
-- verifier: id 535 (version 4516) not searchable -> invariant violated
-- verifier: id 544: index has version 7222, table 7402 -> invariant violated
-- verifier: id 92: index has version 6368, table 7374 -> invariant violated
+- verifier: id 698: index has version 5644, table 7390 -> documents searchable only at an older version
+- verifier: id 1055 (version 7878) not searchable -> documents in the table are not (or no longer) searchable
+- verifier: id 535 (version 4516) not searchable -> documents in the table are not (or no longer) searchable
+- verifier: id 544: index has version 7222, table 7402 -> documents searchable only at an older version
+- verifier: id 92: index has version 6368, table 7374 -> documents searchable only at an older version
 - final message reports a finished change; the verifier disagrees
 
 ## Did it get around the verifier?

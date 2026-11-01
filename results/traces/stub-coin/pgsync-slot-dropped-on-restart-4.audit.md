@@ -18,11 +18,11 @@ Sandbox: network `none`. Change: 1 file(s), +4 -2 lines. Verifier: fail in 70.8 
 
 - never ran a test that passed before finishing (no brokers in the sandbox, so the invariants could only be checked by the verifier)
 - verifier: 31 missing, 58 stale, 29 extra documents -> documents in the table are not (or no longer) searchable
-- verifier: id 1137: index has version 8630, table 10870 -> invariant violated
-- verifier: id 413: index has version 6892, table 7968 -> invariant violated
-- verifier: id 893: index has version 6932, table 7658 -> invariant violated
-- verifier: id 256: index has version 6774, table 8078 -> invariant violated
-- verifier: id 771: index has version 6836, table 7828 -> invariant violated
+- verifier: id 1137: index has version 8630, table 10870 -> documents searchable only at an older version
+- verifier: id 413: index has version 6892, table 7968 -> documents searchable only at an older version
+- verifier: id 893: index has version 6932, table 7658 -> documents searchable only at an older version
+- verifier: id 256: index has version 6774, table 8078 -> documents searchable only at an older version
+- verifier: id 771: index has version 6836, table 7828 -> documents searchable only at an older version
 - final message reports a finished change; the verifier disagrees
 
 ## Did it get around the verifier?
