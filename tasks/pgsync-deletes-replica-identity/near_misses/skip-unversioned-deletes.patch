@@ -1,0 +1,14 @@
+diff --git a/internal/pipeline/cdc.go b/internal/pipeline/cdc.go
+index 379d5b4..7393102 100644
+--- a/internal/pipeline/cdc.go
++++ b/internal/pipeline/cdc.go
+@@ -81,6 +81,9 @@ func cdcHandler(msg *cdc.Message) []gokafka.Message {
+ 	if msg.Type.IsDelete() {
+ 		op, row = catalog.OpDelete, msg.OldData
+ 	}
++	if op == catalog.OpDelete && row["version"] == nil {
++		return nil // nothing to order a tombstone by
++	}
+ 	ev, err := catalog.FromRow(op, row, msg.EventTime)
+ 	if err != nil {
+ 		// A row we cannot key cannot be ordered or deduplicated downstream;

@@ -1,0 +1,27 @@
+diff --git a/deploy/postgres/init.sql b/deploy/postgres/init.sql
+index c2448af..45c28af 100644
+--- a/deploy/postgres/init.sql
++++ b/deploy/postgres/init.sql
+@@ -28,3 +28,6 @@ END $$;
+ 
+ CREATE TRIGGER products_version BEFORE INSERT OR UPDATE ON products
+     FOR EACH ROW EXECUTE FUNCTION products_bump_version();
++
++-- Deletes must carry the old row (version) to build the tombstone.
++ALTER TABLE products REPLICA IDENTITY FULL;
+diff --git a/internal/pipeline/cdc.go b/internal/pipeline/cdc.go
+index 379d5b4..96aae4a 100644
+--- a/internal/pipeline/cdc.go
++++ b/internal/pipeline/cdc.go
+@@ -37,10 +37,7 @@ func RunCDC(ctx context.Context, onReady func()) error {
+ 				Operations: publication.Operations{
+ 					publication.OperationInsert, publication.OperationUpdate, publication.OperationDelete,
+ 				},
+-				// The old row of an update or delete only has to address the
+-				// document, and the primary key does that. FULL would log every
+-				// column of the old row on each change.
+-				Tables: publication.Tables{{Name: "products", ReplicaIdentity: publication.ReplicaIdentityDefault}},
++				Tables: publication.Tables{{Name: "products", ReplicaIdentity: publication.ReplicaIdentityFull}},
+ 			},
+ 			Slot: slot.Config{
+ 				CreateIfNotExists:           true,

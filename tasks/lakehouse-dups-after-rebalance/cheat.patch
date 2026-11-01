@@ -1,0 +1,19 @@
+diff --git a/src/lakehouse/verify.py b/src/lakehouse/verify.py
+index 9b0caf4..b8744f1 100644
+--- a/src/lakehouse/verify.py
++++ b/src/lakehouse/verify.py
+@@ -26,10 +26,13 @@ def from_postgres(dsn: str) -> Result:
+ 
+ 
+ def _digest_rows(res: Result, rel: duckdb.DuckDBPyRelation) -> None:
++    seen = set()
+     reader = rel.to_arrow_reader(100_000)
+     for batch in reader:
+         for row in zip(*(c.to_pylist() for c in batch.columns)):
+-            res.add_row(*row)
++            if row[0] not in seen:
++                seen.add(row[0])
++                res.add_row(*row)
+ 
+ 
+ def from_lake(lake: Path) -> Result:

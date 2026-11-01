@@ -1,0 +1,14 @@
+diff --git a/src/lakehouse/ingest.py b/src/lakehouse/ingest.py
+index 4a9bd51..ccc2a10 100644
+--- a/src/lakehouse/ingest.py
++++ b/src/lakehouse/ingest.py
+@@ -106,7 +106,8 @@ class Ingest:
+     def __init__(self, conn: psycopg.Connection, lake: Path, topic: str):
+         self.conn, self.lake, self.topic = conn, lake, topic
+         self.stats = {"messages": 0, "inserted": 0, "duplicates": 0, "quarantined": 0, "batches": 0}
+-        self.seen: set[str] = set()  # event ids loaded by this process
++        self.seen: set[str] = {r[0] for r in conn.execute("SELECT event_id::text FROM events")}
++        conn.commit()
+ 
+     def flush(self, msgs: list) -> None:
+         ingested_at = dt.datetime.now(dt.UTC)

@@ -1,0 +1,24 @@
+diff --git a/internal/pipeline/cdc.go b/internal/pipeline/cdc.go
+index cba56bc..a4bd05d 100644
+--- a/internal/pipeline/cdc.go
++++ b/internal/pipeline/cdc.go
+@@ -64,14 +64,15 @@ func RunCDC(ctx context.Context, onReady func()) error {
+ 	// the previous instance died without releasing its slot, drop it and let
+ 	// the connector create a fresh one. An active slot belongs to a running
+ 	// instance and is left alone.
+-	if err := dropIdleSlot(ctx, cfg.CDC); err != nil {
+-		return err
+-	}
+ 	connector, err := cdc.NewConnector(ctx, cfg, cdcHandler)
+ 	if err != nil {
+ 		return err
+ 	}
+-	go func() { <-ctx.Done(); connector.Close() }()
++	go func() {
++		<-ctx.Done()
++		connector.Close()
++		dropIdleSlot(context.Background(), cfg.CDC)
++	}()
+ 	if onReady != nil {
+ 		go func() {
+ 			if connector.WaitUntilReady(ctx) == nil {

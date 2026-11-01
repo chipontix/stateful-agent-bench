@@ -1,0 +1,91 @@
+diff --git a/internal/db/schema.sql b/internal/db/schema.sql
+index 9f0cd17..9dd63a9 100644
+--- a/internal/db/schema.sql
++++ b/internal/db/schema.sql
+@@ -58,8 +58,8 @@ CREATE TABLE IF NOT EXISTS ledger.accounts (
+     frozen    boolean NOT NULL DEFAULT false
+ );
+ 
+--- One row per (saga, step): the business-level idempotency key. Rejections
+--- and fences are recorded too, so a duplicate replays the original answer.
++-- One row per decision. Rejections and fences are recorded too: Decide reads
++-- them back as the saga's prior steps.
+ CREATE TABLE IF NOT EXISTS ledger.operations (
+     id         bigserial PRIMARY KEY,
+     saga_id    uuid   NOT NULL,
+@@ -68,9 +68,9 @@ CREATE TABLE IF NOT EXISTS ledger.operations (
+     amount     bigint NOT NULL,
+     outcome    text   NOT NULL,
+     reason     text   NOT NULL DEFAULT '',
+-    at         timestamptz NOT NULL DEFAULT now(),
+-    UNIQUE (saga_id, step)
++    at         timestamptz NOT NULL DEFAULT now()
+ );
++CREATE INDEX IF NOT EXISTS operations_by_saga ON ledger.operations (saga_id);
+ 
+ CREATE TABLE IF NOT EXISTS ledger.entries (
+     op_id      bigint NOT NULL REFERENCES ledger.operations (id),
+diff --git a/internal/ledger/store.go b/internal/ledger/store.go
+index 4bf3e4d..7614679 100644
+--- a/internal/ledger/store.go
++++ b/internal/ledger/store.go
+@@ -44,40 +44,34 @@ func (s *Store) Handle(ctx context.Context, c wire.Command) (string, error) {
+ 		return "", err
+ 	}
+ 	prior := Prior{}
+-	var replay *Decision
+ 	for rows.Next() {
+ 		var step wire.Step
+-		var d Decision
+-		if err := rows.Scan(&step, &d.Outcome, &d.Reason); err != nil {
++		var outcome wire.Outcome
++		var reason string
++		if err := rows.Scan(&step, &outcome, &reason); err != nil {
+ 			return "", err
+ 		}
+-		prior[step] = d.Outcome
+-		if step == c.Step {
+-			replay = &d
+-		}
++		prior[step] = outcome
+ 	}
+ 	if err := rows.Err(); err != nil {
+ 		return "", err
+ 	}
+ 
+-	result := "replayed"
+-	d := replay
+-	if d == nil {
+-		result = "applied"
+-		a := Account{ID: c.Account}
+-		err := tx.QueryRow(ctx, `SELECT available, held, frozen FROM ledger.accounts WHERE id = $1 FOR UPDATE`,
+-			c.Account).Scan(&a.Available, &a.Held, &a.Frozen)
+-		switch {
+-		case err == nil:
+-			a.Exists = true
+-		case !errors.Is(err, pgx.ErrNoRows):
+-			return "", err
+-		}
+-		dec := Decide(c, prior, a)
+-		d = &dec
+-		if err := s.record(ctx, tx, c, dec); err != nil {
+-			return "", err
+-		}
++	// The inbox has already dropped redeliveries of this message, so what
++	// reaches this point is a command the ledger has not applied yet.
++	result := "applied"
++	a := Account{ID: c.Account}
++	err = tx.QueryRow(ctx, `SELECT available, held, frozen FROM ledger.accounts WHERE id = $1 FOR UPDATE`,
++		c.Account).Scan(&a.Available, &a.Held, &a.Frozen)
++	switch {
++	case err == nil:
++		a.Exists = true
++	case !errors.Is(err, pgx.ErrNoRows):
++		return "", err
++	}
++	d := Decide(c, prior, a)
++	if err := s.record(ctx, tx, c, d); err != nil {
++		return "", err
+ 	}
+ 
+ 	r := wire.Reply{MsgID: wire.ReplyID(c.SagaID, c.Step), SagaID: c.SagaID, Step: c.Step,

@@ -1,0 +1,10 @@
+{
+  "project": "pg-search-sync",
+  "commit": "90cb8a4deae31111f5952112f5464b930e693539",
+  "verifier": {
+    "kind": "pgsync"
+  },
+  "protected": [
+    "cmd/sabcheck"
+  ]
+}

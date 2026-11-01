@@ -1,0 +1,14 @@
+{
+  "project": "ledger-saga",
+  "commit": "0b4c09d004583310e630fad8da077b8989569d72",
+  "verifier": {
+    "kind": "ledger",
+    "points": "none,ledger.before_commit,ledger.after_commit,orch.reply.after_commit"
+  },
+  "protected": [
+    "cmd/ledgersaga/chaos.go",
+    "internal/check",
+    "internal/failpoint",
+    "internal/saga/effects.go"
+  ]
+}
