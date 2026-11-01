@@ -119,49 +119,22 @@ hold on a laptop shared with other workloads.
 ### Results
 
 <!-- results:verify-all -->
-<!-- /results -->
+| task | with the bug | first problem the verifier reports | reference fix, green runs | verifier time, reference (s) |
+|---|---|---|---|---|
+| `lakehouse-dups-after-rebalance` | red | postgres.duplicates: want 3006, got 1947 | 3/3 | 20–27 |
+| `lakehouse-offsets-after-parquet` | red | postgres.duplicates: want 3006, got 6985 | 3/3 | 20–40 |
+| `ledger-hold-release-race` | red | concurrent: 289 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600) | 3/3 | 43–50 |
+| `ledger-retry-double-charge` | red | concurrent: 0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600) | 3/3 | 47–51 |
+| `pgsync-deletes-replica-identity` | red | 1045 missing, 138 stale, 47 extra documents | 3/3 | 27–28 |
+| `pgsync-slot-dropped-on-restart` | red | 29 missing, 63 stale, 53 extra documents | 3/3 | 28–31 |
 
-## Mutation testing of the verifiers
-
-`bench/mutate.py` mutates only the lines the reference fix touches:
-`revert-hunk` undoes one hunk of the fix (a partial fix), `delete-line` drops
-one added line, and `flip` inverts one operator or literal. Comments and
-docstrings are never mutated. A mutant that does not build is "stillborn" and
-stays out of the score, because the compiler caught it and the verifier did
-not. The hand-written `near_misses/` run next to the generated mutants.
-
-<!-- results:mutation -->
+`3` reference runs per task, recorded 2026-11-01T08:20:28Z, host load average s: 42.48 48.19 54.02. Reproduce: `make verify-all REPEAT=3`.
 <!-- /results -->
 
 Surviving mutants:
 
 <!-- results:survivors -->
-<!-- /results -->
-
-## Runner and agents
-
-`python3 -m bench run --agent A -n N -k K` runs each attempt like this:
-
-1. It builds the task repository (pinned commit + `bug.patch`, one fresh
-   commit).
-2. It starts the agent with `docker run --network none --memory 512m --cpus
-   1`. The repository is mounted at `/workspace`; `issue.md` and nothing else
-   from the task is mounted at `/task`.
-3. It takes the agent's diff, runs the verifier on a copy with the protected
-   files restored, and writes everything to one JSONL trace: runner events,
-   agent events (each read, edit, command and network probe) and the
-   verifier result.
-4. It computes pass@1 and pass@k with the unbiased estimator (Chen et al.
-   2021) over the N attempts.
-
-The agents here are stubs that play back a prepared patch through a small
-stdlib-only patch applier inside the container. They show that the runner
-and the verifiers separate a correct fix from a wrong one, and from an
-attempt to edit the grader. They say nothing about any model. The first thing
-a stub does is probe the network (two IP addresses, no DNS needed), and the
-trace records the result.
-
-<!-- results:runs -->
+_not run yet_
 <!-- /results -->
 
 ### Trace auditor
