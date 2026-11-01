@@ -68,7 +68,12 @@ one needs a second actor, a retry or a crash in a particular gap:
   once, under READ COMMITTED, reading the saga's prior steps before either
   commits. That interleaving only happens when the ledger catches up on a
   backlog after a crash. A test that sends hold and then release in order
-  passes.
+  passes. The crash harness alone reached the interleaving in only 4 of 40
+  runs (8 runs per verification, 5 verifications), so a plausible wrong fix
+  got through once in two tries
+  (`results/raw/race-detection-crash-harness-only.txt`). That is why the ledger verifier starts with
+  `sabrace`, which sends hold and release of one saga at the same instant
+  300 times per verification.
 - **Slot dropped on restart** needs the connector to die while writes
   continue. The code that drops the slot even has a careful `AND NOT
   active`. The verifier kills it twice and restarts it once under 400
@@ -103,7 +108,7 @@ auditor).
 
 | project | scenario | invariants | performance budget |
 |---|---|---|---|
-| ledger-saga | the project's crash harness (`ledgersaga chaos`): 3 services as real processes, a seeded workload of 200 transfers over the HTTP API, duplication, reordering and late redelivery on every run; crash points `none`, `ledger.before_commit`, `ledger.after_commit`, `orch.reply.after_commit` in parallel, each SIGKILLing the process once and restarting it | the project's own audit (`internal/check`): journal sums to zero per operation and globally, balances equal the journal, no negative balance, nothing held at rest, customer money equals the opening total, every saga terminal with exactly the ledger effects its state allows and exactly ±amount moved, legal transition logs, one transfer per idempotency key | every run quiesces within 40 s of the workload's end |
+| ledger-saga | (1) `verifiers/ledger/sabrace.go`: the repository's real `ledger.Store` on a fresh database, 600 sagas, and for each one, after a start barrier, either hold ‖ release or hold ‖ retried hold, then capture ‖ retried capture and credit ‖ retried credit, with handler errors retried as the consumer would; (2) the project's crash harness (`ledgersaga chaos`): three services as real processes, a seeded workload of 200 transfers over the HTTP API, duplication, reordering and late redelivery on every run; crash points `none`, `ledger.before_commit`, `ledger.after_commit`, `orch.reply.after_commit` in parallel, each SIGKILLing the process once and restarting it | (1) per saga, the recorded operations are ones its final state allows (`saga.CheckEffects`, the project's rule), each step recorded once, exactly ±amount moved; journal balanced, nothing held. (2) the project's own audit (`internal/check`): journal sums to zero per operation and globally, balances equal the journal, no negative balance, nothing held at rest, customer money equals the opening total, every saga terminal with exactly the ledger effects its state allows and exactly ±amount moved, legal transition logs, one transfer per idempotency key | (1) ≥ 150 handled commands/s; (2) every run quiesces within 90 s of the workload's end |
 | pg-search-sync | `verifiers/pgsync/sabcheck.go`: fresh database and topic, real `cdc` binary, 16 s of 400 writes/s (60% update, 20% insert, 12% delete, 8% re-insert of a deleted id), `kill -9` twice and one SIGTERM restart while the writes continue | the topic resolved per id (highest version wins, as with ES `version_type=external`) equals the table: every row searchable at its current version, every deleted row a tombstone, nothing extra; the connector never exits on its own | converged within 30 s after the writes stop |
 | events-lakehouse | `verifiers/lakehouse/verify.py`: 60k generated messages (5% duplicates, 3% late, 0.5% bad) in three thirds: two workers on {0,1,2}/{3,4,5}; partitions moved to {0,2,4}/{1,3,5}, the first started with the after-commit failpoint armed; one worker for all partitions SIGKILLed at seeded random moments | Postgres `events` and the Parquet lake equal the generator's reference row for row (count + order-independent digest of all columns), quarantine counts per reason, duplicate count | every phase-1 worker ingests ≥ 1,500 msg/s |
 

@@ -1,0 +1,7 @@
+# ledger-hold-release-race, crash harness only (before sabrace existed), SAB_LEDGER_SEEDS=2: 8 runs per verification
+# columns: state, repetition, verifier pass, [(crash point, seed, run pass)], slowest quiesce s
+bug 0 True [('none', 1, True), ('none', 2, True), ('orch.reply.after_commit', 1, True), ('orch.reply.after_commit', 2, True), ('ledger.before_commit', 1, True), ('ledger.before_commit', 2, True), ('ledger.after_commit', 1, True), ('ledger.after_commit', 2, True)] 15.3
+bug 1 False [('none', 1, False), ('none', 2, True), ('orch.reply.after_commit', 1, True), ('orch.reply.after_commit', 2, True), ('ledger.before_commit', 1, True), ('ledger.before_commit', 2, False), ('ledger.after_commit', 1, True), ('ledger.after_commit', 2, True)] 20.3
+bug 2 True [('none', 1, True), ('none', 2, True), ('orch.reply.after_commit', 1, True), ('orch.reply.after_commit', 2, True), ('ledger.before_commit', 1, True), ('ledger.before_commit', 2, True), ('ledger.after_commit', 1, True), ('ledger.after_commit', 2, True)] 20.9
+wrong 0 True [('none', 1, True), ('none', 2, True), ('orch.reply.after_commit', 1, True), ('orch.reply.after_commit', 2, True), ('ledger.before_commit', 1, True), ('ledger.before_commit', 2, True), ('ledger.after_commit', 1, True), ('ledger.after_commit', 2, True)] 41.3
+wrong 1 False [('none', 1, True), ('none', 2, True), ('orch.reply.after_commit', 1, True), ('orch.reply.after_commit', 2, True), ('ledger.before_commit', 1, False), ('ledger.before_commit', 2, True), ('ledger.after_commit', 1, False), ('ledger.after_commit', 2, True)] 34.5
