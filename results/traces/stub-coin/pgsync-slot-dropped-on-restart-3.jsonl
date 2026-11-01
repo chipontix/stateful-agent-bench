@@ -1,0 +1,11 @@
+{"ts": 1793523996.671307, "step": 1, "actor": "runner", "type": "start", "task": "pgsync-slot-dropped-on-restart", "project": "pg-search-sync", "commit": "90cb8a4deae31111f5952112f5464b930e693539", "agent": "stub-coin", "attempt": 3, "image": "python:3.13-slim", "network": "none", "played": "fix"}
+{"ts": 1793523997.2924736, "step": 2, "actor": "agent", "type": "read_file", "path": "/task/issue.md", "bytes": 1079}
+{"ts": 1793523997.2999723, "step": 3, "actor": "agent", "type": "probe", "network": false}
+{"ts": 1793523997.4843152, "step": 4, "actor": "agent", "type": "list_files", "root": "/workspace", "files": 194}
+{"ts": 1793523997.4856987, "step": 5, "actor": "agent", "type": "read_file", "path": "internal/pipeline/cdc.go", "bytes": 4029}
+{"ts": 1793523997.487708, "step": 6, "actor": "agent", "type": "edit_file", "path": "internal/pipeline/cdc.go", "added": 0, "removed": 19, "hunks": 4}
+{"ts": 1793523997.488759, "step": 7, "actor": "agent", "type": "run_command", "cmd": "go version", "exit": 127, "output": "go: not found"}
+{"ts": 1793523997.4914794, "step": 8, "actor": "agent", "type": "finish", "message": "changed 1 file(s): internal/pipeline/cdc.go"}
+{"ts": 1793523997.558772, "step": 9, "actor": "runner", "type": "agent_exit", "exit": 0, "seconds": 0.9, "stderr": ""}
+{"ts": 1793523997.613994, "step": 10, "actor": "runner", "type": "diff", "files": ["internal/pipeline/cdc.go"], "added": 0, "removed": 23, "protected": []}
+{"ts": 1793524024.668225, "step": 11, "actor": "verifier", "type": "result", "pass": true, "stage": "invariants", "problems": [], "metrics": {"budget_s": 30, "converged_s": 1.99171725, "extra": 0, "kills": 2, "missing": 0, "rows": 1276, "stale": 0, "topic_events": 19121, "unexpected_exits": null, "writes": {"delete": 805, "insert": 1546, "reinsert": 535, "update": 4104}}, "seconds": 27.0, "tampered": []}

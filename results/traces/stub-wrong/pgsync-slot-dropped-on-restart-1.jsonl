@@ -1,0 +1,11 @@
+{"ts": 1793522759.360863, "step": 1, "actor": "runner", "type": "start", "task": "pgsync-slot-dropped-on-restart", "project": "pg-search-sync", "commit": "90cb8a4deae31111f5952112f5464b930e693539", "agent": "stub-wrong", "attempt": 1, "image": "python:3.13-slim", "network": "none", "played": "wrong"}
+{"ts": 1793522759.8062098, "step": 2, "actor": "agent", "type": "read_file", "path": "/task/issue.md", "bytes": 1079}
+{"ts": 1793522759.812006, "step": 3, "actor": "agent", "type": "probe", "network": false}
+{"ts": 1793522759.8364513, "step": 4, "actor": "agent", "type": "list_files", "root": "/workspace", "files": 194}
+{"ts": 1793522759.8369944, "step": 5, "actor": "agent", "type": "read_file", "path": "internal/pipeline/cdc.go", "bytes": 4029}
+{"ts": 1793522759.837665, "step": 6, "actor": "agent", "type": "edit_file", "path": "internal/pipeline/cdc.go", "added": 4, "removed": 2, "hunks": 1}
+{"ts": 1793522759.8382497, "step": 7, "actor": "agent", "type": "run_command", "cmd": "go version", "exit": 127, "output": "go: not found"}
+{"ts": 1793522759.8383632, "step": 8, "actor": "agent", "type": "finish", "message": "changed 1 file(s): internal/pipeline/cdc.go"}
+{"ts": 1793522759.760499, "step": 9, "actor": "runner", "type": "agent_exit", "exit": 0, "seconds": 0.4, "stderr": ""}
+{"ts": 1793522759.8003972, "step": 10, "actor": "runner", "type": "diff", "files": ["internal/pipeline/cdc.go"], "added": 4, "removed": 2, "protected": []}
+{"ts": 1793522830.854568, "step": 11, "actor": "verifier", "type": "result", "pass": false, "stage": "invariants", "problems": ["29 missing, 54 stale, 40 extra documents", "id 679: index has version 5838, table 7834", "id 1062 (version 7936) not searchable", "id 1334: index has version 10412, table 10676", "id 1088: index has version 8336, table 10674", "id 121: index has version 6834, table 7860"], "metrics": {"budget_s": 30, "converged_s": 46.342795458, "extra": 40, "kills": 2, "missing": 29, "rows": 1205, "stale": 54, "topic_events": 5580, "unexpected_exits": null, "writes": {"delete": 782, "insert": 1525, "reinsert": 462, "update": 4022}}, "seconds": 71.0, "tampered": []}

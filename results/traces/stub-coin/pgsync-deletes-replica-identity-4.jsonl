@@ -1,0 +1,11 @@
+{"ts": 1793523769.367939, "step": 1, "actor": "runner", "type": "start", "task": "pgsync-deletes-replica-identity", "project": "pg-search-sync", "commit": "90cb8a4deae31111f5952112f5464b930e693539", "agent": "stub-coin", "attempt": 4, "image": "python:3.13-slim", "network": "none", "played": "wrong"}
+{"ts": 1793523769.9769266, "step": 2, "actor": "agent", "type": "read_file", "path": "/task/issue.md", "bytes": 1079}
+{"ts": 1793523769.9871826, "step": 3, "actor": "agent", "type": "probe", "network": false}
+{"ts": 1793523770.1322608, "step": 4, "actor": "agent", "type": "list_files", "root": "/workspace", "files": 194}
+{"ts": 1793523770.136569, "step": 5, "actor": "agent", "type": "read_file", "path": "internal/catalog/event.go", "bytes": 2565}
+{"ts": 1793523770.1451936, "step": 6, "actor": "agent", "type": "edit_file", "path": "internal/catalog/event.go", "added": 4, "removed": 3, "hunks": 2}
+{"ts": 1793523770.1562796, "step": 7, "actor": "agent", "type": "run_command", "cmd": "go version", "exit": 127, "output": "go: not found"}
+{"ts": 1793523770.1578221, "step": 8, "actor": "agent", "type": "finish", "message": "changed 1 file(s): internal/catalog/event.go"}
+{"ts": 1793523770.456518, "step": 9, "actor": "runner", "type": "agent_exit", "exit": 0, "seconds": 1.1, "stderr": ""}
+{"ts": 1793523770.672912, "step": 10, "actor": "runner", "type": "diff", "files": ["internal/catalog/event.go"], "added": 7, "removed": 6, "protected": []}
+{"ts": 1793523842.4172952, "step": 11, "actor": "verifier", "type": "result", "pass": false, "stage": "invariants", "problems": ["315 missing, 0 stale, 0 extra documents", "id 722 (version 10288) not searchable", "id 430 (version 11550) not searchable", "id 749 (version 12028) not searchable", "id 168 (version 11836) not searchable", "id 223 (version 10570) not searchable"], "metrics": {"budget_s": 30, "converged_s": 46.18475125, "extra": 0, "kills": 2, "missing": 315, "rows": 1250, "stale": 0, "topic_events": 18818, "unexpected_exits": null, "writes": {"delete": 831, "insert": 1586, "reinsert": 495, "update": 3969}}, "seconds": 71.6, "tampered": []}

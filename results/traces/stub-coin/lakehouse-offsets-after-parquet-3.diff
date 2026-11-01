@@ -1,0 +1,44 @@
+diff --git a/src/lakehouse/ingest.py b/src/lakehouse/ingest.py
+index b26cd81..07deb4a 100644
+--- a/src/lakehouse/ingest.py
++++ b/src/lakehouse/ingest.py
+@@ -6,10 +6,9 @@ One loop, one transaction per batch:
+    ``events_quarantine`` with the reason and the raw bytes;
+ 2. dedup inside the batch, then ``INSERT .. ON CONFLICT (event_id) DO
+    NOTHING RETURNING event_id`` dedups against everything already loaded;
+-3. the batch row, the events and the quarantine rows commit together; the
+-   next offset per partition is stored only once the batch is durable
+-   everywhere, Parquet file included, so the stored position never runs
+-   ahead of the lake;
++3. the batch row, the events, the quarantine rows and the next offset per
++   partition commit together, so a crash replays the batch from the stored
++   offsets and nothing is applied twice;
+ 4. after the commit the batch's new rows are written to one Parquet file
+    (tmp + rename) and the file name is recorded on the batch. A batch
+    committed without a file (crash in between) is rewritten from Postgres
+@@ -156,6 +155,11 @@ class Ingest:
+                     " VALUES (%s, %s, %s, %s, %s, " + str(batch_id) + ") ON CONFLICT DO NOTHING",
+                     quarantine,
+                 )
++            cur.executemany(
++                "INSERT INTO ingest_offsets (topic, partition, next_offset) VALUES (%s, %s, %s)"
++                " ON CONFLICT (topic, partition) DO UPDATE SET next_offset = excluded.next_offset",
++                [(self.topic, p, o) for p, o in next_offsets.items()],
++            )
+         if os.environ.get("LAKEHOUSE_CRASH_AFTER_COMMIT"):  # failpoint for the recovery test
+             os._exit(3)
+ 
+@@ -163,13 +167,6 @@ class Ingest:
+             rel = write_parquet(self.lake, batch_id, ingested_at, [r for k, r in rows.items() if k in inserted])
+             self.conn.execute("UPDATE ingest_batches SET parquet_file = %s WHERE batch_id = %s", [rel, batch_id])
+             self.conn.commit()
+-        # Offsets last: the position only moves once the batch is in the lake.
+-        with self.conn.transaction():
+-            self.conn.cursor().executemany(
+-                "INSERT INTO ingest_offsets (topic, partition, next_offset) VALUES (%s, %s, %s)"
+-                " ON CONFLICT (topic, partition) DO UPDATE SET next_offset = excluded.next_offset",
+-                [(self.topic, p, o) for p, o in next_offsets.items()],
+-            )
+ 
+         s = self.stats
+         s["messages"] += len(msgs)

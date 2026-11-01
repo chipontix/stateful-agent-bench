@@ -1,0 +1,13 @@
+diff --git a/internal/ledger/store.go b/internal/ledger/store.go
+index f2d16a0..ee6c56e 100644
+--- a/internal/ledger/store.go
++++ b/internal/ledger/store.go
+@@ -34,7 +34,7 @@ func (s *Store) Handle(ctx context.Context, c wire.Command) (string, error) {
+ 	if dup, err := outbox.Seen(ctx, tx, outbox.Ledger, c.MsgID); err != nil || dup {
+ 		return "duplicate", err
+ 	}
+-	rows, err := tx.Query(ctx, `SELECT step, outcome, reason FROM ledger.operations WHERE saga_id = $1`, c.SagaID)
++	rows, err := tx.Query(ctx, `SELECT step, outcome, reason FROM ledger.operations WHERE saga_id = $1 FOR UPDATE`, c.SagaID)
+ 	if err != nil {
+ 		return "", err
+ 	}

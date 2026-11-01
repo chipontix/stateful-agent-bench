@@ -1,0 +1,30 @@
+diff --git a/src/lakehouse/ingest.py b/src/lakehouse/ingest.py
+index 4a9bd51..d2ca5f4 100644
+--- a/src/lakehouse/ingest.py
++++ b/src/lakehouse/ingest.py
+@@ -57,6 +57,7 @@ SELECT event_id::uuid, event_type, user_id, 'epoch'::timestamptz + occurred_ms *
+        amount_cents, currency, session_id, schema_version, %s, %s
+ FROM stage
+ ON CONFLICT (event_id) DO NOTHING
++RETURNING event_id::text
+ """
+ 
+ 
+@@ -147,7 +148,7 @@ class Ingest:
+                     for r in rows.values():
+                         copy.write_row(r)
+                 cur.execute(INSERT_EVENTS, [batch_id, ingested_at])
+-                inserted = set(rows)
++                inserted = {r[0] for r in cur.fetchall()}
+             dups += len(rows) - len(inserted)
+             cur.execute("UPDATE ingest_batches SET inserted = %s, duplicates = %s WHERE batch_id = %s",
+                         [len(inserted), dups, batch_id])
+@@ -167,7 +168,7 @@ class Ingest:
+             os._exit(3)
+ 
+         if inserted:
+-            rel = write_parquet(self.lake, batch_id, ingested_at, [r for k, r in rows.items() if k in inserted])
++            rel = write_parquet(self.lake, batch_id, ingested_at, list(rows.values()))
+             self.conn.execute("UPDATE ingest_batches SET parquet_file = %s WHERE batch_id = %s", [rel, batch_id])
+             self.conn.commit()
+ 

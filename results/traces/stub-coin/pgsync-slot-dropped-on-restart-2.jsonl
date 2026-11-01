@@ -1,0 +1,11 @@
+{"ts": 1793523920.712863, "step": 1, "actor": "runner", "type": "start", "task": "pgsync-slot-dropped-on-restart", "project": "pg-search-sync", "commit": "90cb8a4deae31111f5952112f5464b930e693539", "agent": "stub-coin", "attempt": 2, "image": "python:3.13-slim", "network": "none", "played": "wrong"}
+{"ts": 1793523921.63184, "step": 2, "actor": "agent", "type": "read_file", "path": "/task/issue.md", "bytes": 1079}
+{"ts": 1793523921.6395772, "step": 3, "actor": "agent", "type": "probe", "network": false}
+{"ts": 1793523921.9231293, "step": 4, "actor": "agent", "type": "list_files", "root": "/workspace", "files": 194}
+{"ts": 1793523921.9271116, "step": 5, "actor": "agent", "type": "read_file", "path": "internal/pipeline/cdc.go", "bytes": 4029}
+{"ts": 1793523921.9298692, "step": 6, "actor": "agent", "type": "edit_file", "path": "internal/pipeline/cdc.go", "added": 4, "removed": 2, "hunks": 1}
+{"ts": 1793523921.9340672, "step": 7, "actor": "agent", "type": "run_command", "cmd": "go version", "exit": 127, "output": "go: not found"}
+{"ts": 1793523921.93571, "step": 8, "actor": "agent", "type": "finish", "message": "changed 1 file(s): internal/pipeline/cdc.go"}
+{"ts": 1793523921.925693, "step": 9, "actor": "runner", "type": "agent_exit", "exit": 0, "seconds": 1.2, "stderr": ""}
+{"ts": 1793523921.982547, "step": 10, "actor": "runner", "type": "diff", "files": ["internal/pipeline/cdc.go"], "added": 4, "removed": 2, "protected": []}
+{"ts": 1793523996.3634748, "step": 11, "actor": "verifier", "type": "result", "pass": false, "stage": "invariants", "problems": ["42 missing, 89 stale, 40 extra documents", "id 555 (version 6650) not searchable", "id 255: index has version 5778, table 7134", "id 714: index has version 5886, table 9264", "id 470: index has version 5284, table 6404", "id 1090: index has version 8634, table 9148"], "metrics": {"budget_s": 30, "converged_s": 46.149561375, "extra": 40, "kills": 2, "missing": 42, "rows": 1042, "stale": 89, "topic_events": 4584, "unexpected_exits": null, "writes": {"delete": 682, "insert": 1275, "reinsert": 449, "update": 3523}}, "seconds": 74.3, "tampered": []}

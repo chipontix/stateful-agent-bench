@@ -1,0 +1,13 @@
+diff --git a/src/lakehouse/ingest.py b/src/lakehouse/ingest.py
+index b26cd81..cd48758 100644
+--- a/src/lakehouse/ingest.py
++++ b/src/lakehouse/ingest.py
+@@ -156,8 +156,6 @@ class Ingest:
+                     " VALUES (%s, %s, %s, %s, %s, " + str(batch_id) + ") ON CONFLICT DO NOTHING",
+                     quarantine,
+                 )
+-        if os.environ.get("LAKEHOUSE_CRASH_AFTER_COMMIT"):  # failpoint for the recovery test
+-            os._exit(3)
+ 
+         if inserted:
+             rel = write_parquet(self.lake, batch_id, ingested_at, [r for k, r in rows.items() if k in inserted])

@@ -1,0 +1,17 @@
+diff --git a/internal/pipeline/cdc.go b/internal/pipeline/cdc.go
+index cba56bc..35c5d34 100644
+--- a/internal/pipeline/cdc.go
++++ b/internal/pipeline/cdc.go
+@@ -54,8 +54,10 @@ func RunCDC(ctx context.Context, onReady func()) error {
+ 			TableTopicMapping:           map[string]string{"public.products": topic},
+ 			Brokers:                     app.EnvList("KAFKA_BROKERS", "localhost:19092"),
+ 			RequiredAcks:                -1, // all in-sync replicas; the WAL position is acked only after this
+-			ProducerBatchSize:           app.EnvInt("PRODUCER_BATCH_SIZE", 2000),
+-			ProducerBatchTickerDuration: app.EnvDuration("PRODUCER_BATCH_TICK", 50*time.Millisecond),
++			// One change per batch: the WAL position is acked only after its own
++			// write, so a kill cannot lose a half-sent batch.
++			ProducerBatchSize:           app.EnvInt("PRODUCER_BATCH_SIZE", 1),
++			ProducerBatchTickerDuration: app.EnvDuration("PRODUCER_BATCH_TICK", time.Millisecond),
+ 			Compression:                 3, // lz4
+ 		},
+ 	}

@@ -1,0 +1,117 @@
+{
+  "host": {
+    "at": "2026-11-01T08:40:28Z",
+    "machine": "arm64",
+    "system": "Darwin",
+    "cpus": 16,
+    "load_average": "38.07 40.46 44.10"
+  },
+  "agent": "stub-wrong",
+  "k": 1,
+  "attempts_per_task": 1,
+  "tasks": {
+    "lakehouse-dups-after-rebalance": {
+      "n": 1,
+      "correct": 0,
+      "pass@1": 0.0,
+      "attempts": [
+        {
+          "task": "lakehouse-dups-after-rebalance",
+          "agent": "stub-wrong",
+          "attempt": 1,
+          "played": "wrong",
+          "pass": false,
+          "seconds": 17.1,
+          "trace": "results/traces/stub-wrong/lakehouse-dups-after-rebalance-1.jsonl",
+          "verdict": "NOT RESOLVED"
+        }
+      ]
+    },
+    "lakehouse-offsets-after-parquet": {
+      "n": 1,
+      "correct": 0,
+      "pass@1": 0.0,
+      "attempts": [
+        {
+          "task": "lakehouse-offsets-after-parquet",
+          "agent": "stub-wrong",
+          "attempt": 1,
+          "played": "wrong",
+          "pass": false,
+          "seconds": 33.0,
+          "trace": "results/traces/stub-wrong/lakehouse-offsets-after-parquet-1.jsonl",
+          "verdict": "NOT RESOLVED"
+        }
+      ]
+    },
+    "ledger-hold-release-race": {
+      "n": 1,
+      "correct": 0,
+      "pass@1": 0.0,
+      "attempts": [
+        {
+          "task": "ledger-hold-release-race",
+          "agent": "stub-wrong",
+          "attempt": 1,
+          "played": "wrong",
+          "pass": false,
+          "seconds": 41.8,
+          "trace": "results/traces/stub-wrong/ledger-hold-release-race-1.jsonl",
+          "verdict": "NOT RESOLVED"
+        }
+      ]
+    },
+    "ledger-retry-double-charge": {
+      "n": 1,
+      "correct": 0,
+      "pass@1": 0.0,
+      "attempts": [
+        {
+          "task": "ledger-retry-double-charge",
+          "agent": "stub-wrong",
+          "attempt": 1,
+          "played": "wrong",
+          "pass": false,
+          "seconds": 162.9,
+          "trace": "results/traces/stub-wrong/ledger-retry-double-charge-1.jsonl",
+          "verdict": "NOT RESOLVED"
+        }
+      ]
+    },
+    "pgsync-deletes-replica-identity": {
+      "n": 1,
+      "correct": 0,
+      "pass@1": 0.0,
+      "attempts": [
+        {
+          "task": "pgsync-deletes-replica-identity",
+          "agent": "stub-wrong",
+          "attempt": 1,
+          "played": "wrong",
+          "pass": false,
+          "seconds": 70.3,
+          "trace": "results/traces/stub-wrong/pgsync-deletes-replica-identity-1.jsonl",
+          "verdict": "NOT RESOLVED"
+        }
+      ]
+    },
+    "pgsync-slot-dropped-on-restart": {
+      "n": 1,
+      "correct": 0,
+      "pass@1": 0.0,
+      "attempts": [
+        {
+          "task": "pgsync-slot-dropped-on-restart",
+          "agent": "stub-wrong",
+          "attempt": 1,
+          "played": "wrong",
+          "pass": false,
+          "seconds": 71.0,
+          "trace": "results/traces/stub-wrong/pgsync-slot-dropped-on-restart-1.jsonl",
+          "verdict": "NOT RESOLVED"
+        }
+      ]
+    }
+  },
+  "mean_pass@1": 0.0
+}

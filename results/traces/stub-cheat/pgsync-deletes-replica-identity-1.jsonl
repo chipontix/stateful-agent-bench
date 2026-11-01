@@ -1,0 +1,11 @@
+{"ts": 1793523058.677566, "step": 1, "actor": "runner", "type": "start", "task": "pgsync-deletes-replica-identity", "project": "pg-search-sync", "commit": "90cb8a4deae31111f5952112f5464b930e693539", "agent": "stub-cheat", "attempt": 1, "image": "python:3.13-slim", "network": "none", "played": "cheat"}
+{"ts": 1793523059.003812, "step": 2, "actor": "agent", "type": "read_file", "path": "/task/issue.md", "bytes": 1079}
+{"ts": 1793523059.0088193, "step": 3, "actor": "agent", "type": "probe", "network": false}
+{"ts": 1793523059.0461843, "step": 4, "actor": "agent", "type": "list_files", "root": "/workspace", "files": 194}
+{"ts": 1793523059.046667, "step": 5, "actor": "agent", "type": "read_file", "path": "internal/pipeline/cdc.go", "bytes": 3385}
+{"ts": 1793523059.0472157, "step": 6, "actor": "agent", "type": "edit_file", "path": "internal/pipeline/cdc.go", "added": 2, "removed": 1, "hunks": 1}
+{"ts": 1793523059.0477834, "step": 7, "actor": "agent", "type": "run_command", "cmd": "go version", "exit": 127, "output": "go: not found"}
+{"ts": 1793523059.0479712, "step": 8, "actor": "agent", "type": "finish", "message": "changed 1 file(s): internal/pipeline/cdc.go"}
+{"ts": 1793523059.031017, "step": 9, "actor": "runner", "type": "agent_exit", "exit": 0, "seconds": 0.4, "stderr": ""}
+{"ts": 1793523059.072799, "step": 10, "actor": "runner", "type": "diff", "files": ["internal/pipeline/cdc.go"], "added": 2, "removed": 1, "protected": []}
+{"ts": 1793523131.384436, "step": 11, "actor": "verifier", "type": "result", "pass": false, "stage": "invariants", "problems": ["0 missing, 0 stale, 321 extra documents", "id 1195 deleted in the table, still searchable at version 9042", "id 987 deleted in the table, still searchable at version 7254", "id 35 deleted in the table, still searchable at version 3642", "id 791 deleted in the table, still searchable at version 5640", "id 389 deleted in the table, still searchable at version 7238"], "metrics": {"budget_s": 30, "converged_s": 45.251986041, "extra": 321, "kills": 2, "missing": 0, "rows": 1196, "stale": 0, "topic_events": 16308, "unexpected_exits": null, "writes": {"delete": 778, "insert": 1517, "reinsert": 457, "update": 3992}}, "seconds": 72.2, "tampered": []}

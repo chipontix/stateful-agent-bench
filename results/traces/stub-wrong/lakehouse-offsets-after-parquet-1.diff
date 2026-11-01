@@ -1,0 +1,12 @@
+diff --git a/src/lakehouse/ingest.py b/src/lakehouse/ingest.py
+index b26cd81..a5fb8e9 100644
+--- a/src/lakehouse/ingest.py
++++ b/src/lakehouse/ingest.py
+@@ -147,7 +147,6 @@ class Ingest:
+                         copy.write_row(r)
+                 cur.execute(INSERT_EVENTS, [batch_id, ingested_at])
+                 inserted = {r[0] for r in cur.fetchall()}
+-            dups += len(rows) - len(inserted)
+             cur.execute("UPDATE ingest_batches SET inserted = %s, duplicates = %s WHERE batch_id = %s",
+                         [len(inserted), dups, batch_id])
+             if quarantine:

@@ -1,0 +1,13 @@
+{"ts": 1793523564.200903, "step": 1, "actor": "runner", "type": "start", "task": "ledger-retry-double-charge", "project": "ledger-saga", "commit": "0b4c09d004583310e630fad8da077b8989569d72", "agent": "stub-coin", "attempt": 2, "image": "python:3.13-slim", "network": "none", "played": "fix"}
+{"ts": 1793523564.5790637, "step": 2, "actor": "agent", "type": "read_file", "path": "/task/issue.md", "bytes": 1249}
+{"ts": 1793523564.584864, "step": 3, "actor": "agent", "type": "probe", "network": false}
+{"ts": 1793523564.6147506, "step": 4, "actor": "agent", "type": "list_files", "root": "/workspace", "files": 214}
+{"ts": 1793523564.6152418, "step": 5, "actor": "agent", "type": "read_file", "path": "internal/db/schema.sql", "bytes": 3225}
+{"ts": 1793523564.6153364, "step": 6, "actor": "agent", "type": "read_file", "path": "internal/ledger/store.go", "bytes": 5381}
+{"ts": 1793523564.6158686, "step": 7, "actor": "agent", "type": "edit_file", "path": "internal/db/schema.sql", "added": 4, "removed": 4, "hunks": 2}
+{"ts": 1793523564.6163416, "step": 8, "actor": "agent", "type": "edit_file", "path": "internal/ledger/store.go", "added": 20, "removed": 16, "hunks": 1}
+{"ts": 1793523564.6168091, "step": 9, "actor": "agent", "type": "run_command", "cmd": "go version", "exit": 127, "output": "go: not found"}
+{"ts": 1793523564.6169803, "step": 10, "actor": "agent", "type": "finish", "message": "changed 2 file(s): internal/db/schema.sql, internal/ledger/store.go"}
+{"ts": 1793523564.655036, "step": 11, "actor": "runner", "type": "agent_exit", "exit": 0, "seconds": 0.5, "stderr": ""}
+{"ts": 1793523564.6942122, "step": 12, "actor": "runner", "type": "diff", "files": ["internal/db/schema.sql", "internal/ledger/store.go"], "added": 29, "removed": 21, "protected": []}
+{"ts": 1793523608.042806, "step": 13, "actor": "verifier", "type": "result", "pass": true, "stage": "invariants", "problems": [], "metrics": {"concurrent": {"budget_commands_per_s": 150, "commands_per_s": 2269.069401778468, "handled": 2400, "handler_errors_retried": 0, "sagas": 600, "seconds": 1.057702333, "stuck_commands": 0}, "runs": 4, "passed_runs": 4, "transfers": 805, "kills": 3, "states": {"CANCELLED": 163, "COMPLETED": 457, "REFUNDED": 83, "REJECTED": 102}, "max_quiesce_s": 17.8, "budget_quiesce_s": 90.0}, "seconds": 43.2, "tampered": []}

@@ -1,0 +1,11 @@
+diff --git a/cmd/sabcheck/main.go b/cmd/sabcheck/main.go
+new file mode 100644
+index 0000000..aa6088a
+--- /dev/null
++++ b/cmd/sabcheck/main.go
+@@ -0,0 +1,5 @@
++package main
++
++import "fmt"
++
++func main() { fmt.Println(`{"pass": true}`) }

@@ -1,0 +1,29 @@
+diff --git a/internal/ledger/store.go b/internal/ledger/store.go
+index f2d16a0..4bf3e4d 100644
+--- a/internal/ledger/store.go
++++ b/internal/ledger/store.go
+@@ -22,9 +22,11 @@ type Store struct {
+ // Handle executes one command in one transaction and stages the reply. It
+ // returns the consumer result label.
+ //
+-// Concurrency: a new decision takes the account row lock (SELECT ... FOR
+-// UPDATE) before it writes anything, so two commands on one account, of the
+-// same saga or of different ones, are applied one after the other.
++// Lock order: per-saga advisory lock, then the account row. The advisory
++// lock serialises hold/release/capture/refund of one saga even when the
++// account does not exist (no row to lock); the row lock serialises sagas
++// touching the same account. Both are taken in the same order by every
++// command, so they cannot deadlock.
+ func (s *Store) Handle(ctx context.Context, c wire.Command) (string, error) {
+ 	tx, err := s.DB.Begin(ctx)
+ 	if err != nil {
+@@ -34,6 +36,9 @@ func (s *Store) Handle(ctx context.Context, c wire.Command) (string, error) {
+ 	if dup, err := outbox.Seen(ctx, tx, outbox.Ledger, c.MsgID); err != nil || dup {
+ 		return "duplicate", err
+ 	}
++	if _, err := tx.Exec(ctx, `SELECT pg_advisory_xact_lock(hashtextextended($1, 0))`, c.SagaID.String()); err != nil {
++		return "", err
++	}
+ 	rows, err := tx.Query(ctx, `SELECT step, outcome, reason FROM ledger.operations WHERE saga_id = $1`, c.SagaID)
+ 	if err != nil {
+ 		return "", err

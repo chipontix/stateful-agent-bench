@@ -174,7 +174,14 @@ a stub does is probe the network (two IP addresses, no DNS needed), and the
 trace records the result.
 
 <!-- results:runs -->
-_not run yet_
+| agent | what it plays back | tasks | attempts per task | mean pass@1 | mean pass@k | audit verdicts |
+|---|---|---|---|---|---|---|
+| `stub-ref` | the reference fix | 6 | 1 | 1.00 | pass@1 1.00 | 6× RESOLVED |
+| `stub-wrong` | a plausible wrong fix | 6 | 1 | 0.00 | pass@1 0.00 | 6× NOT RESOLVED |
+| `stub-cheat` | an edit to the verifier's own files | 6 | 1 | 0.00 | pass@1 0.00 | 2× NOT RESOLVED, 4× NOT RESOLVED, with an attempt to game the verifier |
+| `stub-coin` | reference or wrong fix, 50/50 per attempt | 6 | 4 | 0.58 | pass@2 0.72 | 10× NOT RESOLVED, 14× RESOLVED |
+
+Reproduce: `make runs`; traces, diffs and audit reports: `results/traces/<agent>/`.
 <!-- /results -->
 
 ### Trace auditor

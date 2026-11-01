@@ -1,0 +1,116 @@
+{
+  "host": {
+    "at": "2026-11-01T08:37:10Z",
+    "machine": "arm64",
+    "system": "Darwin",
+    "load_average": "s: 35.90 41.68 45.33"
+  },
+  "agent": "stub-ref",
+  "k": 1,
+  "attempts_per_task": 1,
+  "tasks": {
+    "lakehouse-dups-after-rebalance": {
+      "n": 1,
+      "correct": 1,
+      "pass@1": 1.0,
+      "attempts": [
+        {
+          "task": "lakehouse-dups-after-rebalance",
+          "agent": "stub-ref",
+          "attempt": 1,
+          "played": "fix",
+          "pass": true,
+          "seconds": 18.9,
+          "trace": "results/traces/stub-ref/lakehouse-dups-after-rebalance-1.jsonl",
+          "verdict": "RESOLVED"
+        }
+      ]
+    },
+    "lakehouse-offsets-after-parquet": {
+      "n": 1,
+      "correct": 1,
+      "pass@1": 1.0,
+      "attempts": [
+        {
+          "task": "lakehouse-offsets-after-parquet",
+          "agent": "stub-ref",
+          "attempt": 1,
+          "played": "fix",
+          "pass": true,
+          "seconds": 30.5,
+          "trace": "results/traces/stub-ref/lakehouse-offsets-after-parquet-1.jsonl",
+          "verdict": "RESOLVED"
+        }
+      ]
+    },
+    "ledger-hold-release-race": {
+      "n": 1,
+      "correct": 1,
+      "pass@1": 1.0,
+      "attempts": [
+        {
+          "task": "ledger-hold-release-race",
+          "agent": "stub-ref",
+          "attempt": 1,
+          "played": "fix",
+          "pass": true,
+          "seconds": 44.6,
+          "trace": "results/traces/stub-ref/ledger-hold-release-race-1.jsonl",
+          "verdict": "RESOLVED"
+        }
+      ]
+    },
+    "ledger-retry-double-charge": {
+      "n": 1,
+      "correct": 1,
+      "pass@1": 1.0,
+      "attempts": [
+        {
+          "task": "ledger-retry-double-charge",
+          "agent": "stub-ref",
+          "attempt": 1,
+          "played": "fix",
+          "pass": true,
+          "seconds": 44.2,
+          "trace": "results/traces/stub-ref/ledger-retry-double-charge-1.jsonl",
+          "verdict": "RESOLVED"
+        }
+      ]
+    },
+    "pgsync-deletes-replica-identity": {
+      "n": 1,
+      "correct": 1,
+      "pass@1": 1.0,
+      "attempts": [
+        {
+          "task": "pgsync-deletes-replica-identity",
+          "agent": "stub-ref",
+          "attempt": 1,
+          "played": "fix",
+          "pass": true,
+          "seconds": 27.9,
+          "trace": "results/traces/stub-ref/pgsync-deletes-replica-identity-1.jsonl",
+          "verdict": "RESOLVED"
+        }
+      ]
+    },
+    "pgsync-slot-dropped-on-restart": {
+      "n": 1,
+      "correct": 1,
+      "pass@1": 1.0,
+      "attempts": [
+        {
+          "task": "pgsync-slot-dropped-on-restart",
+          "agent": "stub-ref",
+          "attempt": 1,
+          "played": "fix",
+          "pass": true,
+          "seconds": 25.2,
+          "trace": "results/traces/stub-ref/pgsync-slot-dropped-on-restart-1.jsonl",
+          "verdict": "RESOLVED"
+        }
+      ]
+    }
+  },
+  "mean_pass@1": 1.0
+}

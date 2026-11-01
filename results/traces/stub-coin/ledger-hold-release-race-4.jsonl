@@ -1,0 +1,11 @@
+{"ts": 1793523481.0896, "step": 1, "actor": "runner", "type": "start", "task": "ledger-hold-release-race", "project": "ledger-saga", "commit": "0b4c09d004583310e630fad8da077b8989569d72", "agent": "stub-coin", "attempt": 4, "image": "python:3.13-slim", "network": "none", "played": "fix"}
+{"ts": 1793523481.4802625, "step": 2, "actor": "agent", "type": "read_file", "path": "/task/issue.md", "bytes": 1117}
+{"ts": 1793523481.4873645, "step": 3, "actor": "agent", "type": "probe", "network": false}
+{"ts": 1793523481.5743542, "step": 4, "actor": "agent", "type": "list_files", "root": "/workspace", "files": 214}
+{"ts": 1793523481.585214, "step": 5, "actor": "agent", "type": "read_file", "path": "internal/ledger/store.go", "bytes": 5114}
+{"ts": 1793523481.6048062, "step": 6, "actor": "agent", "type": "edit_file", "path": "internal/ledger/store.go", "added": 6, "removed": 3, "hunks": 2}
+{"ts": 1793523481.606432, "step": 7, "actor": "agent", "type": "run_command", "cmd": "go version", "exit": 127, "output": "go: not found"}
+{"ts": 1793523481.6067877, "step": 8, "actor": "agent", "type": "finish", "message": "changed 1 file(s): internal/ledger/store.go"}
+{"ts": 1793523481.6270049, "step": 9, "actor": "runner", "type": "agent_exit", "exit": 0, "seconds": 0.5, "stderr": ""}
+{"ts": 1793523481.6831229, "step": 10, "actor": "runner", "type": "diff", "files": ["internal/ledger/store.go"], "added": 8, "removed": 3, "protected": []}
+{"ts": 1793523522.872849, "step": 11, "actor": "verifier", "type": "result", "pass": true, "stage": "invariants", "problems": [], "metrics": {"concurrent": {"budget_commands_per_s": 150, "commands_per_s": 2042.649383760299, "handled": 2400, "handler_errors_retried": 0, "sagas": 600, "seconds": 1.174944667, "stuck_commands": 0}, "runs": 4, "passed_runs": 4, "transfers": 804, "kills": 3, "states": {"CANCELLED": 176, "COMPLETED": 446, "REFUNDED": 83, "REJECTED": 99}, "max_quiesce_s": 16.0, "budget_quiesce_s": 90.0}, "seconds": 41.0, "tampered": []}

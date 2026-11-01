@@ -1,0 +1,56 @@
+diff --git a/internal/pipeline/cdc.go b/internal/pipeline/cdc.go
+index cba56bc..96aae4a 100644
+--- a/internal/pipeline/cdc.go
++++ b/internal/pipeline/cdc.go
+@@ -3,9 +3,7 @@ package pipeline
+ import (
+ 	"context"
+ 	"encoding/json"
+-	"fmt"
+ 	"log/slog"
+-	"net/url"
+ 	"time"
+ 
+ 	cdc "github.com/Trendyol/go-pq-cdc-kafka"
+@@ -13,7 +11,6 @@ import (
+ 	cdcconfig "github.com/Trendyol/go-pq-cdc/config"
+ 	"github.com/Trendyol/go-pq-cdc/pq/publication"
+ 	"github.com/Trendyol/go-pq-cdc/pq/slot"
+-	"github.com/jackc/pgx/v5"
+ 	gokafka "github.com/segmentio/kafka-go"
+ 
+ 	"github.com/chipontix/pg-search-sync/internal/app"
+@@ -60,13 +57,6 @@ func RunCDC(ctx context.Context, onReady func()) error {
+ 		},
+ 	}
+ 
+-	// A slot nobody reads pins WAL on the primary until the disk fills up. If
+-	// the previous instance died without releasing its slot, drop it and let
+-	// the connector create a fresh one. An active slot belongs to a running
+-	// instance and is left alone.
+-	if err := dropIdleSlot(ctx, cfg.CDC); err != nil {
+-		return err
+-	}
+ 	connector, err := cdc.NewConnector(ctx, cfg, cdcHandler)
+ 	if err != nil {
+ 		return err
+@@ -83,19 +73,6 @@ func RunCDC(ctx context.Context, onReady func()) error {
+ 	return nil
+ }
+ 
+-func dropIdleSlot(ctx context.Context, c cdcconfig.Config) error {
+-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s", url.PathEscape(c.Username), url.PathEscape(c.Password),
+-		c.Host, c.Port, c.Database)
+-	conn, err := pgx.Connect(ctx, dsn)
+-	if err != nil {
+-		return err
+-	}
+-	defer conn.Close(ctx)
+-	_, err = conn.Exec(ctx, `SELECT pg_drop_replication_slot(slot_name) FROM pg_replication_slots
+-		WHERE slot_name = $1 AND NOT active`, c.Slot.Name)
+-	return err
+-}
+-
+ func cdcHandler(msg *cdc.Message) []gokafka.Message {
+ 	op, row := catalog.OpUpsert, msg.NewData
+ 	if msg.Type.IsDelete() {

@@ -1,0 +1,35 @@
+diff --git a/internal/catalog/event.go b/internal/catalog/event.go
+index 9f6e47e..9ca4c01 100644
+--- a/internal/catalog/event.go
++++ b/internal/catalog/event.go
+@@ -4,6 +4,7 @@ package catalog
+ import (
+ 	"encoding/json"
+ 	"fmt"
++	"math"
+ 	"strconv"
+ 	"time"
+ )
+@@ -48,16 +49,16 @@ func FromRow(op string, row map[string]any, sourceTime time.Time) (Event, error)
+ 	if p.ID, ok = row["id"].(int64); !ok {
+ 		return Event{}, fmt.Errorf("id: unexpected %T", row["id"])
+ 	}
+-	if p.Version, ok = row["version"].(int64); !ok {
+-		return Event{}, fmt.Errorf("version: unexpected %T", row["version"])
+-	}
+ 	if op == OpDelete {
+-		// Versions are even (sequence step 2): old+1 beats the deleted row and
+-		// loses to any later re-insert of the same id.
+-		p.Version++
++		// Only the key is in the old row; the tombstone has to beat every
++		// version the document ever had.
++		p.Version = math.MaxInt64
+ 		p.Deleted = true
+ 		return Event{Op: op, Doc: p, SourceTime: sourceTime}, nil
+ 	}
++	if p.Version, ok = row["version"].(int64); !ok {
++		return Event{}, fmt.Errorf("version: unexpected %T", row["version"])
++	}
+ 	p.SKU, _ = row["sku"].(string)
+ 	p.Title, _ = row["title"].(string)
+ 	p.Brand, _ = row["brand"].(string)

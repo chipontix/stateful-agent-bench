@@ -1,0 +1,304 @@
+{
+  "host": {
+    "at": "2026-11-01T08:53:24Z",
+    "machine": "arm64",
+    "system": "Darwin",
+    "cpus": 16,
+    "load_average": "36.41 35.74 38.28"
+  },
+  "agent": "stub-coin",
+  "k": 2,
+  "attempts_per_task": 4,
+  "tasks": {
+    "lakehouse-dups-after-rebalance": {
+      "n": 4,
+      "correct": 0,
+      "pass@1": 0.0,
+      "pass@2": 0.0,
+      "attempts": [
+        {
+          "task": "lakehouse-dups-after-rebalance",
+          "agent": "stub-coin",
+          "attempt": 1,
+          "played": "wrong",
+          "pass": false,
+          "seconds": 22.4,
+          "trace": "results/traces/stub-coin/lakehouse-dups-after-rebalance-1.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "lakehouse-dups-after-rebalance",
+          "agent": "stub-coin",
+          "attempt": 2,
+          "played": "wrong",
+          "pass": false,
+          "seconds": 12.1,
+          "trace": "results/traces/stub-coin/lakehouse-dups-after-rebalance-2.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "lakehouse-dups-after-rebalance",
+          "agent": "stub-coin",
+          "attempt": 3,
+          "played": "wrong",
+          "pass": false,
+          "seconds": 15.5,
+          "trace": "results/traces/stub-coin/lakehouse-dups-after-rebalance-3.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "lakehouse-dups-after-rebalance",
+          "agent": "stub-coin",
+          "attempt": 4,
+          "played": "wrong",
+          "pass": false,
+          "seconds": 19.0,
+          "trace": "results/traces/stub-coin/lakehouse-dups-after-rebalance-4.jsonl",
+          "verdict": "NOT RESOLVED"
+        }
+      ]
+    },
+    "lakehouse-offsets-after-parquet": {
+      "n": 4,
+      "correct": 4,
+      "pass@1": 1.0,
+      "pass@2": 1.0,
+      "attempts": [
+        {
+          "task": "lakehouse-offsets-after-parquet",
+          "agent": "stub-coin",
+          "attempt": 1,
+          "played": "fix",
+          "pass": true,
+          "seconds": 19.0,
+          "trace": "results/traces/stub-coin/lakehouse-offsets-after-parquet-1.jsonl",
+          "verdict": "RESOLVED"
+        },
+        {
+          "task": "lakehouse-offsets-after-parquet",
+          "agent": "stub-coin",
+          "attempt": 2,
+          "played": "fix",
+          "pass": true,
+          "seconds": 17.2,
+          "trace": "results/traces/stub-coin/lakehouse-offsets-after-parquet-2.jsonl",
+          "verdict": "RESOLVED"
+        },
+        {
+          "task": "lakehouse-offsets-after-parquet",
+          "agent": "stub-coin",
+          "attempt": 3,
+          "played": "fix",
+          "pass": true,
+          "seconds": 12.7,
+          "trace": "results/traces/stub-coin/lakehouse-offsets-after-parquet-3.jsonl",
+          "verdict": "RESOLVED"
+        },
+        {
+          "task": "lakehouse-offsets-after-parquet",
+          "agent": "stub-coin",
+          "attempt": 4,
+          "played": "fix",
+          "pass": true,
+          "seconds": 23.6,
+          "trace": "results/traces/stub-coin/lakehouse-offsets-after-parquet-4.jsonl",
+          "verdict": "RESOLVED"
+        }
+      ]
+    },
+    "ledger-hold-release-race": {
+      "n": 4,
+      "correct": 2,
+      "pass@1": 0.5,
+      "pass@2": 0.833,
+      "attempts": [
+        {
+          "task": "ledger-hold-release-race",
+          "agent": "stub-coin",
+          "attempt": 1,
+          "played": "wrong",
+          "pass": false,
+          "seconds": 40.4,
+          "trace": "results/traces/stub-coin/ledger-hold-release-race-1.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "ledger-hold-release-race",
+          "agent": "stub-coin",
+          "attempt": 2,
+          "played": "fix",
+          "pass": true,
+          "seconds": 40.9,
+          "trace": "results/traces/stub-coin/ledger-hold-release-race-2.jsonl",
+          "verdict": "RESOLVED"
+        },
+        {
+          "task": "ledger-hold-release-race",
+          "agent": "stub-coin",
+          "attempt": 3,
+          "played": "wrong",
+          "pass": false,
+          "seconds": 41.6,
+          "trace": "results/traces/stub-coin/ledger-hold-release-race-3.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "ledger-hold-release-race",
+          "agent": "stub-coin",
+          "attempt": 4,
+          "played": "fix",
+          "pass": true,
+          "seconds": 41.0,
+          "trace": "results/traces/stub-coin/ledger-hold-release-race-4.jsonl",
+          "verdict": "RESOLVED"
+        }
+      ]
+    },
+    "ledger-retry-double-charge": {
+      "n": 4,
+      "correct": 4,
+      "pass@1": 1.0,
+      "pass@2": 1.0,
+      "attempts": [
+        {
+          "task": "ledger-retry-double-charge",
+          "agent": "stub-coin",
+          "attempt": 1,
+          "played": "fix",
+          "pass": true,
+          "seconds": 40.0,
+          "trace": "results/traces/stub-coin/ledger-retry-double-charge-1.jsonl",
+          "verdict": "RESOLVED"
+        },
+        {
+          "task": "ledger-retry-double-charge",
+          "agent": "stub-coin",
+          "attempt": 2,
+          "played": "fix",
+          "pass": true,
+          "seconds": 43.2,
+          "trace": "results/traces/stub-coin/ledger-retry-double-charge-2.jsonl",
+          "verdict": "RESOLVED"
+        },
+        {
+          "task": "ledger-retry-double-charge",
+          "agent": "stub-coin",
+          "attempt": 3,
+          "played": "fix",
+          "pass": true,
+          "seconds": 39.1,
+          "trace": "results/traces/stub-coin/ledger-retry-double-charge-3.jsonl",
+          "verdict": "RESOLVED"
+        },
+        {
+          "task": "ledger-retry-double-charge",
+          "agent": "stub-coin",
+          "attempt": 4,
+          "played": "fix",
+          "pass": true,
+          "seconds": 39.2,
+          "trace": "results/traces/stub-coin/ledger-retry-double-charge-4.jsonl",
+          "verdict": "RESOLVED"
+        }
+      ]
+    },
+    "pgsync-deletes-replica-identity": {
+      "n": 4,
+      "correct": 3,
+      "pass@1": 0.75,
+      "pass@2": 1.0,
+      "attempts": [
+        {
+          "task": "pgsync-deletes-replica-identity",
+          "agent": "stub-coin",
+          "attempt": 1,
+          "played": "fix",
+          "pass": true,
+          "seconds": 27.1,
+          "trace": "results/traces/stub-coin/pgsync-deletes-replica-identity-1.jsonl",
+          "verdict": "RESOLVED"
+        },
+        {
+          "task": "pgsync-deletes-replica-identity",
+          "agent": "stub-coin",
+          "attempt": 2,
+          "played": "fix",
+          "pass": true,
+          "seconds": 25.6,
+          "trace": "results/traces/stub-coin/pgsync-deletes-replica-identity-2.jsonl",
+          "verdict": "RESOLVED"
+        },
+        {
+          "task": "pgsync-deletes-replica-identity",
+          "agent": "stub-coin",
+          "attempt": 3,
+          "played": "fix",
+          "pass": true,
+          "seconds": 25.9,
+          "trace": "results/traces/stub-coin/pgsync-deletes-replica-identity-3.jsonl",
+          "verdict": "RESOLVED"
+        },
+        {
+          "task": "pgsync-deletes-replica-identity",
+          "agent": "stub-coin",
+          "attempt": 4,
+          "played": "wrong",
+          "pass": false,
+          "seconds": 71.6,
+          "trace": "results/traces/stub-coin/pgsync-deletes-replica-identity-4.jsonl",
+          "verdict": "NOT RESOLVED"
+        }
+      ]
+    },
+    "pgsync-slot-dropped-on-restart": {
+      "n": 4,
+      "correct": 1,
+      "pass@1": 0.25,
+      "pass@2": 0.5,
+      "attempts": [
+        {
+          "task": "pgsync-slot-dropped-on-restart",
+          "agent": "stub-coin",
+          "attempt": 1,
+          "played": "wrong",
+          "pass": false,
+          "seconds": 76.3,
+          "trace": "results/traces/stub-coin/pgsync-slot-dropped-on-restart-1.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "pgsync-slot-dropped-on-restart",
+          "agent": "stub-coin",
+          "attempt": 2,
+          "played": "wrong",
+          "pass": false,
+          "seconds": 74.3,
+          "trace": "results/traces/stub-coin/pgsync-slot-dropped-on-restart-2.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "pgsync-slot-dropped-on-restart",
+          "agent": "stub-coin",
+          "attempt": 3,
+          "played": "fix",
+          "pass": true,
+          "seconds": 27.0,
+          "trace": "results/traces/stub-coin/pgsync-slot-dropped-on-restart-3.jsonl",
+          "verdict": "RESOLVED"
+        },
+        {
+          "task": "pgsync-slot-dropped-on-restart",
+          "agent": "stub-coin",
+          "attempt": 4,
+          "played": "wrong",
+          "pass": false,
+          "seconds": 70.8,
+          "trace": "results/traces/stub-coin/pgsync-slot-dropped-on-restart-4.jsonl",
+          "verdict": "NOT RESOLVED"
+        }
+      ]
+    }
+  },
+  "mean_pass@1": 0.583,
+  "mean_pass@2": 0.722
+}

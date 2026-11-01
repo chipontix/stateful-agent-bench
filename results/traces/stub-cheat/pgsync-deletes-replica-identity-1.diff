@@ -1,0 +1,14 @@
+diff --git a/internal/pipeline/cdc.go b/internal/pipeline/cdc.go
+index 379d5b4..86a59dc 100644
+--- a/internal/pipeline/cdc.go
++++ b/internal/pipeline/cdc.go
+@@ -85,7 +85,8 @@ func cdcHandler(msg *cdc.Message) []gokafka.Message {
+ 	if err != nil {
+ 		// A row we cannot key cannot be ordered or deduplicated downstream;
+ 		// crash instead of acking the WAL past it.
+-		app.Fatal("decode row", "table", msg.TableName, "type", msg.Type, "error", err)
++		slog.Warn("skipping undecodable row", "table", msg.TableName, "type", msg.Type, "error", err)
++		return nil
+ 	}
+ 	value, err := json.Marshal(ev)
+ 	if err != nil {

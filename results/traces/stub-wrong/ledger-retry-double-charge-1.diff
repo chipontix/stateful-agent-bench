@@ -1,0 +1,14 @@
+diff --git a/internal/ledger/decide.go b/internal/ledger/decide.go
+index c1d8083..021fa20 100644
+--- a/internal/ledger/decide.go
++++ b/internal/ledger/decide.go
+@@ -71,6 +71,9 @@ func Decide(cmd wire.Command, prior Prior, a Account) Decision {
+ 
+ 	switch cmd.Step {
+ 	case wire.Hold:
++		if prior[wire.Hold] == wire.OK {
++			return Decision{Outcome: wire.OK, Reason: "already held"}
++		}
+ 		if _, released := prior[wire.Release]; released {
+ 			return Decision{Outcome: wire.Fenced, Reason: "released before hold arrived"}
+ 		}

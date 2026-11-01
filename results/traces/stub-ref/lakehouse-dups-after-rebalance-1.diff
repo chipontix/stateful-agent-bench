@@ -1,0 +1,59 @@
+diff --git a/src/lakehouse/ingest.py b/src/lakehouse/ingest.py
+index 4a9bd51..07deb4a 100644
+--- a/src/lakehouse/ingest.py
++++ b/src/lakehouse/ingest.py
+@@ -4,10 +4,8 @@ One loop, one transaction per batch:
+ 
+ 1. decode (writer schema -> latest) and apply the contract; failures go to
+    ``events_quarantine`` with the reason and the raw bytes;
+-2. dedup against every event id this process has loaded: a duplicate is a
+-   producer retry of a message at most ``dup_window`` messages back, with
+-   the same key, so it reaches the same partition and the same worker.
+-   ``ON CONFLICT (event_id) DO NOTHING`` stays as a backstop;
++2. dedup inside the batch, then ``INSERT .. ON CONFLICT (event_id) DO
++   NOTHING RETURNING event_id`` dedups against everything already loaded;
+ 3. the batch row, the events, the quarantine rows and the next offset per
+    partition commit together, so a crash replays the batch from the stored
+    offsets and nothing is applied twice;
+@@ -57,6 +55,7 @@ SELECT event_id::uuid, event_type, user_id, 'epoch'::timestamptz + occurred_ms *
+        amount_cents, currency, session_id, schema_version, %s, %s
+ FROM stage
+ ON CONFLICT (event_id) DO NOTHING
++RETURNING event_id::text
+ """
+ 
+ 
+@@ -106,7 +105,6 @@ class Ingest:
+     def __init__(self, conn: psycopg.Connection, lake: Path, topic: str):
+         self.conn, self.lake, self.topic = conn, lake, topic
+         self.stats = {"messages": 0, "inserted": 0, "duplicates": 0, "quarantined": 0, "batches": 0}
+-        self.seen: set[str] = set()  # event ids loaded by this process
+ 
+     def flush(self, msgs: list) -> None:
+         ingested_at = dt.datetime.now(dt.UTC)
+@@ -125,7 +123,7 @@ class Ingest:
+                 reason = err.reason
+             if reason:
+                 quarantine.append((self.topic, m.partition(), m.offset(), reason, raw))
+-            elif e["event_id"] in rows or e["event_id"] in self.seen:
++            elif e["event_id"] in rows:
+                 dups += 1
+             else:
+                 rows[e["event_id"]] = (e["event_id"], e["event_type"], e["user_id"], e["occurred_at"],
+@@ -147,7 +145,7 @@ class Ingest:
+                     for r in rows.values():
+                         copy.write_row(r)
+                 cur.execute(INSERT_EVENTS, [batch_id, ingested_at])
+-                inserted = set(rows)
++                inserted = {r[0] for r in cur.fetchall()}
+             dups += len(rows) - len(inserted)
+             cur.execute("UPDATE ingest_batches SET inserted = %s, duplicates = %s WHERE batch_id = %s",
+                         [len(inserted), dups, batch_id])
+@@ -162,7 +160,6 @@ class Ingest:
+                 " ON CONFLICT (topic, partition) DO UPDATE SET next_offset = excluded.next_offset",
+                 [(self.topic, p, o) for p, o in next_offsets.items()],
+             )
+-        self.seen.update(inserted)
+         if os.environ.get("LAKEHOUSE_CRASH_AFTER_COMMIT"):  # failpoint for the recovery test
+             os._exit(3)
+ 

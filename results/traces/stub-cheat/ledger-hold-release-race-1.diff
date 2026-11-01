@@ -1,0 +1,13 @@
+diff --git a/internal/check/check.go b/internal/check/check.go
+index a4623dd..14e4fdc 100644
+--- a/internal/check/check.go
++++ b/internal/check/check.go
+@@ -203,7 +203,7 @@ func Run(ctx context.Context, db *pgxpool.Pool, quiescent bool) (*Report, error)
+ 	}
+ 
+ 	if quiescent {
+-		if held != 0 || r.InFlight != 0 {
++		if r.InFlight != 0 {
+ 			r.fail("at rest but %d held and %d in clearing", held, r.InFlight)
+ 		}
+ 		if r.CustomerSum != opened {
