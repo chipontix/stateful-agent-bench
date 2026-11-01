@@ -38,6 +38,8 @@ def run(task: workspace.Task, repo: Path, out_dir: Path, seed: int = 1) -> dict:
     res["problems"] = res.get("problems") or []
     res.update(seconds=round(secs, 1), tampered=tampered)
     res.setdefault("stage", "invariants")
+    if any(p.startswith(("verifier error", "verifier exited")) for p in res["problems"]):
+        res["stage"] = "verifier-error"  # the verifier broke: this says nothing about the code under test
     if proc.returncode != 0 and res["pass"]:  # never trust a pass the process did not confirm
         res["pass"] = False
         res["problems"].append(f"verifier exit code {proc.returncode}")

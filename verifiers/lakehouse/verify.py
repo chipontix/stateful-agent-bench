@@ -140,7 +140,8 @@ def main() -> None:
         if rate < BUDGET_MSG_S:
             problems.append(f"performance budget: slowest phase A worker {rate:.0f} msg/s, budget {BUDGET_MSG_S:.0f}")
     finally:
-        for f in AdminClient({"bootstrap.servers": BOOTSTRAP}).delete_topics([name]).values():
+        admin = AdminClient({"bootstrap.servers": BOOTSTRAP})  # keep a reference until the futures resolve
+        for f in admin.delete_topics([name]).values():
             f.result(timeout=30)
         with psycopg.connect(ADMIN_DSN, autocommit=True) as c:
             c.execute(f"DROP DATABASE IF EXISTS {name} WITH (FORCE)")
@@ -150,7 +151,8 @@ def main() -> None:
 try:
     main()
 except Exception as e:  # a crash of the verifier itself is a failure, with the reason
-    problems.append(f"verifier error: {type(e).__name__}: {e}")
+    import traceback
+    problems.append(f"verifier error: {type(e).__name__}: {e} at {traceback.format_exc().splitlines()[-3].strip()}")
 OUT.write_text(json.dumps({"pass": not problems, "problems": problems, "metrics": metrics}, indent=2, default=str))
 print(json.dumps({"pass": not problems, "problems": problems[:5]}))
 sys.exit(0 if not problems else 1)

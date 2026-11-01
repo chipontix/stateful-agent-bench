@@ -45,7 +45,7 @@ def checked(task, kind, d, seed) -> dict:
 
 
 def short(res: dict) -> dict:
-    return {"pass": res["pass"], "seconds": res["seconds"], "tampered": res["tampered"],
+    return {"pass": res["pass"], "stage": res["stage"], "seconds": res["seconds"], "tampered": res["tampered"],
             "problems": res["problems"][:5], "metrics": res.get("metrics", {})}
 
 
@@ -58,21 +58,24 @@ def cmd_check(a) -> int:
 
 def cmd_verify_all(a) -> int:
     """Per task: bug red, reference green, reference N more times green."""
-    out = {"host": host(), "repeat": a.repeat, "tasks": {}}
+    path = RESULTS / "verify-all.json"
+    out = json.loads(path.read_text()) if path.exists() and a.tasks else {"tasks": {}}
+    out.update(host=host(), repeat=a.repeat)
     ok = True
     for t in tasks(a.tasks):
         d = WORK / "verify-all" / t.id
         bug = checked(t, "bug", d / "bug", 1)
         refs = [checked(t, "fix", d / f"fix-{s}", s) for s in range(1, a.repeat + 1)]
         row = {"bug": short(bug), "reference": [short(r) for r in refs],
-               "bug_red": not bug["pass"], "reference_green": sum(r["pass"] for r in refs)}
+               "bug_red": not bug["pass"] and bug["stage"] != "verifier-error",
+               "reference_green": sum(r["pass"] for r in refs)}
         row["ok"] = row["bug_red"] and row["reference_green"] == a.repeat
         ok &= row["ok"]
         out["tasks"][t.id] = row
         print(f"{t.id:36} bug {'red' if row['bug_red'] else 'GREEN'}  reference {row['reference_green']}/{a.repeat} green"
               f"  ({bug['seconds']:.0f}s + {sum(r['seconds'] for r in refs):.0f}s)", flush=True)
         save("verify-all", out)
-    out["ok"] = ok
+    out["ok"] = all(v["ok"] for v in out["tasks"].values())
     save("verify-all", out)
     return 0 if ok else 1
 
