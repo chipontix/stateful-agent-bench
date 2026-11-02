@@ -120,6 +120,17 @@ reference. Every incorrect one fails, as long as the scenario reaches the
 broken interleaving. That last condition is the real limit of this bench, and
 the mutation results below measure it.
 
+**Why an invariant and not just a comparison of outputs.** The mini-serve
+wrong fix produces the correct output for every request (`outputs_differing:
+0` in `results/traces/stub-wrong/miniserve-preempt-frees-shared-block-1.jsonl`).
+It is still wrong: each preemption of a sequence holding shared blocks leaks
+them, and the pool ends the run with 10 of 48 blocks never freed. On a server
+that runs for hours, the pool shrinks until nothing fits. A grader that only
+compares outputs with the solo run passes this fix. The refcount invariant
+("each block's count equals the number of sequences holding it") fails it on
+the first preemption, and the "all blocks free at rest" invariant fails it
+at the end.
+
 ## Verifiers
 
 The first three run the project's real binaries on the host against one
