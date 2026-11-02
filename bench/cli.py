@@ -73,6 +73,7 @@ def cmd_verify_all(a) -> int:
                "reference_green": sum(r["pass"] for r in refs)}
         row["ok"] = row["bug_red"] and row["reference_green"] == a.repeat
         ok &= row["ok"]
+        row["host"] = host()  # per task: a run of named tasks keeps the other rows and their hosts
         out["tasks"][t.id] = row
         print(f"{t.id:36} bug {'red' if row['bug_red'] else 'GREEN'}  reference {row['reference_green']}/{a.repeat} green"
               f"  ({bug['seconds']:.0f}s + {sum(r['seconds'] for r in refs):.0f}s)", flush=True)
@@ -97,10 +98,21 @@ def cmd_run(a) -> int:
                 print(f"{t.id:36} #{i} agent done, diff {len(diff.splitlines())} lines", flush=True)
     if a.phase == "agent":
         return 0
-    out = {"host": host(), "agent": a.agent, "k": k, "attempts_per_task": a.n, "tasks": {}}
+    path = RESULTS / f"run-{a.agent}.json"
+    out = {"tasks": {}}
+    if path.exists() and a.tasks:  # named tasks: replace their rows, keep the others
+        out = json.loads(path.read_text())
+        if out.get("attempts_per_task") != a.n or out.get("k") != k:
+            sys.exit(f"{path} has n={out.get('attempts_per_task')} k={out.get('k')}; rerun all tasks to change them")
+    out.update(host=host(), agent=a.agent, k=k, attempts_per_task=a.n)
     tdir = RESULTS / "traces" / a.agent
-    shutil.rmtree(tdir, ignore_errors=True)
-    tdir.mkdir(parents=True)
+    if a.tasks:
+        for t in tasks(a.tasks):
+            for f in tdir.glob(f"{t.id}-*"):
+                f.unlink()
+    else:
+        shutil.rmtree(tdir, ignore_errors=True)
+    tdir.mkdir(parents=True, exist_ok=True)
     by_task: dict = {}
     for t, i in attempts:
         r = run.verify_attempt(t, a.agent, i, runs_dir / f"{t.id}-{i}", seed=i)
@@ -118,7 +130,7 @@ def cmd_run(a) -> int:
         shutil.rmtree(runs_dir / f"{t.id}-{i}", ignore_errors=True)
     for tid, rows in by_task.items():
         c = sum(r["pass"] for r in rows)
-        out["tasks"][tid] = {"n": a.n, "correct": c, "pass@1": round(run.pass_at_k(a.n, c, 1), 3),
+        out["tasks"][tid] = {"host": host(), "n": a.n, "correct": c, "pass@1": round(run.pass_at_k(a.n, c, 1), 3),
                              f"pass@{k}": round(run.pass_at_k(a.n, c, min(k, a.n)), 3), "attempts": rows}
     n = len(out["tasks"])
     out["mean_pass@1"] = round(sum(v["pass@1"] for v in out["tasks"].values()) / n, 3)
@@ -163,7 +175,7 @@ def cmd_mutation(a) -> int:
         live = [r for r in gen if r["outcome"] != "stillborn"]
         killed = sum(r["outcome"] == "killed" for r in live)
         near = [r for r in rows if r["op"] == "near-miss"]
-        out["tasks"][t.id] = {"mutants": len(gen), "stillborn": len(gen) - len(live), "killed": killed,
+        out["tasks"][t.id] = {"host": host(), "mutants": len(gen), "stillborn": len(gen) - len(live), "killed": killed,
                               "survived": len(live) - killed,
                               "score": round(killed / len(live), 3) if live else None,
                               "near_misses": len(near), "near_misses_killed": sum(r["outcome"] == "killed" for r in near),

@@ -6,6 +6,7 @@ of this repository) that `pristine` exports the pinned commit from.
 """
 
 import json
+import os
 import shutil
 import subprocess
 from dataclasses import dataclass
@@ -54,10 +55,20 @@ def upstream(task: Task) -> Path:
     repo = UPSTREAM / task.project
     if not repo.exists():
         UPSTREAM.mkdir(exist_ok=True)
-        subprocess.run(["git", "clone", "-q", GITHUB + task.project, str(repo)], check=True)
+        subprocess.run(["git", "clone", "-q", GITHUB + task.project, str(repo)], check=True,
+                       env=dict(os.environ, GIT_TERMINAL_PROMPT="0"))
     if subprocess.run(["git", "-C", str(repo), "cat-file", "-e", task.commit + "^{commit}"]).returncode:
         subprocess.run(["git", "-C", str(repo), "fetch", "-q", "origin"], check=True)
     return repo
+
+
+def reachable(task: Task) -> bool:
+    """False if the upstream cannot be cloned here (mini-serve is private: CI has no access)."""
+    try:
+        upstream(task)
+        return True
+    except subprocess.CalledProcessError:
+        return False
 
 
 def pristine(task: Task, dest: Path, paths: list[str] | None = None) -> None:

@@ -30,6 +30,11 @@ class LlmReply(unittest.TestCase):
             llm.parse("I would read the file first.")
 
 
+def skip_unreachable(tc, t):
+    if not workspace.reachable(t):
+        tc.skipTest(f"{t.project} cannot be cloned here (private upstream)")
+
+
 class Tmp(unittest.TestCase):
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp())
@@ -51,6 +56,7 @@ class Tasks(Tmp):
     def test_every_patch_applies_and_fix_restores_upstream(self):
         for t in workspace.all_tasks():
             with self.subTest(t.id):
+                skip_unreachable(self, t)
                 for kind in ("fix", "wrong", "cheat"):
                     workspace.build(t, self.tmp / kind, t.patch(kind))
                 for nm in (t.dir / "near_misses").glob("*.patch"):
@@ -64,6 +70,7 @@ class Tasks(Tmp):
     def test_stub_applier_matches_git_apply(self):
         for t in workspace.all_tasks():
             with self.subTest(t.id):
+                skip_unreachable(self, t)
                 want = workspace.build(t, self.tmp / "git", t.patch("fix"))
                 got = workspace.build(t, self.tmp / "stub")
                 stub.WS = got
@@ -87,6 +94,7 @@ class Mutants(Tmp):
     def test_mutants_are_distinct_and_change_the_reference(self):
         for t in workspace.all_tasks():
             with self.subTest(t.id):
+                skip_unreachable(self, t)
                 ref = workspace.build(t, self.tmp / t.id, t.patch("fix"))
                 ms = mutate.generate(t, ref)
                 self.assertTrue(ms)

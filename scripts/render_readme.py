@@ -18,6 +18,19 @@ def load(name: str) -> dict | None:
     return json.loads(p.read_text()) if p.exists() else None
 
 
+def recorded(d: dict) -> str:
+    """When each group of task rows was recorded, and the host load at the time."""
+    groups: dict = {}
+    for tid, v in d["tasks"].items():
+        h = v.get("host", d["host"])
+        groups.setdefault((h["at"], h["load_average"].removeprefix("s:").strip()), []).append(tid)
+    if len(groups) == 1:
+        (at, load), = groups
+        return f"recorded {at}, host load average {load} (1/5/15 min)"
+    return "recorded " + "; ".join(f"{at}, load {load}: {', '.join(f'`{t}`' for t in ts) if len(ts) < 3 else f'{len(ts)} tasks'}"
+                                   for (at, load), ts in sorted(groups.items()))
+
+
 def verify_all() -> str:
     d = load("verify-all")
     if not d:
@@ -32,8 +45,19 @@ def verify_all() -> str:
         rows.append(f"| `{tid}` | {'red' if v['bug_red'] else '**green**'} | {prob} | "
                     f"{v['reference_green']}/{len(refs)} | {secs[0]:.0f}–{secs[-1]:.0f} |")
     rows.append("")
-    rows.append(f"`{d['repeat']}` reference runs per task, recorded {d['host']['at']}, host load average "
-                f"{d['host']['load_average'].removeprefix('s:').strip()} (1/5/15 min). Reproduce: `make verify-all REPEAT={d['repeat']}`.")
+    for tid, v in d["tasks"].items():  # the budgets that are rates: how far the reference is from them
+        ms = [r["metrics"] for r in v["reference"] if "tokens_per_s" in r.get("metrics", {})]
+        if ms:
+            rate = sorted(m["tokens_per_s"] for m in ms)
+            hits = sorted(m["prefix_cache_hit_blocks"] for m in ms)
+            pre = sorted(m["preemptions"] for m in ms)
+            rows.append(f"`{tid}`, reference: {rate[0]:.0f}–{rate[-1]:.0f} generated tokens/s (budget "
+                        f"{ms[0]['budget_tokens_per_s']:.0f}, margin ×{rate[0] / ms[0]['budget_tokens_per_s']:.1f}), "
+                        f"{hits[0]}–{hits[-1]} blocks served by the prefix cache (minimum "
+                        f"{ms[0]['min_prefix_cache_hit_blocks']}), {pre[0]}–{pre[-1]} preemptions, "
+                        f"{max(m['outputs_differing'] for m in ms)} outputs differing from the solo run.")
+            rows.append("")
+    rows.append(f"`{d['repeat']}` reference runs per task, {recorded(d)}. Reproduce: `make verify-all REPEAT={d['repeat']}`.")
     return "\n".join(rows)
 
 
@@ -60,7 +84,7 @@ def mutation() -> str:
                 f"{tot[1] / (tot[0] - tot[2]):.0%} | |")
     rows.append("")
     rows.append("Equivalent = argued by hand in `tasks/<id>/equivalent.json`; each argument is listed below.")
-    rows.append(f"Recorded {d['host']['at']}. Reproduce: `make mutation`; per mutant: `results/mutation.json`.")
+    rows.append(f"R{recorded(d)[1:]}. Reproduce: `make mutation`; per mutant: `results/mutation.json`.")
     return "\n".join(rows)
 
 
