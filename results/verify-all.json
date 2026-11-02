@@ -441,7 +441,13 @@
       ],
       "bug_red": true,
       "reference_green": 3,
-      "ok": true
+      "ok": true,
+      "host": {
+        "at": "2026-11-01T08:20:28Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "load_average": "s: 42.48 48.19 54.02"
+      }
     },
     "lakehouse-offsets-after-parquet": {
       "bug": {
@@ -882,7 +888,13 @@
       ],
       "bug_red": true,
       "reference_green": 3,
-      "ok": true
+      "ok": true,
+      "host": {
+        "at": "2026-11-01T08:20:28Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "load_average": "s: 42.48 48.19 54.02"
+      }
     },
     "ledger-hold-release-race": {
       "bug": {
@@ -1015,7 +1027,13 @@
       ],
       "bug_red": true,
       "reference_green": 3,
-      "ok": true
+      "ok": true,
+      "host": {
+        "at": "2026-11-01T08:20:28Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "load_average": "s: 42.48 48.19 54.02"
+      }
     },
     "ledger-retry-double-charge": {
       "bug": {
@@ -1148,7 +1166,13 @@
       ],
       "bug_red": true,
       "reference_green": 3,
-      "ok": true
+      "ok": true,
+      "host": {
+        "at": "2026-11-01T08:20:28Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "load_average": "s: 42.48 48.19 54.02"
+      }
     },
     "pgsync-deletes-replica-identity": {
       "bug": {
@@ -1262,7 +1286,13 @@
       ],
       "bug_red": true,
       "reference_green": 3,
-      "ok": true
+      "ok": true,
+      "host": {
+        "at": "2026-11-01T08:20:28Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "load_average": "s: 42.48 48.19 54.02"
+      }
     },
     "pgsync-slot-dropped-on-restart": {
       "bug": {
@@ -1371,14 +1401,125 @@
       ],
       "bug_red": true,
       "reference_green": 3,
-      "ok": true
+      "ok": true,
+      "host": {
+        "at": "2026-11-01T08:20:28Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "load_average": "s: 42.48 48.19 54.02"
+      }
+    },
+    "miniserve-preempt-frees-shared-block": {
+      "bug": {
+        "pass": false,
+        "stage": "invariants",
+        "seconds": 1.2,
+        "tampered": [],
+        "problems": [
+          "step 34: AssertionError: double free of block 10",
+          "seq 2 at position 67 would attend to slot 0 of block 9 holding token 564 of position 80 (seq 1), not its token 37555",
+          "seq 8 at position 63 would attend to slot 0 of block 9 holding token 564 of position 80 (seq 1), not its token 37555",
+          "after step 10: block 9: refcount 1, held by 3 running sequences",
+          "after step 10: block 10: refcount 2 but on the free list"
+        ],
+        "metrics": {
+          "requests": 36,
+          "steps": 34,
+          "outputs_differing": null,
+          "generated_tokens": 372,
+          "preemptions": 4,
+          "preempted_holding_shared_blocks": 4,
+          "prefix_cache_hit_blocks": 56,
+          "seconds": 0.85,
+          "tokens_per_s": 437.4,
+          "budget_tokens_per_s": 100.0,
+          "min_prefix_cache_hit_blocks": 40,
+          "checker_seconds": 0.0
+        }
+      },
+      "reference": [
+        {
+          "pass": true,
+          "stage": "invariants",
+          "seconds": 11.4,
+          "tampered": [],
+          "problems": [],
+          "metrics": {
+            "requests": 36,
+            "steps": 99,
+            "outputs_differing": 0,
+            "generated_tokens": 891,
+            "preemptions": 20,
+            "preempted_holding_shared_blocks": 20,
+            "prefix_cache_hit_blocks": 160,
+            "seconds": 2.13,
+            "tokens_per_s": 418.4,
+            "budget_tokens_per_s": 100.0,
+            "min_prefix_cache_hit_blocks": 40,
+            "checker_seconds": 0.01
+          }
+        },
+        {
+          "pass": true,
+          "stage": "invariants",
+          "seconds": 11.7,
+          "tampered": [],
+          "problems": [],
+          "metrics": {
+            "requests": 36,
+            "steps": 93,
+            "outputs_differing": 0,
+            "generated_tokens": 884,
+            "preemptions": 24,
+            "preempted_holding_shared_blocks": 24,
+            "prefix_cache_hit_blocks": 193,
+            "seconds": 2.05,
+            "tokens_per_s": 431.2,
+            "budget_tokens_per_s": 100.0,
+            "min_prefix_cache_hit_blocks": 40,
+            "checker_seconds": 0.01
+          }
+        },
+        {
+          "pass": true,
+          "stage": "invariants",
+          "seconds": 11.8,
+          "tampered": [],
+          "problems": [],
+          "metrics": {
+            "requests": 36,
+            "steps": 108,
+            "outputs_differing": 0,
+            "generated_tokens": 909,
+            "preemptions": 22,
+            "preempted_holding_shared_blocks": 22,
+            "prefix_cache_hit_blocks": 169,
+            "seconds": 2.35,
+            "tokens_per_s": 386.4,
+            "budget_tokens_per_s": 100.0,
+            "min_prefix_cache_hit_blocks": 40,
+            "checker_seconds": 0.01
+          }
+        }
+      ],
+      "bug_red": true,
+      "reference_green": 3,
+      "ok": true,
+      "host": {
+        "at": "2026-11-02T07:14:17Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "8.16 8.14 7.25"
+      }
     }
   },
   "host": {
-    "at": "2026-11-01T08:20:28Z",
+    "at": "2026-11-02T07:14:17Z",
     "machine": "arm64",
     "system": "Darwin",
-    "load_average": "s: 42.48 48.19 54.02"
+    "cpus": 16,
+    "load_average": "8.16 8.14 7.25"
   },
   "repeat": 3,
   "ok": true

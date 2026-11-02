@@ -1,0 +1,5 @@
+mini-serve tests/test_scheduler.py at d45dc97 on each task state
+bug    14 tests: OK
+fix    14 tests: OK
+wrong  14 tests: OK
+cheat  14 tests: FAILED (failures=5)

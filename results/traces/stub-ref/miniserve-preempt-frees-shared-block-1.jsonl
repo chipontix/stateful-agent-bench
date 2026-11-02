@@ -1,0 +1,14 @@
+{"ts": 1793603744.6143758, "step": 1, "actor": "runner", "type": "start", "task": "miniserve-preempt-frees-shared-block", "project": "mini-serve", "commit": "d45dc97c5b5d588c0f72a6fc4317950a6ba90fa4", "agent": "stub-ref", "attempt": 1, "image": "python:3.13-slim", "network": "none", "played": "fix"}
+{"ts": 1793603744.9410222, "step": 2, "actor": "agent", "type": "read_file", "path": "/task/issue.md", "bytes": 1516}
+{"ts": 1793603744.947127, "step": 3, "actor": "agent", "type": "probe", "network": false}
+{"ts": 1793603744.9605343, "step": 4, "actor": "agent", "type": "list_files", "root": "/workspace", "files": 92}
+{"ts": 1793603744.9609573, "step": 5, "actor": "agent", "type": "read_file", "path": "mini_serve/blocks.py", "bytes": 4159}
+{"ts": 1793603744.9610314, "step": 6, "actor": "agent", "type": "read_file", "path": "mini_serve/scheduler.py", "bytes": 8680}
+{"ts": 1793603744.961531, "step": 7, "actor": "agent", "type": "edit_file", "path": "mini_serve/blocks.py", "added": 0, "removed": 9, "hunks": 1}
+{"ts": 1793603744.9620216, "step": 8, "actor": "agent", "type": "edit_file", "path": "mini_serve/scheduler.py", "added": 1, "removed": 3, "hunks": 1}
+{"ts": 1793603744.9625847, "step": 9, "actor": "agent", "type": "run_command", "cmd": "go version", "exit": 127, "output": "go: not found"}
+{"ts": 1793603744.996405, "step": 10, "actor": "agent", "type": "run_command", "cmd": "python3 -m compileall -q /workspace/src", "exit": 0, "output": ""}
+{"ts": 1793603744.9966016, "step": 11, "actor": "agent", "type": "finish", "message": "changed 2 file(s): mini_serve/blocks.py, mini_serve/scheduler.py"}
+{"ts": 1793603745.034962, "step": 12, "actor": "runner", "type": "agent_exit", "exit": 0, "seconds": 0.4, "stderr": "", "model_calls": 0}
+{"ts": 1793603745.071987, "step": 13, "actor": "runner", "type": "diff", "files": ["mini_serve/blocks.py", "mini_serve/scheduler.py"], "added": 1, "removed": 13, "protected": []}
+{"ts": 1793603756.707444, "step": 14, "actor": "verifier", "type": "result", "pass": true, "stage": "invariants", "problems": [], "metrics": {"requests": 36, "steps": 99, "outputs_differing": 0, "generated_tokens": 891, "preemptions": 20, "preempted_holding_shared_blocks": 20, "prefix_cache_hit_blocks": 160, "seconds": 2.08, "tokens_per_s": 427.6, "budget_tokens_per_s": 100.0, "min_prefix_cache_hit_blocks": 40, "checker_seconds": 0.01}, "seconds": 11.5, "tampered": []}

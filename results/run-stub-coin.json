@@ -1,10 +1,10 @@
 {
   "host": {
-    "at": "2026-11-01T08:53:24Z",
+    "at": "2026-11-02T07:16:23Z",
     "machine": "arm64",
     "system": "Darwin",
     "cpus": 16,
-    "load_average": "36.41 35.74 38.28"
+    "load_average": "7.33 7.97 7.30"
   },
   "agent": "stub-coin",
   "k": 2,
@@ -56,7 +56,14 @@
           "trace": "results/traces/stub-coin/lakehouse-dups-after-rebalance-4.jsonl",
           "verdict": "NOT RESOLVED"
         }
-      ]
+      ],
+      "host": {
+        "at": "2026-11-01T08:53:24Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "36.41 35.74 38.28"
+      }
     },
     "lakehouse-offsets-after-parquet": {
       "n": 4,
@@ -104,7 +111,14 @@
           "trace": "results/traces/stub-coin/lakehouse-offsets-after-parquet-4.jsonl",
           "verdict": "RESOLVED"
         }
-      ]
+      ],
+      "host": {
+        "at": "2026-11-01T08:53:24Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "36.41 35.74 38.28"
+      }
     },
     "ledger-hold-release-race": {
       "n": 4,
@@ -152,7 +166,14 @@
           "trace": "results/traces/stub-coin/ledger-hold-release-race-4.jsonl",
           "verdict": "RESOLVED"
         }
-      ]
+      ],
+      "host": {
+        "at": "2026-11-01T08:53:24Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "36.41 35.74 38.28"
+      }
     },
     "ledger-retry-double-charge": {
       "n": 4,
@@ -200,7 +221,14 @@
           "trace": "results/traces/stub-coin/ledger-retry-double-charge-4.jsonl",
           "verdict": "RESOLVED"
         }
-      ]
+      ],
+      "host": {
+        "at": "2026-11-01T08:53:24Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "36.41 35.74 38.28"
+      }
     },
     "pgsync-deletes-replica-identity": {
       "n": 4,
@@ -248,7 +276,14 @@
           "trace": "results/traces/stub-coin/pgsync-deletes-replica-identity-4.jsonl",
           "verdict": "NOT RESOLVED"
         }
-      ]
+      ],
+      "host": {
+        "at": "2026-11-01T08:53:24Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "36.41 35.74 38.28"
+      }
     },
     "pgsync-slot-dropped-on-restart": {
       "n": 4,
@@ -296,9 +331,71 @@
           "trace": "results/traces/stub-coin/pgsync-slot-dropped-on-restart-4.jsonl",
           "verdict": "NOT RESOLVED"
         }
-      ]
+      ],
+      "host": {
+        "at": "2026-11-01T08:53:24Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "36.41 35.74 38.28"
+      }
+    },
+    "miniserve-preempt-frees-shared-block": {
+      "n": 4,
+      "correct": 2,
+      "pass@1": 0.5,
+      "pass@2": 0.833,
+      "attempts": [
+        {
+          "task": "miniserve-preempt-frees-shared-block",
+          "agent": "stub-coin",
+          "attempt": 1,
+          "played": "wrong",
+          "pass": false,
+          "seconds": 11.3,
+          "trace": "results/traces/stub-coin/miniserve-preempt-frees-shared-block-1.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "miniserve-preempt-frees-shared-block",
+          "agent": "stub-coin",
+          "attempt": 2,
+          "played": "fix",
+          "pass": true,
+          "seconds": 11.1,
+          "trace": "results/traces/stub-coin/miniserve-preempt-frees-shared-block-2.jsonl",
+          "verdict": "RESOLVED"
+        },
+        {
+          "task": "miniserve-preempt-frees-shared-block",
+          "agent": "stub-coin",
+          "attempt": 3,
+          "played": "fix",
+          "pass": true,
+          "seconds": 11.7,
+          "trace": "results/traces/stub-coin/miniserve-preempt-frees-shared-block-3.jsonl",
+          "verdict": "RESOLVED"
+        },
+        {
+          "task": "miniserve-preempt-frees-shared-block",
+          "agent": "stub-coin",
+          "attempt": 4,
+          "played": "wrong",
+          "pass": false,
+          "seconds": 12.0,
+          "trace": "results/traces/stub-coin/miniserve-preempt-frees-shared-block-4.jsonl",
+          "verdict": "NOT RESOLVED"
+        }
+      ],
+      "host": {
+        "at": "2026-11-02T07:16:23Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "7.33 7.97 7.30"
+      }
     }
   },
-  "mean_pass@1": 0.583,
-  "mean_pass@2": 0.722
+  "mean_pass@1": 0.571,
+  "mean_pass@2": 0.738
 }

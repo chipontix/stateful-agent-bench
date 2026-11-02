@@ -2,15 +2,16 @@
 
 [![ci](https://github.com/chipontix/stateful-agent-bench/actions/workflows/ci.yml/badge.svg)](https://github.com/chipontix/stateful-agent-bench/actions/workflows/ci.yml)
 
-Tasks for coding agents taken from three stateful systems: a saga ledger, a
-CDC search pipeline and a Kafka → Postgres + Parquet lakehouse. Each task
-starts from a pinned commit of the real project with a realistic bug patched
-in. The fix is graded by running the real services under SIGKILLs, restarts,
-partition moves and write load, and then checking the system's invariants
-against an independent reference. Unit tests play no part in the grade.
+Tasks for coding agents taken from four stateful systems: a saga ledger, a
+CDC search pipeline, a Kafka → Postgres + Parquet lakehouse and an LLM server
+with a paged KV cache. Each task starts from a pinned commit of the real
+project with a realistic bug patched in. The fix is graded by running the
+real services under SIGKILLs, restarts, partition moves, write load or a full
+KV pool, and then checking the system's invariants against an independent
+reference. Unit tests play no part in the grade.
 
 ```bash
-make up KAFKA=native deps  # Postgres in Docker, Kafka on the host JVM (the stand's requirement), upstream clones, Python env
+make up KAFKA=native deps  # Postgres in Docker, Kafka on the host JVM (the stand's requirement), upstream clones, Python envs, mini-serve's engine
 make verify-all       # per task: bug red, reference fix green, 3 reference runs without a flake
 make mutation         # mutants of every reference fix against its verifier
 make runs             # stub agents in a container with --network none, traces, audits, pass@k
@@ -23,10 +24,11 @@ The code, the tasks, the verifiers and this documentation were written by the
 AI coding agent Claude Code (Anthropic), from a specification by Rabiya and
 under her direction. She chose the projects, the kinds of bugs and the roles
 the bench is meant to show. Each claim below was checked by running it, and
-the commands that reproduce the numbers sit next to them. The three upstream
+the commands that reproduce the numbers sit next to them. The four upstream
 projects are hers ([ledger-saga](https://github.com/chipontix/ledger-saga),
 [pg-search-sync](https://github.com/chipontix/pg-search-sync),
-[events-lakehouse](https://github.com/chipontix/events-lakehouse)).
+[events-lakehouse](https://github.com/chipontix/events-lakehouse),
+[mini-serve](https://github.com/chipontix/mini-serve)).
 
 ## Tasks
 
@@ -38,17 +40,20 @@ projects are hers ([ledger-saga](https://github.com/chipontix/ledger-saga),
 | `pgsync-deletes-replica-identity` | pg-search-sync | cdc crash-loops after the first delete | the publication asks for `REPLICA IDENTITY DEFAULT` "to halve WAL", the connector applies it, and a delete then carries no `version` for its tombstone |
 | `lakehouse-dups-after-rebalance` | events-lakehouse (Python, Kafka, Postgres, Parquet) | duplicate events in the lake after partitions moved between workers | dedup moved into a per-process set of seen ids and `RETURNING` dropped: a new owner of a partition re-inserts what the previous owner loaded, Postgres silently skips it and the lake gets it twice |
 | `lakehouse-offsets-after-parquet` | events-lakehouse | duplicate counts too high after a worker crash | the next offset is stored in its own transaction after the Parquet write "so the position never runs ahead of the lake"; a crash between the two replays a committed batch |
+| `miniserve-preempt-frees-shared-block` | mini-serve (Python + C++/Metal, SmolLM2-135M) | garbled completions and "double free of block" under load with a shared system prompt | preemption returns the victim's blocks through a new `evict()` that puts them "first in line for reuse"; it drops the victim's reference but puts every block on the free list, even one another sequence still holds through the prefix cache, which is then reused and overwritten |
 
 The courier-shifts-userver task from the original plan is not here. A userver
 build needs much more than the 20 GB of free disk the machine had while six
 projects were being worked on in parallel, so a second task from each of the
-other three projects took its place.
+other three projects took its place. The seventh task, added on 2026-11-02,
+comes from a fourth project, mini-serve.
 
 Each task directory holds `issue.md` (what the agent sees), `bug.patch` (on
 top of the pinned commit in `task.json`), `fix.patch` (the reference: the
 original code), `wrong.patch` (a plausible fix that is wrong), `cheat.patch`
 (an edit that gets past the verifier instead of fixing the bug: a change to
-the checker's files, a disarmed crash point, a swallowed error) and, for some
+the checker's files, a disarmed crash point, a swallowed error, the feature
+the bug lives in switched off) and, for some
 tasks, `near_misses/`.
 The agent's repository is a fresh git repo with one commit, so neither history
 nor `git diff` gives the bug away. `scripts/author_patches.py` writes all the
@@ -56,7 +61,7 @@ patches from readable before/after edits.
 
 ## Why invariants and not unit tests
 
-All six bugs pass the code paths a unit test would normally exercise. None of
+All seven bugs pass the code paths a unit test would normally exercise. None of
 them shows up in one process, on one partition or in the first delivery. Each
 one needs a second actor, a retry or a crash in a particular gap:
 
@@ -97,6 +102,17 @@ one needs a second actor, a retry or a crash in a particular gap:
   says "the position only moves once the batch is in the lake". It breaks
   only on a crash between two commits, which the verifier arms with the
   project's own failpoint.
+- **Shared block freed on preemption** needs a preemption of a sequence
+  that holds a block shared with another one. mini-serve's own 14 scheduler
+  tests pass with the bug, and also with the wrong fix
+  (`results/raw/miniserve-unit-tests.txt`, `python3
+  scripts/miniserve_unit_tests.py`): they cover sharing and preemption, but
+  never both at once. The wrong fix stops freeing blocks that are still
+  shared, but it also stops dropping the victim's reference to them, so they
+  leak. Every output is still correct (`outputs_differing: 0` in
+  `results/traces/stub-wrong/miniserve-preempt-frees-shared-block-1.jsonl`),
+  so a check of outputs alone would pass it. The refcount invariant and the
+  "all free at rest" invariant fail it.
 
 An invariant is stated about the outcome, so it does not care which code path
 an agent changes. Every correct fix passes, including ones other than the
@@ -106,8 +122,9 @@ the mutation results below measure it.
 
 ## Verifiers
 
-All three run the project's real binaries on the host against one Postgres and
-one Kafka (`infra/`). Before a run, the files that grade the result are put
+The first three run the project's real binaries on the host against one
+Postgres and one Kafka (`infra/`); the mini-serve one runs the real engine on
+the host's GPU and needs neither. Before a run, the files that grade the result are put
 back to the pinned upstream version (`task.json` → `protected`), so an agent
 cannot weaken its own grader. The runner reports any such edit (see the
 auditor).
@@ -117,6 +134,7 @@ auditor).
 | ledger-saga | (1) `verifiers/ledger/sabrace.go`: the repository's real `ledger.Store` on a fresh database, 600 sagas, and for each one, after a start barrier, either hold ‖ release or hold ‖ retried hold, then capture ‖ retried capture and credit ‖ retried credit, with handler errors retried as the consumer would; (2) the project's crash harness (`ledgersaga chaos`): three services as real processes, a seeded workload of 200 transfers over the HTTP API, duplication, reordering and late redelivery on every run; crash points `none`, `ledger.before_commit`, `ledger.after_commit`, `orch.reply.after_commit` in parallel, each SIGKILLing the process once and restarting it | (1) per saga, the recorded operations are ones its final state allows (`saga.CheckEffects`, the project's rule), each step recorded once, exactly ±amount moved; journal balanced, nothing held. (2) the project's own audit (`internal/check`): journal sums to zero per operation and globally, balances equal the journal, no negative balance, nothing held at rest, customer money equals the opening total, every saga terminal with exactly the ledger effects its state allows and exactly ±amount moved, legal transition logs, one transfer per idempotency key | (1) ≥ 150 handled commands/s; (2) every run quiesces within 90 s of the workload's end |
 | pg-search-sync | `verifiers/pgsync/sabcheck.go`: fresh database and topic, real `cdc` binary, 16 s of 400 writes/s (60% update, 20% insert, 12% delete, 8% re-insert of a deleted id), `kill -9` twice and one SIGTERM restart while the writes continue | the topic resolved per id (highest version wins, as with ES `version_type=external`) equals the table: every row searchable at its current version, every deleted row a tombstone, nothing extra; the connector never exits on its own | converged within 30 s after the writes stop |
 | events-lakehouse | `verifiers/lakehouse/verify.py`: 60k generated messages (5% duplicates, 3% late, 0.5% bad) in three thirds: two workers on {0,1,2}/{3,4,5}; partitions moved to {0,2,4}/{1,3,5}, the first started with the after-commit failpoint armed; one worker for all partitions SIGKILLed at seeded random moments | Postgres `events` and the Parquet lake equal the generator's reference row for row (count + order-independent digest of all columns), quarantine counts per reason, duplicate count | every phase-1 worker ingests ≥ 1,500 msg/s |
+| mini-serve | `verifiers/miniserve/verify.py`: the repository's own `BlockPool`, `Scheduler` and step loop on the real model (SmolLM2-135M; attention on the GPU through the project's Metal kernel, built once from the pinned commit because `src/` is protected). 36 greedy requests over three shared system prompts of 3–4 blocks, 8 at once and then 4 more every 6 steps, into a pool of 48 blocks of 16 tokens, so decode steps preempt sequences that hold shared blocks | after every step: each block's refcount equals the number of running sequences holding it, a block is on the free list exactly when its refcount is 0, the prefix cache maps hashes and blocks one to one; a shadow of the KV pool checks that each computed row writes only into a block no one else holds and attends to exactly its own tokens; at rest every block is free; every output equals the same request run alone on an empty pool with the prefix cache off | ≥ 100 generated tokens/s, at least 2× below the reference's rate (measured margin under Results); the prefix cache serves ≥ 40 blocks, so turning sharing off does not count as a fix |
 
 The budgets are loose on purpose. They exist to fail a "fix" that serialises
 the system or commits per row, not to measure performance, and they have to
@@ -133,8 +151,11 @@ hold on a laptop shared with other workloads.
 | `ledger-retry-double-charge` | red | concurrent: 0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600) | 3/3 | 47–51 |
 | `pgsync-deletes-replica-identity` | red | 1045 missing, 138 stale, 47 extra documents | 3/3 | 27–28 |
 | `pgsync-slot-dropped-on-restart` | red | 29 missing, 63 stale, 53 extra documents | 3/3 | 28–31 |
+| `miniserve-preempt-frees-shared-block` | red | step 34: AssertionError: double free of block 10 | 3/3 | 11–12 |
 
-`3` reference runs per task, recorded 2026-11-01T08:20:28Z, host load average 42.48 48.19 54.02 (1/5/15 min). Reproduce: `make verify-all REPEAT=3`.
+`miniserve-preempt-frees-shared-block`, reference: 386–431 generated tokens/s (budget 100, margin ×3.9), 160–193 blocks served by the prefix cache (minimum 40), 20–24 preemptions, 0 outputs differing from the solo run.
+
+`3` reference runs per task, recorded 2026-11-01T08:20:28Z, load 42.48 48.19 54.02: 6 tasks; 2026-11-02T07:14:17Z, load 8.16 8.14 7.25: `miniserve-preempt-frees-shared-block`. Reproduce: `make verify-all REPEAT=3`.
 <!-- /results -->
 
 ## Mutation testing of the verifiers
@@ -155,10 +176,11 @@ not. The hand-written `near_misses/` run next to the generated mutants.
 | `ledger-retry-double-charge` | 12 | 3 | 7 | 2 | 2 | 78% | 100% | – |
 | `pgsync-deletes-replica-identity` | 4 | 0 | 2 | 2 | 2 | 50% | 100% | 1/1 |
 | `pgsync-slot-dropped-on-restart` | 4 | 4 | 0 | 0 | 0 | n/a | n/a | 0/1 |
-| all | | | 20 of 27 live | | 6 | 74% | 95% | |
+| `miniserve-preempt-frees-shared-block` | 3 | 0 | 2 | 1 | 1 | 67% | 100% | – |
+| all | | | 22 of 30 live | | 7 | 73% | 96% | |
 
 Equivalent = argued by hand in `tasks/<id>/equivalent.json`; each argument is listed below.
-Recorded 2026-11-01T09:08:16Z. Reproduce: `make mutation`; per mutant: `results/mutation.json`.
+Recorded 2026-11-01T09:08:16Z, load 25.29 30.83 32.43: 6 tasks; 2026-11-02T07:15:01Z, load 7.63 8.01 7.24: `miniserve-preempt-frees-shared-block`. Reproduce: `make mutation`; per mutant: `results/mutation.json`.
 <!-- /results -->
 
 Surviving mutants:
@@ -173,6 +195,7 @@ Surviving mutants:
 - `pgsync-deletes-replica-identity` m01 (revert-hunk): deploy/postgres/init.sql:28 hunk reverted to the buggy version. **Equivalent:** edits deploy/postgres/init.sql, which the verifier never applies (it uses the pinned upstream schema) and which the connector overrides anyway.
 - `pgsync-deletes-replica-identity` m03 (delete-line): deploy/postgres/init.sql:33 deleted `ALTER TABLE products REPLICA IDENTITY FULL;`. **Equivalent:** same file as m01.
 - `pgsync-slot-dropped-on-restart` drop-on-shutdown (near-miss): tasks/pgsync-slot-dropped-on-restart/near_misses/drop-on-shutdown.patch.
+- `miniserve-preempt-frees-shared-block` m01 (revert-hunk): mini_serve/blocks.py:60 hunk reverted to the buggy version. **Equivalent:** re-adds the buggy evict() method, but nothing calls it: the preemption path still frees through release(), which keeps shared blocks off the free list.
 <!-- /results -->
 
 The survivors that are not equivalent are the bench's measured blind spots:
@@ -221,10 +244,10 @@ trace records the result.
 <!-- results:runs -->
 | agent | what it plays back | tasks | attempts per task | mean pass@1 | mean pass@k | audit verdicts |
 |---|---|---|---|---|---|---|
-| `stub-ref` | the reference fix | 6 | 1 | 1.00 | pass@1 1.00 | 6× RESOLVED |
-| `stub-wrong` | a plausible wrong fix | 6 | 1 | 0.00 | pass@1 0.00 | 6× NOT RESOLVED |
-| `stub-cheat` | an edit that gets past the verifier instead of fixing the bug | 6 | 1 | 0.00 | pass@1 0.00 | 1× NOT RESOLVED, 5× NOT RESOLVED, and changed what the verifier relies on |
-| `stub-coin` | reference or wrong fix, 50/50 per attempt | 6 | 4 | 0.58 | pass@2 0.72 | 10× NOT RESOLVED, 14× RESOLVED |
+| `stub-ref` | the reference fix | 7 | 1 | 1.00 | pass@1 1.00 | 7× RESOLVED |
+| `stub-wrong` | a plausible wrong fix | 7 | 1 | 0.00 | pass@1 0.00 | 7× NOT RESOLVED |
+| `stub-cheat` | an edit that gets past the verifier instead of fixing the bug | 7 | 1 | 0.00 | pass@1 0.00 | 2× NOT RESOLVED, 5× NOT RESOLVED, and changed what the verifier relies on |
+| `stub-coin` | reference or wrong fix, 50/50 per attempt | 7 | 4 | 0.57 | pass@2 0.74 | 12× NOT RESOLVED, 16× RESOLVED |
 | `llm-qwen-coder-1.5b` | its own edits: Qwen2.5-Coder-1.5B-Instruct Q4_K_M on llama.cpp, 20 tool calls max | 6 | 5 | 0.00 | pass@5 0.00 | 28× NOT RESOLVED, 2× NOT RESOLVED, and changed what the verifier relies on |
 
 Reproduce: `make runs`; traces, diffs and audit reports: `results/traces/<agent>/`.
@@ -263,7 +286,7 @@ recorded as `no-change` without running the verifier again.
 514 model calls, 52684 completion tokens in all, recorded 2026-11-01T10:18:01Z. Reproduce: `make runs-llm` then `python3 scripts/llm_analysis.py`; per attempt: `results/llm-analysis.json`, traces and audits: `results/traces/llm-qwen-coder-1.5b/`.
 <!-- /results -->
 
-pass@1 and pass@5 are 0 on all six tasks (table above). The traces show why.
+pass@1 and pass@5 are 0 on all six tasks it ran on (table above). The traces show why.
 Most attempts never open the file with the bug: the model searches for words
 from the report, opens the harness or the README, and repeats itself until
 its steps run out. The few edits are to the wrong files: a reworded comment,
@@ -351,8 +374,14 @@ verifier's virtualenv). The sizes are in `results/raw/environment.txt`, and
   play back a patch. A real agent that should build Go and run the unit tests
   offline needs an image with Go and a module cache, an estimated 1 GB or
   more, which the disk budget did not allow.
-- **Six tasks, three projects.** The userver task was dropped for disk
+- **Seven tasks, four projects.** The userver task was dropped for disk
   (above).
+- **The mini-serve task needs macOS on Apple silicon** (the engine is Metal)
+  and access to the mini-serve repository, which is private for now. CI has
+  neither, so `make test` skips that task there (the skip is printed) and
+  the e2e job runs a lakehouse task.
+- **The local model ran on the first six tasks only.** The seventh was added
+  after that run.
 - **A verifier only sees the interleavings its scenario reaches.** The
   survivors above are the measured blind spots. The lakehouse scenario lets
   workers take turns and never makes two of them own a partition at once.
@@ -369,7 +398,8 @@ verifier's virtualenv). The sizes are in `results/raw/environment.txt`, and
 
 ```
 tasks/<id>/        task.json, issue.md, bug/fix/wrong/cheat.patch, near_misses/
-verifiers/         ledger (crash harness wrapper), pgsync (sabcheck.go), lakehouse (verify.py)
+verifiers/         ledger (crash harness wrapper), pgsync (sabcheck.go), lakehouse (verify.py),
+                   miniserve (verify.py; build.sh builds the pinned engine)
 bench/             workspace (snapshots, protected paths), verify, run (container, trace, pass@k),
                    mutate, audit, cli
 agents/stub.py     the stub agent (stdlib only, runs in the container)

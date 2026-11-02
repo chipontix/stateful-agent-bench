@@ -1,0 +1,12 @@
+{"ts": 1793603783.033143, "step": 1, "actor": "runner", "type": "start", "task": "miniserve-preempt-frees-shared-block", "project": "mini-serve", "commit": "d45dc97c5b5d588c0f72a6fc4317950a6ba90fa4", "agent": "stub-coin", "attempt": 4, "image": "python:3.13-slim", "network": "none", "played": "wrong"}
+{"ts": 1793603783.231385, "step": 2, "actor": "agent", "type": "read_file", "path": "/task/issue.md", "bytes": 1516}
+{"ts": 1793603783.237057, "step": 3, "actor": "agent", "type": "probe", "network": false}
+{"ts": 1793603783.2605681, "step": 4, "actor": "agent", "type": "list_files", "root": "/workspace", "files": 92}
+{"ts": 1793603783.261289, "step": 5, "actor": "agent", "type": "read_file", "path": "mini_serve/blocks.py", "bytes": 4159}
+{"ts": 1793603783.2619538, "step": 6, "actor": "agent", "type": "edit_file", "path": "mini_serve/blocks.py", "added": 2, "removed": 0, "hunks": 1}
+{"ts": 1793603783.262446, "step": 7, "actor": "agent", "type": "run_command", "cmd": "go version", "exit": 127, "output": "go: not found"}
+{"ts": 1793603783.303399, "step": 8, "actor": "agent", "type": "run_command", "cmd": "python3 -m compileall -q /workspace/src", "exit": 0, "output": ""}
+{"ts": 1793603783.3039513, "step": 9, "actor": "agent", "type": "finish", "message": "changed 1 file(s): mini_serve/blocks.py"}
+{"ts": 1793603783.351101, "step": 10, "actor": "runner", "type": "agent_exit", "exit": 0, "seconds": 0.3, "stderr": "", "model_calls": 0}
+{"ts": 1793603783.3925178, "step": 11, "actor": "runner", "type": "diff", "files": ["mini_serve/blocks.py"], "added": 2, "removed": 0, "protected": []}
+{"ts": 1793603830.280716, "step": 12, "actor": "verifier", "type": "result", "pass": false, "stage": "invariants", "problems": ["after step 14: block 4: refcount 2, held by 1 running sequences", "after step 14: block 5: refcount 2, held by 1 running sequences", "after step 14: block 6: refcount 2, held by 1 running sequences", "at rest: 38 of 48 blocks free, 10 with a nonzero refcount"], "metrics": {"requests": 36, "steps": 100, "outputs_differing": 0, "generated_tokens": 937, "preemptions": 24, "preempted_holding_shared_blocks": 24, "prefix_cache_hit_blocks": 182, "seconds": 2.07, "tokens_per_s": 451.7, "budget_tokens_per_s": 100.0, "min_prefix_cache_hit_blocks": 40, "checker_seconds": 0.01}, "seconds": 12.0, "tampered": []}

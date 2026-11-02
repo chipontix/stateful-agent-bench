@@ -93,7 +93,14 @@
         }
       ],
       "near_misses": 1,
-      "near_misses_killed": 0
+      "near_misses_killed": 0,
+      "host": {
+        "at": "2026-11-01T09:08:16Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "25.29 30.83 32.43"
+      }
     },
     "lakehouse-offsets-after-parquet": {
       "mutants": 6,
@@ -166,7 +173,14 @@
         }
       ],
       "near_misses": 0,
-      "near_misses_killed": 0
+      "near_misses_killed": 0,
+      "host": {
+        "at": "2026-11-01T09:08:16Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "25.29 30.83 32.43"
+      }
     },
     "ledger-hold-release-race": {
       "mutants": 4,
@@ -219,7 +233,14 @@
         }
       ],
       "near_misses": 0,
-      "near_misses_killed": 0
+      "near_misses_killed": 0,
+      "host": {
+        "at": "2026-11-01T09:08:16Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "25.29 30.83 32.43"
+      }
     },
     "ledger-retry-double-charge": {
       "mutants": 12,
@@ -360,7 +381,14 @@
         }
       ],
       "near_misses": 0,
-      "near_misses_killed": 0
+      "near_misses_killed": 0,
+      "host": {
+        "at": "2026-11-01T09:08:16Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "25.29 30.83 32.43"
+      }
     },
     "pgsync-deletes-replica-identity": {
       "mutants": 4,
@@ -421,7 +449,14 @@
         }
       ],
       "near_misses": 1,
-      "near_misses_killed": 1
+      "near_misses_killed": 1,
+      "host": {
+        "at": "2026-11-01T09:08:16Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "25.29 30.83 32.43"
+      }
     },
     "pgsync-slot-dropped-on-restart": {
       "mutants": 4,
@@ -480,14 +515,69 @@
         }
       ],
       "near_misses": 1,
-      "near_misses_killed": 0
+      "near_misses_killed": 0,
+      "host": {
+        "at": "2026-11-01T09:08:16Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "25.29 30.83 32.43"
+      }
+    },
+    "miniserve-preempt-frees-shared-block": {
+      "mutants": 3,
+      "stillborn": 0,
+      "killed": 2,
+      "survived": 1,
+      "score": 0.667,
+      "near_misses": 0,
+      "near_misses_killed": 0,
+      "rows": [
+        {
+          "id": "m01",
+          "op": "revert-hunk",
+          "where": "mini_serve/blocks.py:60 hunk reverted to the buggy version",
+          "outcome": "survived",
+          "problems": [],
+          "seconds": 11.9
+        },
+        {
+          "id": "m02",
+          "op": "revert-hunk",
+          "where": "mini_serve/scheduler.py:125 hunk reverted to the buggy version",
+          "outcome": "killed",
+          "problems": [
+            "step 9: AttributeError: 'BlockPool' object has no attribute 'evict'"
+          ],
+          "seconds": 0.6
+        },
+        {
+          "id": "m03",
+          "op": "delete-line",
+          "where": "mini_serve/scheduler.py:128 deleted `self._free(seq)`",
+          "outcome": "killed",
+          "problems": [
+            "36 of 36 outputs differ from the same request run alone",
+            "after step 10: waiting seq 1 still holds blocks [4, 5, 6, 7, 8]",
+            "after step 10: waiting seq 2 still holds blocks [9, 10, 11, 12, 39]"
+          ],
+          "seconds": 9.7
+        }
+      ],
+      "host": {
+        "at": "2026-11-02T07:15:01Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "7.63 8.01 7.24"
+      }
     }
   },
   "host": {
-    "at": "2026-11-01T09:08:16Z",
+    "at": "2026-11-02T07:15:01Z",
     "machine": "arm64",
     "system": "Darwin",
     "cpus": 16,
-    "load_average": "25.29 30.83 32.43"
+    "load_average": "7.63 8.01 7.24"
   }
 }

@@ -1,10 +1,10 @@
 {
   "host": {
-    "at": "2026-11-01T08:40:28Z",
+    "at": "2026-11-02T07:15:57Z",
     "machine": "arm64",
     "system": "Darwin",
     "cpus": 16,
-    "load_average": "38.07 40.46 44.10"
+    "load_average": "8.69 8.25 7.38"
   },
   "agent": "stub-wrong",
   "k": 1,
@@ -25,7 +25,14 @@
           "trace": "results/traces/stub-wrong/lakehouse-dups-after-rebalance-1.jsonl",
           "verdict": "NOT RESOLVED"
         }
-      ]
+      ],
+      "host": {
+        "at": "2026-11-01T08:40:28Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "38.07 40.46 44.10"
+      }
     },
     "lakehouse-offsets-after-parquet": {
       "n": 1,
@@ -42,7 +49,14 @@
           "trace": "results/traces/stub-wrong/lakehouse-offsets-after-parquet-1.jsonl",
           "verdict": "NOT RESOLVED"
         }
-      ]
+      ],
+      "host": {
+        "at": "2026-11-01T08:40:28Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "38.07 40.46 44.10"
+      }
     },
     "ledger-hold-release-race": {
       "n": 1,
@@ -59,7 +73,14 @@
           "trace": "results/traces/stub-wrong/ledger-hold-release-race-1.jsonl",
           "verdict": "NOT RESOLVED"
         }
-      ]
+      ],
+      "host": {
+        "at": "2026-11-01T08:40:28Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "38.07 40.46 44.10"
+      }
     },
     "ledger-retry-double-charge": {
       "n": 1,
@@ -76,7 +97,14 @@
           "trace": "results/traces/stub-wrong/ledger-retry-double-charge-1.jsonl",
           "verdict": "NOT RESOLVED"
         }
-      ]
+      ],
+      "host": {
+        "at": "2026-11-01T08:40:28Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "38.07 40.46 44.10"
+      }
     },
     "pgsync-deletes-replica-identity": {
       "n": 1,
@@ -93,7 +121,14 @@
           "trace": "results/traces/stub-wrong/pgsync-deletes-replica-identity-1.jsonl",
           "verdict": "NOT RESOLVED"
         }
-      ]
+      ],
+      "host": {
+        "at": "2026-11-01T08:40:28Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "38.07 40.46 44.10"
+      }
     },
     "pgsync-slot-dropped-on-restart": {
       "n": 1,
@@ -110,7 +145,38 @@
           "trace": "results/traces/stub-wrong/pgsync-slot-dropped-on-restart-1.jsonl",
           "verdict": "NOT RESOLVED"
         }
-      ]
+      ],
+      "host": {
+        "at": "2026-11-01T08:40:28Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "38.07 40.46 44.10"
+      }
+    },
+    "miniserve-preempt-frees-shared-block": {
+      "n": 1,
+      "correct": 0,
+      "pass@1": 0.0,
+      "attempts": [
+        {
+          "task": "miniserve-preempt-frees-shared-block",
+          "agent": "stub-wrong",
+          "attempt": 1,
+          "played": "wrong",
+          "pass": false,
+          "seconds": 11.1,
+          "trace": "results/traces/stub-wrong/miniserve-preempt-frees-shared-block-1.jsonl",
+          "verdict": "NOT RESOLVED"
+        }
+      ],
+      "host": {
+        "at": "2026-11-02T07:15:57Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "8.69 8.25 7.38"
+      }
     }
   },
   "mean_pass@1": 0.0
