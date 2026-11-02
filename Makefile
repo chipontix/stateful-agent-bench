@@ -10,8 +10,9 @@ REPEAT ?= 3
 test:              ## tooling self-checks: no brokers, no Docker
 	$(PY) -m unittest discover -s tests -v
 
-deps:              ## upstream clones + the Python env of the lakehouse verifier
-	$(PY) -c 'from bench import workspace as w; [w.upstream(t) for t in w.all_tasks()]'
+deps:              ## upstream clones, the lakehouse verifier's env, mini-serve's engine (macOS only)
+	$(PY) -c 'from bench import workspace as w; [print("not reachable, skipped:", t.id) for t in w.all_tasks() if not w.reachable(t)]'
+	if [ "$$(uname)" = Darwin ] && [ -d upstream/mini-serve ]; then verifiers/miniserve/build.sh; fi
 	test -x .cache/venv-lakehouse/bin/python || uv venv -q -p 3.12 .cache/venv-lakehouse
 	uv pip install -q -p .cache/venv-lakehouse -r verifiers/lakehouse/requirements.txt
 

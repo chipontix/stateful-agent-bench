@@ -390,6 +390,41 @@ RETURNING event_id::text
             os._exit(3)
 ''', '')],
     },
+    "miniserve-preempt-frees-shared-block": {
+        "bug": [("mini_serve/scheduler.py", """        self.running.remove(seq)
+        self._free(seq)
+        seq.preemptions += 1""", """        self.running.remove(seq)
+        # Its blocks are reused first: the victim is recomputed from its tokens anyway.
+        self.pool.evict(seq.blocks)
+        seq.blocks, seq.hashes, seq.num_computed = [], [], 0
+        seq.preemptions += 1"""),
+                ("mini_serve/blocks.py", """                self.free[b] = None  # most recently freed: evicted last
+""", """                self.free[b] = None  # most recently freed: evicted last
+
+    def evict(self, blocks):
+        \"\"\"Returns a preempted sequence's blocks to the front of the free list, so they are
+        reused before the blocks of finished requests: those are the likely prefix hits, while
+        the victim is recomputed from its tokens when it is admitted again.\"\"\"
+        for b in reversed(blocks):
+            assert self.ref[b] > 0, f"double free of block {b}"
+            self.ref[b] -= 1
+            self.free[b] = None
+            self.free.move_to_end(b, last=False)
+""")],
+        # Stops freeing blocks another sequence still holds, but also stops dropping the
+        # victim's reference to them: they leak (outputs stay right, the pool shrinks).
+        "wrong": [("mini_serve/blocks.py", """        for b in reversed(blocks):
+            assert self.ref[b] > 0, f"double free of block {b}"
+            self.ref[b] -= 1""", """        for b in reversed(blocks):
+            assert self.ref[b] > 0, f"double free of block {b}"
+            if self.ref[b] > 1:
+                continue  # still used by another sequence: not ours to free
+            self.ref[b] -= 1""")],
+        # Turns the prefix cache off, so no block is ever shared and the bug cannot happen.
+        "cheat": [("mini_serve/blocks.py", """        out = []
+        if self.prefix_cache:""", """        out = []
+        if self.prefix_cache and False:  # sharing disabled until preemption is sorted out""")],
+    },
 }
 
 

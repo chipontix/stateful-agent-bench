@@ -1,0 +1,36 @@
+diff --git a/mini_serve/blocks.py b/mini_serve/blocks.py
+index 40715f3..1382174 100644
+--- a/mini_serve/blocks.py
++++ b/mini_serve/blocks.py
+@@ -60,6 +60,16 @@ class BlockPool:
+             if self.ref[b] == 0:
+                 self.free[b] = None  # most recently freed: evicted last
+ 
++    def evict(self, blocks):
++        """Returns a preempted sequence's blocks to the front of the free list, so they are
++        reused before the blocks of finished requests: those are the likely prefix hits, while
++        the victim is recomputed from its tokens when it is admitted again."""
++        for b in reversed(blocks):
++            assert self.ref[b] > 0, f"double free of block {b}"
++            self.ref[b] -= 1
++            self.free[b] = None
++            self.free.move_to_end(b, last=False)
++
+     def lookup(self, hashes):
+         """Blocks of the longest cached prefix of `hashes`, without taking them."""
+         out = []
+diff --git a/mini_serve/scheduler.py b/mini_serve/scheduler.py
+index b09c188..2579295 100644
+--- a/mini_serve/scheduler.py
++++ b/mini_serve/scheduler.py
+@@ -125,7 +125,9 @@ class Scheduler:
+ 
+     def _preempt(self, seq):
+         self.running.remove(seq)
+-        self._free(seq)
++        # Its blocks are reused first: the victim is recomputed from its tokens anyway.
++        self.pool.evict(seq.blocks)
++        seq.blocks, seq.hashes, seq.num_computed = [], [], 0
+         seq.preemptions += 1
+         self.preemptions += 1
+         self.waiting.appendleft(seq)

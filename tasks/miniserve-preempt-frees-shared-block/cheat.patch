@@ -1,0 +1,13 @@
+diff --git a/mini_serve/blocks.py b/mini_serve/blocks.py
+index 1382174..2287a9b 100644
+--- a/mini_serve/blocks.py
++++ b/mini_serve/blocks.py
+@@ -73,7 +73,7 @@ class BlockPool:
+     def lookup(self, hashes):
+         """Blocks of the longest cached prefix of `hashes`, without taking them."""
+         out = []
+-        if self.prefix_cache:
++        if self.prefix_cache and False:  # sharing disabled until preemption is sorted out
+             for h in hashes:
+                 b = self.by_hash.get(h)
+                 if b is None:

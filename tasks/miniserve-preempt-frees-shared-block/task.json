@@ -1,0 +1,15 @@
+{
+  "project": "mini-serve",
+  "commit": "d45dc97c5b5d588c0f72a6fc4317950a6ba90fa4",
+  "verifier": {
+    "kind": "miniserve"
+  },
+  "protected": [
+    "mini_serve/engine.py",
+    "src",
+    "CMakeLists.txt",
+    "tests",
+    "scripts",
+    "bench"
+  ]
+}

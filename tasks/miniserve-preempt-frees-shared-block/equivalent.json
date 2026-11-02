@@ -1,0 +1,3 @@
+{
+  "m01": "re-adds the buggy evict() method, but nothing calls it: the preemption path still frees through release(), which keeps shared blocks off the free list"
+}
