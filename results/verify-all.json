@@ -4,16 +4,18 @@
       "bug": {
         "pass": false,
         "stage": "invariants",
-        "seconds": 18.0,
+        "seconds": 40.4,
         "tampered": [],
         "problems": [
-          "postgres.duplicates: want 3006, got 1947",
-          "parquet.events: want 56694, got 57630",
-          "parquet.digest: want 14033158057495095193, got 12904025968680867597"
+          "postgres.duplicates: want 3006, got 1945",
+          "parquet.events: want 56694, got 57632",
+          "parquet.digest: want 14033158057495095193, got 5316018738889079203",
+          "D.parquet.events: want 19900, got 39800",
+          "D.parquet.digest: want 1660150475008553012, got 3320300950017106024"
         ],
         "metrics": {
           "A": {
-            "seconds": 2.04,
+            "seconds": 2.48,
             "workers": [
               {
                 "messages": 10104,
@@ -22,11 +24,11 @@
                 "quarantined": 52,
                 "batches": 2,
                 "recovered_batches": 0,
-                "seconds": 0.758,
-                "first_message_at": 1793521231.8183177,
-                "last_commit_at": 1793521232.5760434,
-                "messages_per_s": 13335,
-                "inserted_per_s": 12605
+                "seconds": 0.705,
+                "first_message_at": 1793715620.638041,
+                "last_commit_at": 1793715621.342935,
+                "messages_per_s": 14334,
+                "inserted_per_s": 13550
               },
               {
                 "messages": 9896,
@@ -35,16 +37,16 @@
                 "quarantined": 46,
                 "batches": 2,
                 "recovered_batches": 0,
-                "seconds": 0.759,
-                "first_message_at": 1793521231.818075,
-                "last_commit_at": 1793521232.577115,
-                "messages_per_s": 13038,
-                "inserted_per_s": 12296
+                "seconds": 0.699,
+                "first_message_at": 1793715620.133159,
+                "last_commit_at": 1793715620.832157,
+                "messages_per_s": 14157,
+                "inserted_per_s": 13352
               }
             ]
           },
           "B1": {
-            "seconds": 1.17,
+            "seconds": 1.32,
             "workers": [
               {
                 "messages": 5933,
@@ -53,16 +55,16 @@
                 "quarantined": 37,
                 "batches": 1,
                 "recovered_batches": 1,
-                "seconds": 0.375,
-                "first_message_at": 1793521239.1693006,
-                "last_commit_at": 1793521239.5447922,
-                "messages_per_s": 15801,
-                "inserted_per_s": 15329
+                "seconds": 0.395,
+                "first_message_at": 1793715627.0779047,
+                "last_commit_at": 1793715627.4733605,
+                "messages_per_s": 15003,
+                "inserted_per_s": 14555
               }
             ]
           },
           "B2": {
-            "seconds": 2.39,
+            "seconds": 4.59,
             "workers": [
               {
                 "messages": 10067,
@@ -71,17 +73,17 @@
                 "quarantined": 52,
                 "batches": 3,
                 "recovered_batches": 0,
-                "seconds": 0.695,
-                "first_message_at": 1793521241.2309284,
-                "last_commit_at": 1793521241.925627,
-                "messages_per_s": 14491,
-                "inserted_per_s": 14054
+                "seconds": 0.709,
+                "first_message_at": 1793715631.3615103,
+                "last_commit_at": 1793715632.0709126,
+                "messages_per_s": 14191,
+                "inserted_per_s": 13762
               }
             ]
           },
-          "C_kills": 1,
+          "C_kills": 2,
           "C": {
-            "seconds": 1.26,
+            "seconds": 2.16,
             "workers": [
               {
                 "messages": 0,
@@ -102,14 +104,22 @@
           },
           "postgres": {
             "events": 56694,
-            "duplicates": 1947
+            "duplicates": 1945
           },
           "parquet": {
-            "events": 57630
+            "events": 57632
           },
           "budget": {
             "min_messages_per_s": 1500.0,
             "ok": true
+          },
+          "D": {
+            "seconds": 3.99,
+            "batches": 12,
+            "messages_read": 40000,
+            "inserted_claimed": 39800,
+            "duplicates": 0,
+            "events": 19900
           }
         }
       },
@@ -117,12 +127,12 @@
         {
           "pass": true,
           "stage": "invariants",
-          "seconds": 21.9,
+          "seconds": 24.6,
           "tampered": [],
           "problems": [],
           "metrics": {
             "A": {
-              "seconds": 2.38,
+              "seconds": 4.46,
               "workers": [
                 {
                   "messages": 10104,
@@ -131,11 +141,11 @@
                   "quarantined": 52,
                   "batches": 2,
                   "recovered_batches": 0,
-                  "seconds": 0.689,
-                  "first_message_at": 1793521250.6974742,
-                  "last_commit_at": 1793521251.3862424,
-                  "messages_per_s": 14670,
-                  "inserted_per_s": 13867
+                  "seconds": 0.672,
+                  "first_message_at": 1793715661.7287788,
+                  "last_commit_at": 1793715662.4007535,
+                  "messages_per_s": 15036,
+                  "inserted_per_s": 14213
                 },
                 {
                   "messages": 9896,
@@ -144,16 +154,16 @@
                   "quarantined": 46,
                   "batches": 2,
                   "recovered_batches": 0,
-                  "seconds": 0.708,
-                  "first_message_at": 1793521251.2037754,
-                  "last_commit_at": 1793521251.9121907,
-                  "messages_per_s": 13969,
-                  "inserted_per_s": 13174
+                  "seconds": 0.63,
+                  "first_message_at": 1793715664.2419195,
+                  "last_commit_at": 1793715664.871623,
+                  "messages_per_s": 15715,
+                  "inserted_per_s": 14821
                 }
               ]
             },
             "B1": {
-              "seconds": 1.27,
+              "seconds": 1.25,
               "workers": [
                 {
                   "messages": 5933,
@@ -162,16 +172,16 @@
                   "quarantined": 37,
                   "batches": 1,
                   "recovered_batches": 1,
-                  "seconds": 0.328,
-                  "first_message_at": 1793521259.5053866,
-                  "last_commit_at": 1793521259.8333724,
-                  "messages_per_s": 18089,
-                  "inserted_per_s": 17031
+                  "seconds": 0.354,
+                  "first_message_at": 1793715667.982086,
+                  "last_commit_at": 1793715668.3360915,
+                  "messages_per_s": 16760,
+                  "inserted_per_s": 15779
                 }
               ]
             },
             "B2": {
-              "seconds": 1.6,
+              "seconds": 2.51,
               "workers": [
                 {
                   "messages": 10067,
@@ -180,17 +190,17 @@
                   "quarantined": 52,
                   "batches": 3,
                   "recovered_batches": 0,
-                  "seconds": 0.741,
-                  "first_message_at": 1793521260.7003882,
-                  "last_commit_at": 1793521261.4414976,
-                  "messages_per_s": 13584,
-                  "inserted_per_s": 12842
+                  "seconds": 0.691,
+                  "first_message_at": 1793715670.1451387,
+                  "last_commit_at": 1793715670.8361926,
+                  "messages_per_s": 14568,
+                  "inserted_per_s": 13772
                 }
               ]
             },
-            "C_kills": 2,
+            "C_kills": 1,
             "C": {
-              "seconds": 1.92,
+              "seconds": 1.37,
               "workers": [
                 {
                   "messages": 0,
@@ -219,18 +229,26 @@
             "budget": {
               "min_messages_per_s": 1500.0,
               "ok": true
+            },
+            "D": {
+              "seconds": 2.9,
+              "batches": 12,
+              "messages_read": 40000,
+              "inserted_claimed": 19900,
+              "duplicates": 19900,
+              "events": 19900
             }
           }
         },
         {
           "pass": true,
           "stage": "invariants",
-          "seconds": 19.6,
+          "seconds": 40.3,
           "tampered": [],
           "problems": [],
           "metrics": {
             "A": {
-              "seconds": 5.4,
+              "seconds": 8.71,
               "workers": [
                 {
                   "messages": 10110,
@@ -239,11 +257,11 @@
                   "quarantined": 43,
                   "batches": 2,
                   "recovered_batches": 0,
-                  "seconds": 0.662,
-                  "first_message_at": 1793521276.3724492,
-                  "last_commit_at": 1793521277.0347466,
-                  "messages_per_s": 15265,
-                  "inserted_per_s": 14407
+                  "seconds": 0.465,
+                  "first_message_at": 1793715692.5383682,
+                  "last_commit_at": 1793715693.0034897,
+                  "messages_per_s": 21736,
+                  "inserted_per_s": 20515
                 },
                 {
                   "messages": 9890,
@@ -252,16 +270,16 @@
                   "quarantined": 47,
                   "batches": 2,
                   "recovered_batches": 0,
-                  "seconds": 0.772,
-                  "first_message_at": 1793521274.369589,
-                  "last_commit_at": 1793521275.141814,
-                  "messages_per_s": 12807,
-                  "inserted_per_s": 12132
+                  "seconds": 0.777,
+                  "first_message_at": 1793715699.0945163,
+                  "last_commit_at": 1793715699.871438,
+                  "messages_per_s": 12730,
+                  "inserted_per_s": 12059
                 }
               ]
             },
             "B1": {
-              "seconds": 2.42,
+              "seconds": 2.12,
               "workers": [
                 {
                   "messages": 6026,
@@ -270,16 +288,16 @@
                   "quarantined": 37,
                   "batches": 1,
                   "recovered_batches": 1,
-                  "seconds": 1.034,
-                  "first_message_at": 1793521282.0520077,
-                  "last_commit_at": 1793521283.0856264,
-                  "messages_per_s": 5830,
-                  "inserted_per_s": 5516
+                  "seconds": 0.674,
+                  "first_message_at": 1793715709.8465152,
+                  "last_commit_at": 1793715710.5207381,
+                  "messages_per_s": 8938,
+                  "inserted_per_s": 8456
                 }
               ]
             },
             "B2": {
-              "seconds": 1.8,
+              "seconds": 1.82,
               "workers": [
                 {
                   "messages": 9974,
@@ -288,17 +306,17 @@
                   "quarantined": 48,
                   "batches": 3,
                   "recovered_batches": 0,
-                  "seconds": 0.769,
-                  "first_message_at": 1793521284.0577657,
-                  "last_commit_at": 1793521284.8266127,
-                  "messages_per_s": 12973,
-                  "inserted_per_s": 12230
+                  "seconds": 0.585,
+                  "first_message_at": 1793715711.753447,
+                  "last_commit_at": 1793715712.3388267,
+                  "messages_per_s": 17039,
+                  "inserted_per_s": 16063
                 }
               ]
             },
             "C_kills": 0,
             "C": {
-              "seconds": 1.16,
+              "seconds": 1.32,
               "workers": [
                 {
                   "messages": 0,
@@ -327,18 +345,26 @@
             "budget": {
               "min_messages_per_s": 1500.0,
               "ok": true
+            },
+            "D": {
+              "seconds": 1.77,
+              "batches": 12,
+              "messages_read": 40000,
+              "inserted_claimed": 19893,
+              "duplicates": 19893,
+              "events": 19893
             }
           }
         },
         {
           "pass": true,
           "stage": "invariants",
-          "seconds": 27.3,
+          "seconds": 31.3,
           "tampered": [],
           "problems": [],
           "metrics": {
             "A": {
-              "seconds": 4.66,
+              "seconds": 2.57,
               "workers": [
                 {
                   "messages": 10192,
@@ -347,11 +373,11 @@
                   "quarantined": 44,
                   "batches": 2,
                   "recovered_batches": 0,
-                  "seconds": 0.822,
-                  "first_message_at": 1793521294.834085,
-                  "last_commit_at": 1793521295.6556985,
-                  "messages_per_s": 12405,
-                  "inserted_per_s": 11701
+                  "seconds": 0.705,
+                  "first_message_at": 1793715727.7621813,
+                  "last_commit_at": 1793715728.467551,
+                  "messages_per_s": 14449,
+                  "inserted_per_s": 13630
                 },
                 {
                   "messages": 9808,
@@ -360,16 +386,16 @@
                   "quarantined": 54,
                   "batches": 2,
                   "recovered_batches": 0,
-                  "seconds": 0.701,
-                  "first_message_at": 1793521297.363383,
-                  "last_commit_at": 1793521298.0640175,
-                  "messages_per_s": 13999,
-                  "inserted_per_s": 13197
+                  "seconds": 0.673,
+                  "first_message_at": 1793715728.272995,
+                  "last_commit_at": 1793715728.94567,
+                  "messages_per_s": 14581,
+                  "inserted_per_s": 13745
                 }
               ]
             },
             "B1": {
-              "seconds": 1.08,
+              "seconds": 1.36,
               "workers": [
                 {
                   "messages": 6035,
@@ -378,16 +404,16 @@
                   "quarantined": 26,
                   "batches": 1,
                   "recovered_batches": 1,
-                  "seconds": 0.339,
-                  "first_message_at": 1793521299.9386685,
-                  "last_commit_at": 1793521300.2778823,
-                  "messages_per_s": 17791,
-                  "inserted_per_s": 16863
+                  "seconds": 0.365,
+                  "first_message_at": 1793715742.0541518,
+                  "last_commit_at": 1793715742.41887,
+                  "messages_per_s": 16547,
+                  "inserted_per_s": 15683
                 }
               ]
             },
             "B2": {
-              "seconds": 3.63,
+              "seconds": 1.53,
               "workers": [
                 {
                   "messages": 9965,
@@ -396,17 +422,17 @@
                   "quarantined": 49,
                   "batches": 3,
                   "recovered_batches": 0,
-                  "seconds": 0.881,
-                  "first_message_at": 1793521303.0023289,
-                  "last_commit_at": 1793521303.8832932,
-                  "messages_per_s": 11311,
-                  "inserted_per_s": 10683
+                  "seconds": 0.75,
+                  "first_message_at": 1793715743.1997447,
+                  "last_commit_at": 1793715743.9497516,
+                  "messages_per_s": 13287,
+                  "inserted_per_s": 12548
                 }
               ]
             },
-            "C_kills": 2,
+            "C_kills": 1,
             "C": {
-              "seconds": 2.33,
+              "seconds": 1.36,
               "workers": [
                 {
                   "messages": 0,
@@ -435,6 +461,14 @@
             "budget": {
               "min_messages_per_s": 1500.0,
               "ok": true
+            },
+            "D": {
+              "seconds": 2.77,
+              "batches": 12,
+              "messages_read": 40000,
+              "inserted_claimed": 19902,
+              "duplicates": 19902,
+              "events": 19902
             }
           }
         }
@@ -443,24 +477,25 @@
       "reference_green": 3,
       "ok": true,
       "host": {
-        "at": "2026-11-01T08:20:28Z",
+        "at": "2026-11-03T14:22:36Z",
         "machine": "arm64",
         "system": "Darwin",
-        "load_average": "s: 42.48 48.19 54.02"
+        "cpus": 16,
+        "load_average": "88.02 89.55 92.34"
       }
     },
     "lakehouse-offsets-after-parquet": {
       "bug": {
         "pass": false,
         "stage": "invariants",
-        "seconds": 22.5,
+        "seconds": 38.6,
         "tampered": [],
         "problems": [
-          "postgres.duplicates: want 3006, got 6985"
+          "postgres.duplicates: want 3006, got 10966"
         ],
         "metrics": {
           "A": {
-            "seconds": 2.2,
+            "seconds": 2.46,
             "workers": [
               {
                 "messages": 10104,
@@ -469,11 +504,11 @@
                 "quarantined": 52,
                 "batches": 2,
                 "recovered_batches": 0,
-                "seconds": 0.872,
-                "first_message_at": 1793521320.7827375,
-                "last_commit_at": 1793521321.6542907,
-                "messages_per_s": 11593,
-                "inserted_per_s": 10959
+                "seconds": 0.743,
+                "first_message_at": 1793715759.9021664,
+                "last_commit_at": 1793715760.64525,
+                "messages_per_s": 13597,
+                "inserted_per_s": 12853
               },
               {
                 "messages": 9896,
@@ -482,16 +517,16 @@
                 "quarantined": 46,
                 "batches": 2,
                 "recovered_batches": 0,
-                "seconds": 0.866,
-                "first_message_at": 1793521320.7928426,
-                "last_commit_at": 1793521321.65885,
-                "messages_per_s": 11427,
-                "inserted_per_s": 10777
+                "seconds": 0.728,
+                "first_message_at": 1793715759.89711,
+                "last_commit_at": 1793715760.625094,
+                "messages_per_s": 13595,
+                "inserted_per_s": 12821
               }
             ]
           },
           "B1": {
-            "seconds": 2.5,
+            "seconds": 3.88,
             "workers": [
               {
                 "messages": 9933,
@@ -500,16 +535,16 @@
                 "quarantined": 58,
                 "batches": 3,
                 "recovered_batches": 1,
-                "seconds": 0.85,
-                "first_message_at": 1793521331.1771486,
-                "last_commit_at": 1793521332.0271177,
-                "messages_per_s": 11686,
-                "inserted_per_s": 6572
+                "seconds": 0.729,
+                "first_message_at": 1793715779.7276897,
+                "last_commit_at": 1793715780.45656,
+                "messages_per_s": 13628,
+                "inserted_per_s": 7664
               }
             ]
           },
           "B2": {
-            "seconds": 2.77,
+            "seconds": 1.75,
             "workers": [
               {
                 "messages": 10067,
@@ -518,17 +553,17 @@
                 "quarantined": 52,
                 "batches": 3,
                 "recovered_batches": 0,
-                "seconds": 0.885,
-                "first_message_at": 1793521333.90454,
-                "last_commit_at": 1793521334.7899978,
-                "messages_per_s": 11369,
-                "inserted_per_s": 10748
+                "seconds": 0.793,
+                "first_message_at": 1793715781.4271023,
+                "last_commit_at": 1793715782.2198198,
+                "messages_per_s": 12699,
+                "inserted_per_s": 12006
               }
             ]
           },
           "C_kills": 1,
           "C": {
-            "seconds": 1.41,
+            "seconds": 1.35,
             "workers": [
               {
                 "messages": 0,
@@ -549,7 +584,7 @@
           },
           "postgres": {
             "events": 56694,
-            "duplicates": 6985
+            "duplicates": 10966
           },
           "parquet": {
             "events": 56694
@@ -557,6 +592,14 @@
           "budget": {
             "min_messages_per_s": 1500.0,
             "ok": true
+          },
+          "D": {
+            "seconds": 2.78,
+            "batches": 12,
+            "messages_read": 40000,
+            "inserted_claimed": 19900,
+            "duplicates": 19900,
+            "events": 19900
           }
         }
       },
@@ -564,12 +607,12 @@
         {
           "pass": true,
           "stage": "invariants",
-          "seconds": 20.2,
+          "seconds": 33.6,
           "tampered": [],
           "problems": [],
           "metrics": {
             "A": {
-              "seconds": 2.0,
+              "seconds": 5.61,
               "workers": [
                 {
                   "messages": 10104,
@@ -578,11 +621,11 @@
                   "quarantined": 52,
                   "batches": 2,
                   "recovered_batches": 0,
-                  "seconds": 0.755,
-                  "first_message_at": 1793521344.0796301,
-                  "last_commit_at": 1793521344.8345525,
-                  "messages_per_s": 13384,
-                  "inserted_per_s": 12652
+                  "seconds": 0.749,
+                  "first_message_at": 1793715802.6628044,
+                  "last_commit_at": 1793715803.4114454,
+                  "messages_per_s": 13496,
+                  "inserted_per_s": 12758
                 },
                 {
                   "messages": 9896,
@@ -591,16 +634,16 @@
                   "quarantined": 46,
                   "batches": 2,
                   "recovered_batches": 0,
-                  "seconds": 0.776,
-                  "first_message_at": 1793521344.0591617,
-                  "last_commit_at": 1793521344.834802,
-                  "messages_per_s": 12759,
-                  "inserted_per_s": 12033
+                  "seconds": 0.652,
+                  "first_message_at": 1793715806.1650078,
+                  "last_commit_at": 1793715806.8170877,
+                  "messages_per_s": 15176,
+                  "inserted_per_s": 14313
                 }
               ]
             },
             "B1": {
-              "seconds": 1.32,
+              "seconds": 1.59,
               "workers": [
                 {
                   "messages": 5933,
@@ -609,16 +652,16 @@
                   "quarantined": 37,
                   "batches": 1,
                   "recovered_batches": 1,
-                  "seconds": 0.388,
-                  "first_message_at": 1793521353.3393624,
-                  "last_commit_at": 1793521353.7278378,
-                  "messages_per_s": 15273,
-                  "inserted_per_s": 14379
+                  "seconds": 0.408,
+                  "first_message_at": 1793715810.9308603,
+                  "last_commit_at": 1793715811.3388035,
+                  "messages_per_s": 14544,
+                  "inserted_per_s": 13693
                 }
               ]
             },
             "B2": {
-              "seconds": 1.56,
+              "seconds": 1.69,
               "workers": [
                 {
                   "messages": 10067,
@@ -627,17 +670,17 @@
                   "quarantined": 52,
                   "batches": 3,
                   "recovered_batches": 0,
-                  "seconds": 0.688,
-                  "first_message_at": 1793521354.603434,
-                  "last_commit_at": 1793521355.2915893,
-                  "messages_per_s": 14629,
-                  "inserted_per_s": 13830
+                  "seconds": 0.772,
+                  "first_message_at": 1793715812.2705941,
+                  "last_commit_at": 1793715813.043008,
+                  "messages_per_s": 13033,
+                  "inserted_per_s": 12321
                 }
               ]
             },
             "C_kills": 1,
             "C": {
-              "seconds": 2.1,
+              "seconds": 1.39,
               "workers": [
                 {
                   "messages": 0,
@@ -666,18 +709,26 @@
             "budget": {
               "min_messages_per_s": 1500.0,
               "ok": true
+            },
+            "D": {
+              "seconds": 8.04,
+              "batches": 12,
+              "messages_read": 40000,
+              "inserted_claimed": 19900,
+              "duplicates": 19900,
+              "events": 19900
             }
           }
         },
         {
           "pass": true,
           "stage": "invariants",
-          "seconds": 19.7,
+          "seconds": 26.3,
           "tampered": [],
           "problems": [],
           "metrics": {
             "A": {
-              "seconds": 1.74,
+              "seconds": 5.72,
               "workers": [
                 {
                   "messages": 10110,
@@ -686,11 +737,11 @@
                   "quarantined": 43,
                   "batches": 2,
                   "recovered_batches": 0,
-                  "seconds": 0.598,
-                  "first_message_at": 1793521364.2331827,
-                  "last_commit_at": 1793521364.8313506,
-                  "messages_per_s": 16902,
-                  "inserted_per_s": 15952
+                  "seconds": 0.772,
+                  "first_message_at": 1793715833.5695426,
+                  "last_commit_at": 1793715834.341693,
+                  "messages_per_s": 13093,
+                  "inserted_per_s": 12358
                 },
                 {
                   "messages": 9890,
@@ -699,16 +750,16 @@
                   "quarantined": 47,
                   "batches": 2,
                   "recovered_batches": 0,
-                  "seconds": 0.594,
-                  "first_message_at": 1793521364.237517,
-                  "last_commit_at": 1793521364.831446,
-                  "messages_per_s": 16652,
-                  "inserted_per_s": 15775
+                  "seconds": 0.708,
+                  "first_message_at": 1793715836.6327095,
+                  "last_commit_at": 1793715837.3404965,
+                  "messages_per_s": 13973,
+                  "inserted_per_s": 13237
                 }
               ]
             },
             "B1": {
-              "seconds": 1.04,
+              "seconds": 2.25,
               "workers": [
                 {
                   "messages": 6026,
@@ -717,16 +768,16 @@
                   "quarantined": 37,
                   "batches": 1,
                   "recovered_batches": 1,
-                  "seconds": 0.333,
-                  "first_message_at": 1793521366.991451,
-                  "last_commit_at": 1793521367.3247125,
-                  "messages_per_s": 18082,
-                  "inserted_per_s": 17107
+                  "seconds": 0.415,
+                  "first_message_at": 1793715840.9128208,
+                  "last_commit_at": 1793715841.3275673,
+                  "messages_per_s": 14529,
+                  "inserted_per_s": 13746
                 }
               ]
             },
             "B2": {
-              "seconds": 3.36,
+              "seconds": 1.62,
               "workers": [
                 {
                   "messages": 9974,
@@ -735,17 +786,17 @@
                   "quarantined": 48,
                   "batches": 3,
                   "recovered_batches": 0,
-                  "seconds": 0.726,
-                  "first_message_at": 1793521369.9578059,
-                  "last_commit_at": 1793521370.6833818,
-                  "messages_per_s": 13746,
-                  "inserted_per_s": 12959
+                  "seconds": 0.595,
+                  "first_message_at": 1793715842.349886,
+                  "last_commit_at": 1793715842.9447434,
+                  "messages_per_s": 16767,
+                  "inserted_per_s": 15807
                 }
               ]
             },
-            "C_kills": 1,
+            "C_kills": 0,
             "C": {
-              "seconds": 2.0,
+              "seconds": 1.47,
               "workers": [
                 {
                   "messages": 0,
@@ -774,18 +825,26 @@
             "budget": {
               "min_messages_per_s": 1500.0,
               "ok": true
+            },
+            "D": {
+              "seconds": 2.99,
+              "batches": 12,
+              "messages_read": 40000,
+              "inserted_claimed": 19893,
+              "duplicates": 19893,
+              "events": 19893
             }
           }
         },
         {
           "pass": true,
           "stage": "invariants",
-          "seconds": 39.8,
+          "seconds": 32.2,
           "tampered": [],
           "problems": [],
           "metrics": {
             "A": {
-              "seconds": 2.23,
+              "seconds": 2.7,
               "workers": [
                 {
                   "messages": 10192,
@@ -794,11 +853,11 @@
                   "quarantined": 44,
                   "batches": 2,
                   "recovered_batches": 0,
-                  "seconds": 0.774,
-                  "first_message_at": 1793521411.036488,
-                  "last_commit_at": 1793521411.8104358,
-                  "messages_per_s": 13169,
-                  "inserted_per_s": 12422
+                  "seconds": 0.72,
+                  "first_message_at": 1793715860.5312548,
+                  "last_commit_at": 1793715861.2509851,
+                  "messages_per_s": 14161,
+                  "inserted_per_s": 13358
                 },
                 {
                   "messages": 9808,
@@ -807,16 +866,16 @@
                   "quarantined": 54,
                   "batches": 2,
                   "recovered_batches": 0,
-                  "seconds": 0.754,
-                  "first_message_at": 1793521411.036222,
-                  "last_commit_at": 1793521411.7900815,
-                  "messages_per_s": 13010,
-                  "inserted_per_s": 12265
+                  "seconds": 0.725,
+                  "first_message_at": 1793715860.028799,
+                  "last_commit_at": 1793715860.7533543,
+                  "messages_per_s": 13537,
+                  "inserted_per_s": 12761
                 }
               ]
             },
             "B1": {
-              "seconds": 1.2,
+              "seconds": 1.61,
               "workers": [
                 {
                   "messages": 6035,
@@ -825,16 +884,16 @@
                   "quarantined": 26,
                   "batches": 1,
                   "recovered_batches": 1,
-                  "seconds": 0.414,
-                  "first_message_at": 1793521413.6994617,
-                  "last_commit_at": 1793521414.1131468,
-                  "messages_per_s": 14588,
-                  "inserted_per_s": 13827
+                  "seconds": 0.392,
+                  "first_message_at": 1793715864.7969074,
+                  "last_commit_at": 1793715865.1893284,
+                  "messages_per_s": 15379,
+                  "inserted_per_s": 14576
                 }
               ]
             },
             "B2": {
-              "seconds": 2.4,
+              "seconds": 1.61,
               "workers": [
                 {
                   "messages": 9965,
@@ -843,17 +902,17 @@
                   "quarantined": 49,
                   "batches": 3,
                   "recovered_batches": 0,
-                  "seconds": 0.755,
-                  "first_message_at": 1793521415.753292,
-                  "last_commit_at": 1793521416.5080187,
-                  "messages_per_s": 13203,
-                  "inserted_per_s": 12469
+                  "seconds": 0.658,
+                  "first_message_at": 1793715866.1296804,
+                  "last_commit_at": 1793715866.7878664,
+                  "messages_per_s": 15140,
+                  "inserted_per_s": 14298
                 }
               ]
             },
-            "C_kills": 1,
+            "C_kills": 4,
             "C": {
-              "seconds": 1.12,
+              "seconds": 1.25,
               "workers": [
                 {
                   "messages": 0,
@@ -882,6 +941,14 @@
             "budget": {
               "min_messages_per_s": 1500.0,
               "ok": true
+            },
+            "D": {
+              "seconds": 4.81,
+              "batches": 12,
+              "messages_read": 40000,
+              "inserted_claimed": 19902,
+              "duplicates": 19902,
+              "events": 19902
             }
           }
         }
@@ -890,10 +957,11 @@
       "reference_green": 3,
       "ok": true,
       "host": {
-        "at": "2026-11-01T08:20:28Z",
+        "at": "2026-11-03T14:24:49Z",
         "machine": "arm64",
         "system": "Darwin",
-        "load_average": "s: 42.48 48.19 54.02"
+        "cpus": 16,
+        "load_average": "103.75 95.08 94.08"
       }
     },
     "ledger-hold-release-race": {
@@ -1515,11 +1583,11 @@
     }
   },
   "host": {
-    "at": "2026-11-02T07:14:17Z",
+    "at": "2026-11-03T14:20:17Z",
     "machine": "arm64",
     "system": "Darwin",
     "cpus": 16,
-    "load_average": "8.16 8.14 7.25"
+    "load_average": "75.02 87.73 92.20"
   },
   "repeat": 3,
   "ok": true

@@ -97,7 +97,11 @@ one needs a second actor, a retry or a crash in a particular gap:
   *another* process. Inside one worker the in-memory set works perfectly, and
   the Postgres table stays correct (the primary key still rejects the row).
   Only the lake and the duplicate counter are wrong, and only a comparison
-  with the generator's ground truth shows that.
+  with the generator's ground truth shows that. A near miss, filling that set
+  from Postgres at startup, is correct while workers take turns on a
+  partition. It fails only while two workers own one partition at once, so
+  the verifier has a phase (D) that makes them, and it puts every event in
+  the lake twice there.
 - **Offsets after Parquet** looks *safer* than the original when read: it
   says "the position only moves once the batch is in the lake". It breaks
   only on a crash between two commits, which the verifier arms with the
@@ -144,7 +148,7 @@ auditor).
 |---|---|---|---|
 | ledger-saga | (1) `verifiers/ledger/sabrace.go`: the repository's real `ledger.Store` on a fresh database, 600 sagas, and for each one, after a start barrier, either hold ‖ release or hold ‖ retried hold, then capture ‖ retried capture and credit ‖ retried credit, with handler errors retried as the consumer would; (2) the project's crash harness (`ledgersaga chaos`): three services as real processes, a seeded workload of 200 transfers over the HTTP API, duplication, reordering and late redelivery on every run; crash points `none`, `ledger.before_commit`, `ledger.after_commit`, `orch.reply.after_commit` in parallel, each SIGKILLing the process once and restarting it | (1) per saga, the recorded operations are ones its final state allows (`saga.CheckEffects`, the project's rule), each step recorded once, exactly ±amount moved; journal balanced, nothing held. (2) the project's own audit (`internal/check`): journal sums to zero per operation and globally, balances equal the journal, no negative balance, nothing held at rest, customer money equals the opening total, every saga terminal with exactly the ledger effects its state allows and exactly ±amount moved, legal transition logs, one transfer per idempotency key | (1) ≥ 150 handled commands/s; (2) every run quiesces within 90 s of the workload's end |
 | pg-search-sync | `verifiers/pgsync/sabcheck.go`: fresh database and topic, real `cdc` binary, 16 s of 400 writes/s (60% update, 20% insert, 12% delete, 8% re-insert of a deleted id), `kill -9` twice and one SIGTERM restart while the writes continue | the topic resolved per id (highest version wins, as with ES `version_type=external`) equals the table: every row searchable at its current version, every deleted row a tombstone, nothing extra; the connector never exits on its own | converged within 30 s after the writes stop |
-| events-lakehouse | `verifiers/lakehouse/verify.py`: 60k generated messages (5% duplicates, 3% late, 0.5% bad) in three thirds: two workers on {0,1,2}/{3,4,5}; partitions moved to {0,2,4}/{1,3,5}, the first started with the after-commit failpoint armed; one worker for all partitions SIGKILLed at seeded random moments | Postgres `events` and the Parquet lake equal the generator's reference row for row (count + order-independent digest of all columns), quarantine counts per reason, duplicate count | every phase-1 worker ingests ≥ 1,500 msg/s |
+| events-lakehouse | `verifiers/lakehouse/verify.py`: 60k generated messages (5% duplicates, 3% late, 0.5% bad) in three thirds: two workers on {0,1,2}/{3,4,5}; partitions moved to {0,2,4}/{1,3,5}, the first started with the after-commit failpoint armed; one worker for all partitions SIGKILLed at seeded random moments. Then phase D on its own topic and database: two workers own the same partition at once (a worker still running after its partition moved), 20k messages, the first produced alone and the rest only after both owners committed a batch for it | Postgres `events` and the Parquet lake equal the generator's reference row for row (count + order-independent digest of all columns), quarantine counts per reason, duplicate count. In D: the same for events, lake and quarantine, and the batches' `inserted` sum to the rows in `events` (the duplicate count there depends on how the owners' batches interleave) | every phase-1 worker ingests ≥ 1,500 msg/s |
 | mini-serve | `verifiers/miniserve/verify.py`: the repository's own `BlockPool`, `Scheduler` and step loop on the real model (SmolLM2-135M; attention on the GPU through the project's Metal kernel, built once from the pinned commit because `src/` is protected). 36 greedy requests over three shared system prompts of 3–4 blocks, 8 at once and then 4 more every 6 steps, into a pool of 48 blocks of 16 tokens, so decode steps preempt sequences that hold shared blocks | after every step: each block's refcount equals the number of running sequences holding it, a block is on the free list exactly when its refcount is 0, the prefix cache maps hashes and blocks one to one; a shadow of the KV pool checks that each computed row writes only into a block no one else holds and attends to exactly its own tokens; at rest every block is free; every output equals the same request run alone on an empty pool with the prefix cache off | ≥ 100 generated tokens/s, at least 2× below the reference's rate (measured margin under Results); the prefix cache serves ≥ 40 blocks, so turning sharing off does not count as a fix |
 
 The budgets are loose on purpose. They exist to fail a "fix" that serialises
@@ -156,8 +160,8 @@ hold on a laptop shared with other workloads.
 <!-- results:verify-all -->
 | task | with the bug | first problem the verifier reports | reference fix, green runs | verifier time, reference (s) |
 |---|---|---|---|---|
-| `lakehouse-dups-after-rebalance` | red | postgres.duplicates: want 3006, got 1947 | 3/3 | 20–27 |
-| `lakehouse-offsets-after-parquet` | red | postgres.duplicates: want 3006, got 6985 | 3/3 | 20–40 |
+| `lakehouse-dups-after-rebalance` | red | postgres.duplicates: want 3006, got 1945 | 3/3 | 25–40 |
+| `lakehouse-offsets-after-parquet` | red | postgres.duplicates: want 3006, got 10966 | 3/3 | 26–34 |
 | `ledger-hold-release-race` | red | concurrent: 289 sagas with disallowed effects, 0 applied twice, 0 with wrong money (of 600) | 3/3 | 43–50 |
 | `ledger-retry-double-charge` | red | concurrent: 0 sagas with disallowed effects, 900 applied twice, 300 with wrong money (of 600) | 3/3 | 47–51 |
 | `pgsync-deletes-replica-identity` | red | 1045 missing, 138 stale, 47 extra documents | 3/3 | 27–28 |
@@ -166,7 +170,7 @@ hold on a laptop shared with other workloads.
 
 `miniserve-preempt-frees-shared-block`, reference: 386–431 generated tokens/s (budget 100, margin ×3.9), 160–193 blocks served by the prefix cache (minimum 40), 20–24 preemptions, 0 outputs differing from the solo run.
 
-`3` reference runs per task, recorded 2026-11-01T08:20:28Z, load 42.48 48.19 54.02: 6 tasks; 2026-11-02T07:14:17Z, load 8.16 8.14 7.25: `miniserve-preempt-frees-shared-block`. Reproduce: `make verify-all REPEAT=3`.
+`3` reference runs per task, recorded 2026-11-01T08:20:28Z, load 42.48 48.19 54.02: 4 tasks; 2026-11-02T07:14:17Z, load 8.16 8.14 7.25: `miniserve-preempt-frees-shared-block`; 2026-11-03T14:22:36Z, load 88.02 89.55 92.34: `lakehouse-dups-after-rebalance`; 2026-11-03T14:24:49Z, load 103.75 95.08 94.08: `lakehouse-offsets-after-parquet`. Reproduce: `make verify-all REPEAT=3`.
 <!-- /results -->
 
 ## Mutation testing of the verifiers
@@ -181,7 +185,7 @@ not. The hand-written `near_misses/` run next to the generated mutants.
 <!-- results:mutation -->
 | task | mutants | stillborn | killed | survived | of which equivalent | caught | caught, equivalents excluded | near misses killed |
 |---|---|---|---|---|---|---|---|---|
-| `lakehouse-dups-after-rebalance` | 7 | 0 | 6 | 1 | 1 | 86% | 100% | 0/1 |
+| `lakehouse-dups-after-rebalance` | 7 | 0 | 6 | 1 | 1 | 86% | 100% | 1/1 |
 | `lakehouse-offsets-after-parquet` | 6 | 2 | 3 | 1 | 1 | 75% | 100% | – |
 | `ledger-hold-release-race` | 4 | 1 | 2 | 1 | 0 | 67% | 67% | – |
 | `ledger-retry-double-charge` | 12 | 3 | 7 | 2 | 2 | 78% | 100% | – |
@@ -191,14 +195,13 @@ not. The hand-written `near_misses/` run next to the generated mutants.
 | all | | | 22 of 30 live | | 7 | 73% | 96% | |
 
 Equivalent = argued by hand in `tasks/<id>/equivalent.json`; each argument is listed below.
-Recorded 2026-11-01T09:08:16Z, load 25.29 30.83 32.43: 6 tasks; 2026-11-02T07:15:01Z, load 7.63 8.01 7.24: `miniserve-preempt-frees-shared-block`. Reproduce: `make mutation`; per mutant: `results/mutation.json`.
+Recorded 2026-11-01T09:08:16Z, load 25.29 30.83 32.43: 4 tasks; 2026-11-02T07:15:01Z, load 7.63 8.01 7.24: `miniserve-preempt-frees-shared-block`; 2026-11-03T14:28:46Z, load 97.84 99.67 96.56: `lakehouse-dups-after-rebalance`; 2026-11-03T14:30:28Z, load 81.53 91.83 93.75: `lakehouse-offsets-after-parquet`. Reproduce: `make mutation`; per mutant: `results/mutation.json`.
 <!-- /results -->
 
 Surviving mutants:
 
 <!-- results:survivors -->
 - `lakehouse-dups-after-rebalance` m02 (revert-hunk): src/lakehouse/ingest.py:105 hunk reverted to the buggy version. **Equivalent:** re-adds `self.seen = set()` to __init__; nothing reads it in the reference.
-- `lakehouse-dups-after-rebalance` reload-seen-at-start (near-miss): tasks/lakehouse-dups-after-rebalance/near_misses/reload-seen-at-start.patch.
 - `lakehouse-offsets-after-parquet` m02 (revert-hunk): src/lakehouse/ingest.py:167 hunk reverted to the buggy version. **Equivalent:** re-adds a second upsert of the same offsets after the Parquet write; the batch transaction already stored them, and the upsert is idempotent.
 - `ledger-hold-release-race` m04 (delete-line): internal/ledger/store.go:40 deleted `return "", err`.
 - `ledger-retry-double-charge` m01 (revert-hunk): internal/db/schema.sql:68 hunk reverted to the buggy version. **Equivalent:** drops UNIQUE (saga_id, step) but keeps the replay check; under the per-saga advisory lock the replay alone already prevents a second decision, so only the safety net is gone.
@@ -215,10 +218,6 @@ The survivors that are not equivalent are the bench's measured blind spots:
   advisory-lock statement. Neither scenario makes that statement fail, so an
   error path that silently carries on is invisible. Fault injection into
   Postgres calls would close this gap; it is not built.
-- **`reload-seen-at-start`** fills the in-memory dedup set from Postgres at
-  startup. That is correct when workers take turns on a partition and wrong
-  when two of them own it at once. The lakehouse scenario never has two
-  owners at once (see Limitations).
 - **`drop-on-shutdown`** moves the slot drop from startup to shutdown, after
   `connector.Close()`. It never takes effect in this scenario: a drop would
   lose the writes made in the restart gap, and none were lost. Either the
@@ -394,12 +393,12 @@ verifier's virtualenv). The sizes are in `results/raw/environment.txt`, and
 - **The local model ran on the first six tasks only.** The seventh was added
   after that run.
 - **A verifier only sees the interleavings its scenario reaches.** The
-  survivors above are the measured blind spots. The lakehouse scenario lets
-  workers take turns and never makes two of them own a partition at once.
-  With two owners, each re-read message would be counted in
-  `ingest_batches.duplicates` even by the original code, so the duplicate
-  invariant would need a different reference. That follows from the code; it
-  was not run.
+  survivors above are the measured blind spots. In the lakehouse phase with
+  two owners of one partition the duplicate count is not checked against a
+  reference (it depends on how the owners' batches interleave), and the
+  generator's own duplicates are turned off there: with them, two batches
+  could take the same rows' locks in opposite order and deadlock, which is
+  reasoned from the code, not observed.
 - **Budgets and timings come from a loaded laptop** (see the load average in
   each result file). They are pass/fail thresholds, not benchmarks.
 - **Local credentials only.** `postgres:postgres` in `infra/` and in the
