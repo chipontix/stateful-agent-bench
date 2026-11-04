@@ -258,7 +258,8 @@ trace records the result.
 | `stub-wrong` | a plausible wrong fix | 7 | 1 | 0.00 | pass@1 0.00 | 7× NOT RESOLVED |
 | `stub-cheat` | an edit that gets past the verifier instead of fixing the bug | 7 | 1 | 0.00 | pass@1 0.00 | 2× NOT RESOLVED, 5× NOT RESOLVED, and changed what the verifier relies on |
 | `stub-coin` | reference or wrong fix, 50/50 per attempt | 7 | 4 | 0.57 | pass@2 0.74 | 12× NOT RESOLVED, 16× RESOLVED |
-| `llm-qwen-coder-1.5b` | its own edits: Qwen2.5-Coder-1.5B-Instruct Q4_K_M on llama.cpp, 20 tool calls max | 6 | 5 | 0.00 | pass@5 0.00 | 28× NOT RESOLVED, 2× NOT RESOLVED, and changed what the verifier relies on |
+| `llm-qwen-coder-1.5b` | its own edits: Qwen2.5-Coder-1.5B-Instruct Q4_K_M on llama.cpp, 20 tool calls max | 7 | 5 | 0.00 | pass@5 0.00 | 33× NOT RESOLVED, 2× NOT RESOLVED, and changed what the verifier relies on |
+| `llm-qwen-coder-1.5b-hint` | the same agent, told which files the reference fix changes | 7 | 5 | 0.00 | pass@5 0.00 | 35× NOT RESOLVED |
 
 Reproduce: `make runs`; traces, diffs and audit reports: `results/traces/<agent>/`.
 <!-- /results -->
@@ -280,24 +281,35 @@ lock (`--phase agent`, then `--phase verify`). An attempt that changed
 nothing is the buggy snapshot, which verify-all already shows red, so it is
 recorded as `no-change` without running the verifier again.
 
-<!-- results:llm -->
-| what the attempts did | attempts |
-|---|---|
-| passed the verifier | 0 of 30 |
-| changed nothing | 22 of 30 |
-| read the file the reference fix changes | 4 of 30 |
-| changed that file | 1 of 30 |
-| changed only other files (README, new placeholder files, comments) | 7 of 30 |
-| changed a protected file or removed the failpoint | 2 of 30 |
-| called finish | 6 of 30 |
-| ran out of its 20 steps | 24 of 30 |
-| repeated a call verbatim at least once | 26 of 30 |
+A second agent, `llm-qwen-coder-1.5b-hint`, is the same loop on the same
+model with one change: the first message ends with "The bug is in
+<files>. Start by reading it.", where the files are the ones the reference
+fix changes (`bench/run.py` → `hint_files`; never a protected file). It
+separates two reasons an agent can fail: not finding the code, and not
+fixing it once found.
 
-514 model calls, 52684 completion tokens in all, recorded 2026-11-01T10:18:01Z. Reproduce: `make runs-llm` then `python3 scripts/llm_analysis.py`; per attempt: `results/llm-analysis.json`, traces and audits: `results/traces/llm-qwen-coder-1.5b/`.
+<!-- results:llm -->
+| what the attempts did | no hint | told the file |
+|---|---|---|
+| passed the verifier | 0 of 35 | 0 of 35 |
+| changed nothing | 27 of 35 | 33 of 35 |
+| read the file the reference fix changes | 8 of 35 | 34 of 35 |
+| changed that file | 1 of 35 | 2 of 35 |
+| changed only other files (README, new placeholder files, comments) | 7 of 35 | 0 of 35 |
+| changed a protected file or removed the failpoint | 2 of 35 | 0 of 35 |
+| called finish | 7 of 35 | 5 of 35 |
+| ran out of its 20 steps | 28 of 35 | 30 of 35 |
+| repeated a call verbatim at least once | 31 of 35 | 34 of 35 |
+
+No hint: 604 model calls, 59853 completion tokens in all, recorded between 2026-11-01T10:18:01Z and 2026-11-04T10:56:57Z (the attempts of a task added later were run later). Reproduce: `make runs-llm`; per attempt: `results/llm-analysis.json`, traces and audits: `results/traces/llm-qwen-coder-1.5b/`.
+
+Told the file: 635 model calls, 48619 completion tokens in all, recorded 2026-11-04T10:56:55Z. Reproduce: `make runs-llm-hint`; per attempt: `results/llm-analysis-hint.json`, traces and audits: `results/traces/llm-qwen-coder-1.5b-hint/`.
 <!-- /results -->
 
-pass@1 and pass@5 are 0 on all six tasks it ran on (table above). The traces show why.
-Most attempts never open the file with the bug: the model searches for words
+pass@1 and pass@5 are 0 for both agents on all seven tasks (the runs table above;
+per task: `results/run-llm-qwen-coder-1.5b.json` and
+`results/run-llm-qwen-coder-1.5b-hint.json`). The traces show why.
+Without the hint, most attempts never open the file with the bug: the model searches for words
 from the report, opens the harness or the README, and repeats itself until
 its steps run out. The few edits are to the wrong files: a reworded comment,
 a new placeholder file, the README. The two attempts the auditor flags
@@ -307,6 +319,16 @@ put back. Neither got through. A 1.5B model is far below what these tasks
 need, and that is the expected result: the number shows that the runner, the
 bridge, the verifiers and the auditor work end to end on a real agent, not
 how good an agent can be.
+
+The hint settles the first failure and leaves the second. With it, 34 of 35
+attempts read the file with the bug, against 8 of 35 without, and none
+wanders off to the README or a protected file. Yet 33 of 35 still change
+nothing: the model re-reads the same file or searches it until its 20 steps
+run out. The two edits it did make broke the build: one replaced `import
+psycopg` with `from psycopg import pool`, which crashed every lakehouse
+worker, and one called `cdc.NewConnectorWithRetry`, which does not exist.
+So at 1.5B parameters the gap is not search but understanding the cause, and
+a hint does not move pass@k off zero.
 
 ### Trace auditor
 
@@ -390,8 +412,11 @@ verifier's virtualenv). The sizes are in `results/raw/environment.txt`, and
   and access to the mini-serve repository, which is private for now. CI has
   neither, so `make test` skips that task there (the skip is printed) and
   the e2e job runs a lakehouse task.
-- **The local model ran on the first six tasks only.** The seventh was added
-  after that run.
+- **The two agents are one model.** The comparison isolates the effect of the
+  hint on a 1.5B model; it says nothing about how a larger model would use
+  it. The first 30 attempts of the agent without the hint ran on 2026-11-01,
+  its 5 on the seventh task and all 35 with the hint on 2026-11-04, on the
+  same model file and agent loop.
 - **A verifier only sees the interleavings its scenario reaches.** The
   survivors above are the measured blind spots. In the lakehouse phase with
   two owners of one partition the duplicate count is not checked against a

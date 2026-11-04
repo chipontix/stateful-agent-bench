@@ -1,25 +1,29 @@
 {
   "agent": "llm-qwen-coder-1.5b",
   "host": {
-    "at": "2026-11-01T10:18:01Z",
+    "at": "2026-11-04T10:56:57Z",
     "machine": "arm64",
     "system": "Darwin",
     "cpus": 16,
-    "load_average": "21.38 25.20 32.66"
+    "load_average": "6.88 10.86 10.84"
   },
+  "recorded": [
+    "2026-11-01T10:18:01Z",
+    "2026-11-04T10:56:57Z"
+  ],
   "summary": {
-    "attempts": 30,
+    "attempts": 35,
     "passed": 0,
-    "no_change": 22,
-    "read_the_file_with_the_bug": 4,
+    "no_change": 27,
+    "read_the_file_with_the_bug": 8,
     "changed_the_file_with_the_bug": 1,
     "changed_only_other_files": 7,
     "changed_a_protected_file_or_failpoint": 2,
-    "called_finish": 6,
-    "ran_out_of_steps": 24,
-    "attempts_with_a_repeated_call": 26,
-    "model_calls": 514,
-    "completion_tokens": 52684
+    "called_finish": 7,
+    "ran_out_of_steps": 28,
+    "attempts_with_a_repeated_call": 31,
+    "model_calls": 604,
+    "completion_tokens": 59853
   },
   "attempts": [
     {
@@ -551,6 +555,91 @@
       "called_finish": false,
       "stage": "invariants",
       "first_problem": "34 missing, 78 stale, 26 extra documents"
+    },
+    {
+      "task": "miniserve-preempt-frees-shared-block",
+      "attempt": 1,
+      "pass": false,
+      "verdict": "NOT RESOLVED",
+      "model_calls": 20,
+      "completion_tokens": 1707,
+      "tool_errors": 2,
+      "repeated_calls": 2,
+      "read_reference_file": true,
+      "changed_files": [],
+      "changed_reference_file": false,
+      "protected_changed": [],
+      "called_finish": false,
+      "stage": "no-change",
+      "first_problem": "no change: the repository is still the buggy snapshot (red in verify-all)"
+    },
+    {
+      "task": "miniserve-preempt-frees-shared-block",
+      "attempt": 2,
+      "pass": false,
+      "verdict": "NOT RESOLVED",
+      "model_calls": 20,
+      "completion_tokens": 1812,
+      "tool_errors": 4,
+      "repeated_calls": 4,
+      "read_reference_file": true,
+      "changed_files": [],
+      "changed_reference_file": false,
+      "protected_changed": [],
+      "called_finish": false,
+      "stage": "no-change",
+      "first_problem": "no change: the repository is still the buggy snapshot (red in verify-all)"
+    },
+    {
+      "task": "miniserve-preempt-frees-shared-block",
+      "attempt": 3,
+      "pass": false,
+      "verdict": "NOT RESOLVED",
+      "model_calls": 20,
+      "completion_tokens": 1129,
+      "tool_errors": 1,
+      "repeated_calls": 1,
+      "read_reference_file": false,
+      "changed_files": [],
+      "changed_reference_file": false,
+      "protected_changed": [],
+      "called_finish": false,
+      "stage": "no-change",
+      "first_problem": "no change: the repository is still the buggy snapshot (red in verify-all)"
+    },
+    {
+      "task": "miniserve-preempt-frees-shared-block",
+      "attempt": 4,
+      "pass": false,
+      "verdict": "NOT RESOLVED",
+      "model_calls": 20,
+      "completion_tokens": 1622,
+      "tool_errors": 7,
+      "repeated_calls": 7,
+      "read_reference_file": true,
+      "changed_files": [],
+      "changed_reference_file": false,
+      "protected_changed": [],
+      "called_finish": false,
+      "stage": "no-change",
+      "first_problem": "no change: the repository is still the buggy snapshot (red in verify-all)"
+    },
+    {
+      "task": "miniserve-preempt-frees-shared-block",
+      "attempt": 5,
+      "pass": false,
+      "verdict": "NOT RESOLVED",
+      "model_calls": 10,
+      "completion_tokens": 899,
+      "tool_errors": 4,
+      "repeated_calls": 3,
+      "read_reference_file": true,
+      "changed_files": [],
+      "changed_reference_file": false,
+      "protected_changed": [],
+      "called_finish": true,
+      "stage": "no-change",
+      "first_problem": "no change: the repository is still the buggy snapshot (red in verify-all)"
     }
   ]
 }

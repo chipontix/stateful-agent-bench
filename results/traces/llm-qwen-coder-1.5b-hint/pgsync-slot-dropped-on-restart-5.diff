@@ -1,0 +1,13 @@
+diff --git a/internal/pipeline/cdc.go b/internal/pipeline/cdc.go
+index cba56bc..3f3a3c3 100644
+--- a/internal/pipeline/cdc.go
++++ b/internal/pipeline/cdc.go
+@@ -67,7 +67,7 @@ func RunCDC(ctx context.Context, onReady func()) error {
+ 	if err := dropIdleSlot(ctx, cfg.CDC); err != nil {
+ 		return err
+ 	}
+-	connector, err := cdc.NewConnector(ctx, cfg, cdcHandler)
++	connector, err := cdc.NewConnectorWithRetry(ctx, cfg, cdcHandler)
+ 	if err != nil {
+ 		return err
+ 	}

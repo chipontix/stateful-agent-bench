@@ -1,10 +1,10 @@
 {
   "host": {
-    "at": "2026-11-01T10:18:01Z",
+    "at": "2026-11-04T10:56:57Z",
     "machine": "arm64",
     "system": "Darwin",
     "cpus": 16,
-    "load_average": "21.38 25.20 32.66"
+    "load_average": "6.88 10.86 10.84"
   },
   "agent": "llm-qwen-coder-1.5b",
   "k": 5,
@@ -354,6 +354,71 @@
           "pass": false,
           "seconds": 69.9,
           "trace": "results/traces/llm-qwen-coder-1.5b/pgsync-slot-dropped-on-restart-5.jsonl",
+          "verdict": "NOT RESOLVED"
+        }
+      ]
+    },
+    "miniserve-preempt-frees-shared-block": {
+      "host": {
+        "at": "2026-11-04T10:56:57Z",
+        "machine": "arm64",
+        "system": "Darwin",
+        "cpus": 16,
+        "load_average": "6.88 10.86 10.84"
+      },
+      "n": 5,
+      "correct": 0,
+      "pass@1": 0.0,
+      "pass@5": 0.0,
+      "attempts": [
+        {
+          "task": "miniserve-preempt-frees-shared-block",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 1,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/miniserve-preempt-frees-shared-block-1.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "miniserve-preempt-frees-shared-block",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 2,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/miniserve-preempt-frees-shared-block-2.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "miniserve-preempt-frees-shared-block",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 3,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/miniserve-preempt-frees-shared-block-3.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "miniserve-preempt-frees-shared-block",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 4,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/miniserve-preempt-frees-shared-block-4.jsonl",
+          "verdict": "NOT RESOLVED"
+        },
+        {
+          "task": "miniserve-preempt-frees-shared-block",
+          "agent": "llm-qwen-coder-1.5b",
+          "attempt": 5,
+          "played": null,
+          "pass": false,
+          "seconds": 0,
+          "trace": "results/traces/llm-qwen-coder-1.5b/miniserve-preempt-frees-shared-block-5.jsonl",
           "verdict": "NOT RESOLVED"
         }
       ]
