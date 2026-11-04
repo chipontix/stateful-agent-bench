@@ -5,7 +5,7 @@ PY := python3
 KAFKA ?= docker   # docker | native (host JVM, for a Docker VM too loaded to run a broker)
 REPEAT ?= 3
 
-.PHONY: test deps up down verify-all mutation runs runs-llm audit clean
+.PHONY: test deps up down verify-all mutation runs runs-llm runs-llm-hint audit clean
 
 test:              ## tooling self-checks: no brokers, no Docker
 	$(PY) -m unittest discover -s tests -v
@@ -41,6 +41,11 @@ runs-llm: deps     ## the local-model agent (llama-server + model in the HF cach
 	$(PY) -m bench run --agent llm-qwen-coder-1.5b -n 5 -k 5 --phase agent
 	$(PY) -m bench run --agent llm-qwen-coder-1.5b -n 5 -k 5 --phase verify
 	$(PY) scripts/llm_analysis.py
+
+runs-llm-hint: deps  ## the same agent told which files the reference fix changes
+	$(PY) -m bench run --agent llm-qwen-coder-1.5b-hint -n 5 -k 5 --phase agent
+	$(PY) -m bench run --agent llm-qwen-coder-1.5b-hint -n 5 -k 5 --phase verify
+	$(PY) scripts/llm_analysis.py llm-qwen-coder-1.5b-hint
 
 clean:             ## work dirs and caches (not results/)
 	rm -rf work .cache/go-build

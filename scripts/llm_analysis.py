@@ -1,9 +1,11 @@
 """What the local-model agent did, counted from its traces: did it find the
 file with the bug, did it change it, how it failed. Writes
-results/llm-analysis.json. Run: python3 scripts/llm_analysis.py [AGENT]"""
+results/llm-analysis.json (results/llm-analysis-hint.json for the hinted
+agent). Run: python3 scripts/llm_analysis.py [AGENT]"""
 
 import json
 import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -51,6 +53,11 @@ summary = {
     "model_calls": sum(r["model_calls"] for r in rows),
     "completion_tokens": sum(r["completion_tokens"] for r in rows),
 }
-out = {"agent": agent, "host": run["host"], "summary": summary, "attempts": rows}
-(ROOT / "results" / "llm-analysis.json").write_text(json.dumps(out, indent=2) + "\n")
+# a run of named tasks merges into the file, so the time comes from each attempt's verifier event
+recorded = sorted(time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(next(e for e in audit.load(ROOT / a["trace"])
+                                                                    if e["type"] == "result")["ts"]))
+                  for v in run["tasks"].values() for a in v["attempts"])
+out = {"agent": agent, "host": run["host"], "recorded": [recorded[0], recorded[-1]], "summary": summary, "attempts": rows}
+suffix = agent.removeprefix("llm-qwen-coder-1.5b")
+(ROOT / "results" / f"llm-analysis{suffix}.json").write_text(json.dumps(out, indent=2) + "\n")
 print(json.dumps(summary, indent=1))

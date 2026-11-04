@@ -90,6 +90,8 @@ def audit(events: list[dict], diff_text: str = "") -> dict:
             did.append(f"{s} read `{e['path']}`")
         elif t == "list_files":
             did.append(f"{s} listed {e['files']} files under {e['root']}")
+        elif t == "hint":
+            did.append(f"{s} was told the bug is in {', '.join(f'`{p}`' for p in e['files'])}")
         elif t == "probe":
             did.append(f"{s} probed the network: {'reachable' if e['network'] else 'unreachable'}")
             if e["network"]:

@@ -112,9 +112,10 @@ def runs() -> str:
             "|---|---|---|---|---|---|---|"]
     what = {"stub-ref": "the reference fix", "stub-wrong": "a plausible wrong fix", "stub-cheat":
             "an edit that gets past the verifier instead of fixing the bug", "stub-coin": "reference or wrong fix, 50/50 per attempt",
-            "llm-qwen-coder-1.5b": "its own edits: Qwen2.5-Coder-1.5B-Instruct Q4_K_M on llama.cpp, 20 tool calls max"}
+            "llm-qwen-coder-1.5b": "its own edits: Qwen2.5-Coder-1.5B-Instruct Q4_K_M on llama.cpp, 20 tool calls max",
+            "llm-qwen-coder-1.5b-hint": "the same agent, told which files the reference fix changes"}
     any_ = False
-    for agent in ("stub-ref", "stub-wrong", "stub-cheat", "stub-coin", "llm-qwen-coder-1.5b"):
+    for agent in ("stub-ref", "stub-wrong", "stub-cheat", "stub-coin", "llm-qwen-coder-1.5b", "llm-qwen-coder-1.5b-hint"):
         d = load(f"run-{agent}")
         if not d or "mean_pass@1" not in d:
             continue
@@ -133,12 +134,20 @@ def runs() -> str:
     return "\n".join(rows)
 
 
+def when(d: dict) -> str:
+    a, b = d.get("recorded") or [d["host"]["at"]] * 2
+    days = sorted({r[:10] for r in (a, b)})
+    return a if len(days) == 1 else f"between {a} and {b} (the attempts of a task added later were run later)"
+
+
 def llm() -> str:
-    d = load("llm-analysis")
+    d, h = load("llm-analysis"), load("llm-analysis-hint")
     if not d:
         return "_not run yet_"
     s, n = d["summary"], d["summary"]["attempts"]
-    rows = ["| what the attempts did | attempts |", "|---|---|"]
+    hs = h["summary"] if h else None
+    rows = ["| what the attempts did | no hint | told the file |" if hs else "| what the attempts did | attempts |",
+            "|---|---|---|" if hs else "|---|---|"]
     for key, text in (("passed", "passed the verifier"), ("no_change", "changed nothing"),
                       ("read_the_file_with_the_bug", "read the file the reference fix changes"),
                       ("changed_the_file_with_the_bug", "changed that file"),
@@ -146,10 +155,14 @@ def llm() -> str:
                       ("changed_a_protected_file_or_failpoint", "changed a protected file or removed the failpoint"),
                       ("called_finish", "called finish"), ("ran_out_of_steps", "ran out of its 20 steps"),
                       ("attempts_with_a_repeated_call", "repeated a call verbatim at least once")):
-        rows.append(f"| {text} | {s[key]} of {n} |")
-    rows += ["", f"{s['model_calls']} model calls, {s['completion_tokens']} completion tokens in all, recorded "
-             f"{d['host']['at']}. Reproduce: `make runs-llm` then `python3 scripts/llm_analysis.py`; per attempt: "
+        rows.append(f"| {text} | {s[key]} of {n} |" + (f" {hs[key]} of {hs['attempts']} |" if hs else ""))
+    rows += ["", f"No hint: {s['model_calls']} model calls, {s['completion_tokens']} completion tokens in all, recorded "
+             f"{when(d)}. Reproduce: `make runs-llm`; per attempt: "
              "`results/llm-analysis.json`, traces and audits: `results/traces/llm-qwen-coder-1.5b/`."]
+    if hs:
+        rows += ["", f"Told the file: {hs['model_calls']} model calls, {hs['completion_tokens']} completion tokens in all,"
+                 f" recorded {when(h)}. Reproduce: `make runs-llm-hint`; per attempt: "
+                 "`results/llm-analysis-hint.json`, traces and audits: `results/traces/llm-qwen-coder-1.5b-hint/`."]
     return "\n".join(rows)
 
 

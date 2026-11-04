@@ -9,7 +9,7 @@ import subprocess
 import time
 from pathlib import Path
 
-from . import bridge, verify, workspace
+from . import bridge, mutate, verify, workspace
 
 ROOT = workspace.ROOT
 IMAGE = "python:3.13-slim"  # both agents need only Python; already on most Docker hosts
@@ -21,7 +21,15 @@ AGENTS = {
     "stub-coin": lambda rng: "fix" if rng.random() < 0.5 else "wrong",
     # a real agent loop on a local model (agents/llm.py, bench/bridge.py)
     "llm-qwen-coder-1.5b": None,
+    # the same agent and model, told which files the reference fix changes
+    "llm-qwen-coder-1.5b-hint": None,
 }
+HINTED = {"llm-qwen-coder-1.5b-hint"}
+
+
+def hint_files(task: workspace.Task) -> list[str]:
+    """The files the reference fix changes, in patch order."""
+    return list(dict.fromkeys(p for p, *_ in mutate.hunks(task.patch("fix").read_text())))
 
 
 class Trace:
@@ -68,13 +76,17 @@ def attempt(task: workspace.Task, agent: str, i: int, out: Path, seed: int, time
         argv = ["python3", "/agents/stub.py", "--trace", "/trace/agent.jsonl"]
     else:
         argv = ["python3", "/agents/llm.py", "--trace", "/trace/agent.jsonl", "--seed", str(seed)]
+    hint = hint_files(task) if agent in HINTED else None
+    if hint:
+        (out / "task" / "hint.txt").write_text("\n".join(hint) + "\n")
+        argv += ["--hint", "/task/hint.txt"]
     (out / "agent.jsonl").write_text("")
     name = f"sab-agent-{task.id[:20]}-{i}-{int(time.time())}"
     cmd = ["docker", "run", "--rm", "--name", name, "--network", "none", "--memory", "512m", "--cpus", "1",
            "-v", f"{repo}:/workspace", "-v", f"{out / 'task'}:/task:ro", "-v", f"{ROOT / 'agents'}:/agents:ro",
            "-v", f"{out}:/trace", "-v", f"{out / 'io'}:/io", IMAGE, *argv]
     tr.emit("runner", "start", task=task.id, project=task.project, commit=task.commit, agent=agent, attempt=i,
-            image=IMAGE, network="none", played=played)
+            image=IMAGE, network="none", played=played, hint=hint)
     t0 = time.monotonic()
     with bridge.Bridge(out / "io") as br:
         try:

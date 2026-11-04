@@ -11,6 +11,12 @@ from . import workspace
 ROOT = workspace.ROOT
 
 
+def verifier_broke(problems: list[str]) -> bool:
+    """Only when the verifier's own error comes first: a verifier that trips over
+    what broken code left behind (no tables, no output) still graded that code."""
+    return bool(problems) and problems[0].startswith(("verifier error", "verifier exited"))
+
+
 def run(task: workspace.Task, repo: Path, out_dir: Path, seed: int = 1) -> dict:
     """Verifies repo (left untouched) in out_dir/vrepo: protected paths are put
     back first. Result: pass, problems, metrics, seconds, tampered."""
@@ -38,7 +44,7 @@ def run(task: workspace.Task, repo: Path, out_dir: Path, seed: int = 1) -> dict:
     res["problems"] = res.get("problems") or []
     res.update(seconds=round(secs, 1), tampered=tampered)
     res.setdefault("stage", "invariants")
-    if any(p.startswith(("verifier error", "verifier exited")) for p in res["problems"]):
+    if verifier_broke(res["problems"]):
         res["stage"] = "verifier-error"  # the verifier broke: this says nothing about the code under test
     if proc.returncode != 0 and res["pass"]:  # never trust a pass the process did not confirm
         res["pass"] = False

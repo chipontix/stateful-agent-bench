@@ -30,6 +30,22 @@ class LlmReply(unittest.TestCase):
             llm.parse("I would read the file first.")
 
 
+class VerifierError(unittest.TestCase):
+    def test_only_a_leading_verifier_error_is_the_verifiers_fault(self):
+        from bench import verify
+        self.assertTrue(verify.verifier_broke(["verifier error: KeyError: x"]))
+        self.assertFalse(verify.verifier_broke(["A worker 0,1,2: exit 1: ImportError", "verifier error: UndefinedTable"]))
+        self.assertFalse(verify.verifier_broke([]))
+
+
+class Hint(unittest.TestCase):
+    def test_hint_names_the_reference_files_and_no_grader(self):
+        t = workspace.load("ledger-retry-double-charge")
+        self.assertEqual(run.hint_files(t), ["internal/db/schema.sql", "internal/ledger/store.go"])
+        for t in workspace.all_tasks():
+            self.assertFalse([p for p in run.hint_files(t) if workspace.is_protected(t, p)], t.id)
+
+
 def skip_unreachable(tc, t):
     if not workspace.reachable(t):
         tc.skipTest(f"{t.project} cannot be cloned here (private upstream)")

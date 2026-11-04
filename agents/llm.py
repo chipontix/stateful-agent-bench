@@ -157,14 +157,20 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--trace", required=True)
     ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--hint", help="file listing the paths the bug is in, one per line")
     a = ap.parse_args()
     trace = open(a.trace, "a")
     issue = Path("/task/issue.md").read_text()
     emit("read_file", path="/task/issue.md", bytes=len(issue))
     emit("probe", network=probe_network())
     top = "\n".join(str(f.relative_to(WS)) for f in files(WS))
+    hint = ""
+    if a.hint:
+        paths = Path(a.hint).read_text().split()
+        emit("hint", files=paths)
+        hint = "\n\nThe bug is in " + ", ".join(paths) + ". Start by reading it."
     head = [{"role": "system", "content": SYSTEM},
-            {"role": "user", "content": f"Bug report:\n\n{issue}\n\nFiles in /workspace:\n{top[:6000]}"}]
+            {"role": "user", "content": f"Bug report:\n\n{issue}\n\nFiles in /workspace:\n{top[:6000]}{hint}"}]
     history: list[dict] = []
     read: set[str] = set()
     last, hot = None, False
