@@ -272,8 +272,8 @@ call to one of six tools: `list_files`, `read_file`, `search`, `replace`,
 `write_file` or `finish`. The tool's output goes back as the next message.
 The agent's only crutch is a loop guard: a call repeated verbatim is dropped
 from the history, and the next call runs at a higher temperature. The model
-is Qwen2.5-Coder-1.5B-Instruct (Q4_K_M GGUF, 1.1 GB, in the standard Hugging
-Face cache), served by llama.cpp's `llama-server` on the host. The container
+is Qwen2.5-Coder-1.5B-Instruct (Q4_K_M GGUF, 1.1 GB, size and SHA-256 in
+`results/raw/model.txt`, in the standard Hugging Face cache), served by llama.cpp's `llama-server` on the host. The container
 still has `--network none`. Each request is written to a mounted directory,
 and `bench/bridge.py` answers it on the host. Five attempts per task, each
 with its own seed; verification runs separately, under the Docker queue
@@ -438,7 +438,9 @@ verifiers/         ledger (crash harness wrapper), pgsync (sabcheck.go), lakehou
 bench/             workspace (snapshots, protected paths), verify, run (container, trace, pass@k),
                    mutate, audit, cli
 agents/stub.py     the stub agent (stdlib only, runs in the container)
+agents/llm.py      the local-model agent, with or without the file hint (stdlib only, runs in the container)
 infra/             compose file for the brokers, native Kafka script
-scripts/           author_patches.py (writes the patches), render_readme.py (fills the tables above)
+scripts/           author_patches.py (writes the patches), render_readme.py (fills the tables above),
+                   llm_analysis.py (what the model attempts did), the raw measurements behind results/raw/
 results/           every number in this README, raw
 ```
